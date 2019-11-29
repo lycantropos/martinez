@@ -50,9 +50,10 @@ class BuildExt(build_ext):
                              'unix': []})
 
     if sys.platform == 'darwin':
-        darwin_opts = ['-stdlib=libc++', '-mmacosx-version-min=10.7']
-        compile_args['unix'] += darwin_opts
-        link_args['unix'] += darwin_opts
+        darwin_args = ['-stdlib=libc++', '-mmacosx-version-min=10.7',
+                       '-fno-sized-deallocation']
+        compile_args['unix'] += darwin_args
+        link_args['unix'] += darwin_args
 
     def build_extensions(self):
         compiler_type = self.compiler.compiler_type
