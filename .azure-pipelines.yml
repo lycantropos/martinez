@@ -53,7 +53,13 @@ jobs:
         displayName: 'Upload coverage'
         env:
           CODECOV_TOKEN: $(CODECOV_TOKEN)
-      - script: build.bat
+      - script: python -m pip install --upgrade cibuildwheel
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        displayName: 'Install build requirements'
+      - bash:
+          CIBW_BEFORE_BUILD='python -m pip install -r requirements.txt'
+          CIBW_BUILD=$(python -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")')
+          cibuildwheel --output-dir dist
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
         displayName: 'Build wheels'
       - script: python -m pip install --upgrade twine
