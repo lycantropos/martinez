@@ -42,36 +42,34 @@ def cpp_flag(compiler: CCompiler) -> str:
 
 class BuildExt(build_ext):
     """A custom build extension for adding compiler-specific options."""
-    c_opts = defaultdict(list,
-                         {'msvc': ['/EHsc'],
-                          'unix': []})
-    l_opts = defaultdict(list,
-                         {'msvc': [],
-                          'unix': []})
+    compile_args = defaultdict(list,
+                               {'msvc': ['/EHsc'],
+                                'unix': []})
+    link_args = defaultdict(list,
+                            {'msvc': [],
+                             'unix': []})
 
     if sys.platform == 'darwin':
         darwin_opts = ['-stdlib=libc++', '-mmacosx-version-min=10.7']
-        c_opts['unix'] += darwin_opts
-        l_opts['unix'] += darwin_opts
+        compile_args['unix'] += darwin_opts
+        link_args['unix'] += darwin_opts
 
     def build_extensions(self):
         compiler_type = self.compiler.compiler_type
-        print('compiler type', compiler_type)
-        opts = self.c_opts[compiler_type]
-        link_opts = self.l_opts[compiler_type]
+        compile_args = self.compile_args[compiler_type]
+        link_args = self.link_args[compiler_type]
         if compiler_type == 'unix':
-            opts.append('-DVERSION_INFO="{}"'
-                        .format(self.distribution.get_version()))
-            opts.append(cpp_flag(self.compiler))
+            compile_args.append(cpp_flag(self.compiler))
             if has_flag(self.compiler, '-fvisibility=hidden'):
-                opts.append('-fvisibility=hidden')
-        elif compiler_type == 'msvc':
-            opts.append('/DVERSION_INFO=\\"{}\\"'
-                        .format(self.distribution.get_version()))
-        for ext in self.extensions:
-            ext.extra_compile_args = opts
-            ext.extra_link_args = link_opts
-        build_ext.build_extensions(self)
+                compile_args.append('-fvisibility=hidden')
+        define_macros = [('VERSION_INFO',
+                          ('\\"{}\\"' if compiler_type == 'msvc' else '"{}"')
+                          .format(self.distribution.get_version()))]
+        for extension in self.extensions:
+            extension.extra_compile_args = compile_args
+            extension.extra_link_args = link_args
+            extension.define_macros = define_macros
+        super().build_extensions()
 
 
 project_base_url = 'https://github.com/lycantropos/martinez/'
