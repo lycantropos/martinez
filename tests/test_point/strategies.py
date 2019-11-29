@@ -1,4 +1,4 @@
 from hypothesis import strategies
 
-coordinates = strategies.floats(allow_nan=True,
+coordinates = strategies.floats(allow_nan=False,
                                 allow_infinity=True)
