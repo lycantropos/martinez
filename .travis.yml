@@ -31,7 +31,9 @@ script:
 after_success:
   - python -m codecov -f coverage.xml -X gcov
   - python -m pip install --upgrade twine cibuildwheel
-  - CIBW_BUILD=$(python -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")') cibuildwheel --output-dir dist
+  - CIBW_BEFORE_BUILD='python -m pip install -r requirements.txt'
+    CIBW_BUILD=$(python -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")')
+    cibuildwheel --output-dir dist
 
 deploy:
   provider: script
