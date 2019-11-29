@@ -2,7 +2,7 @@ martinez
 ========
 
 [![](https://travis-ci.com/lycantropos/martinez.svg?branch=master)](https://travis-ci.com/lycantropos/martinez "Travis CI")
-[![](https://dev.azure.com/lycantropos/martinez/_apis/build/status/lycantropos.martinez?branchName=master)](https://dev.azure.com/lycantropos/martinez/_build/latest?branchName=master "Azure Pipelines")
+[![](https://dev.azure.com/lycantropos/martinez/_apis/build/status/lycantropos.martinez?branchName=master)](https://dev.azure.com/lycantropos/martinez/_build/latest?definitionId=15&branchName=master "Azure Pipelines")
 [![](https://codecov.io/gh/lycantropos/martinez/branch/master/graph/badge.svg)](https://codecov.io/gh/lycantropos/martinez "Codecov")
 [![](https://img.shields.io/github/license/lycantropos/martinez.svg)](https://github.com/lycantropos/martinez/blob/master/LICENSE "License")
 [![](https://badge.fury.io/py/martinez.svg)](https://badge.fury.io/py/martinez "PyPI")
