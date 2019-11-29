@@ -2,6 +2,8 @@ sudo: false
 distro: xenial
 
 language: python
+services:
+  - docker
 
 matrix:
   include:
@@ -9,6 +11,11 @@ matrix:
     - python: 3.6
     - python: 3.7
     - python: 3.8
+
+env:
+  global:
+    - TWINE_USERNAME=__token__
+    - secure: xwkpuZv4jh8lAGnWS2Yu06rrvCsp3eZpPSOxjwiKMm8kwdCoqhz7nfpz3cC1HLvQJiIEX6FrZB6FBtw44/eJInM0p4yDnxKmEyqha8W+oLgMamEc5jw2lqHDrn7CZh8t/nVtw23Zw+wbLjvS6mSL5EUIFBDjDMsWz4Mqaj7iiwyqYWoCRoUkhYHJNvu6YYnjJpSdLT2Um4jD98rM5BZRybcSRvBSTJ+69IYBBtzLIY7wqNXiSGYRysowKSnM5290wdm7qIdrccrjOuhobNNbAta5xwO0hjCnIK65zqvH6wv1NkFtKcUjREut0zpVnWsm3SDclPiZrVAaDjw0WyR9u/Jzb+xJKhOke/tABD7vcTY/UfMX4W6lRZEz5CrPkl0Tq+Z7b34BcoD5Q3oud4CbqMilqdjjdHA9jtT5y1KUDZBEqt3811ZCY8N9g5DtYm0lVIbAojw00vrTNqMfF34k0NXTT686uuI2dT4qKPdkXiwSU9ssviKmEqY6ezw+Iz9RfDQP6DD3+66j3J2cIl8aRcZ/AEZMK6xZDOMB0kJQZqJOYDms9hyKQ1I2UyudXafVIlFfRTH6290qIOeGGiCZEX76EHKX1S+KRNJ9gjZGWelz+LsQ8XHmTl04nvNE/HS/0iv5GzDpLxHXgM1QxJF2ehoK4/JwB6MMiXggq7Cnt7E=
 
 install:
   - python -m pip install --upgrade pip setuptools
@@ -23,13 +30,12 @@ script:
 
 after_success:
   - python -m codecov -f coverage.xml -X gcov
+  - python -m pip install --upgrade twine cibuildwheel
+  - CIBW_BUILD=$(python -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")') cibuildwheel --output-dir dist
 
 deploy:
-  provider: pypi
-  user: __token__
-  password:
-    secure: dFv1Ro2yYaUe1rui095swH8577anwkY/NBlQ0S7YuLImKunHIFLzn1oKQ1GT9xcn+4A0zAK9qx0vE7Wa1yDSFeful3fDqEgLDxwqaio3gqbbcHP9gm0dmHR3dSGUtz5r2015al4rDD8yEPfSZLOQBRsHnnQloinJOlrtnO4PySD0MmeCICV8GT+DEXxa61dosoam75R8FmA1DSYraf0T75aEIF6faxMABC3LWxIaK/AZGsOrDVmOS8MEdvu8DK19fvzXy9GTIdIONFd0e1s2P4EmTz2wO85qCJA9byw66SrOCwpN8dnS0EoV7Ml7+yVGH/wAS0ZxGo6kmpvSGE1+ASzu2qaWitry6os/3aMLaQncxQeDAghM1KQo19wjxw+4sB97+TG6uv2lNq9xcro0yv1qU+cxeMlzP1NP6CJyY7iiEI0eG523gCEg+vMy2Y8Bvs25YzJ84t18eF+6TQBF4QsgvN+f9BRpDLB2RgcKAi+AVQlddI7YKpOp8fjRBmjqtkxoWY3EffvSDY6I3wO4Nfu9964+NwsF5zGU7RS2rqmgWCH8bjoD4AZla7dyozBnFKBC0u+vRhxVa3E04nKfT7d713e3XJJytQAwjv2PckS96lyQWymPOJD9uRGAq++EKBShisTnEme2G7r0seF2S0BbkfseXpC01vYlj550hTA=
-  distributions: "sdist bdist_wheel"
-  skip_existing: true
+  provider: script
+  script: twine upload --skip-existing dist/*
+  skip_cleanup: true
   on:
     branch: master
