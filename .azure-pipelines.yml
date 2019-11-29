@@ -56,6 +56,9 @@ jobs:
       - script: build.bat
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
         displayName: 'Build wheels'
+      - script: python -m pip install --upgrade twine
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        displayName: 'Install deployment requirements'
       - script: twine upload --skip-existing dist/*
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
         displayName: 'Deploy wheels'

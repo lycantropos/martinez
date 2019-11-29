@@ -31,6 +31,7 @@ script:
 after_success:
   - python -m codecov -f coverage.xml -X gcov
   - bash build.sh
+  - python -m pip install --upgrade twine
 
 deploy:
   provider: script
