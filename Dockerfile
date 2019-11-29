@@ -20,4 +20,4 @@ COPY src src/
 COPY martinez martinez/
 COPY tests/ tests/
 
-RUN python -m pip install -e .
+RUN python -m pip install .

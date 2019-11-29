@@ -22,7 +22,7 @@ install:
   - python -m pip install --upgrade codecov
   - python -m pip install --force-reinstall -r requirements.txt
   - python -m pip install --force-reinstall -r requirements-tests.txt
-  - python -m pip install -e .
+  - python -m pip install .
 
 script:
   - pytest
@@ -31,7 +31,6 @@ script:
 after_success:
   - python -m codecov -f coverage.xml -X gcov
   - python -m pip install --upgrade twine cibuildwheel
-  - find . -type f -iname '*.so' -delete
   - CIBW_BEFORE_BUILD='python -m pip install -r requirements.txt'
     CIBW_BUILD=$(python -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")')
     cibuildwheel --output-dir dist
