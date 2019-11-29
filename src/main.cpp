@@ -1,61 +1,27 @@
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <string>
+#include <pybind11/pybind11.h>
 
-#include "booleanop.h"
+#include "point_2.h"
 
-void fatalError(const std::string& message, int exitCode) {
-  std::cerr << message;
-  exit(exitCode);
-}
+namespace py = pybind11;
 
-int main(int argc, char* argv[]) {
-  std::string paramError =
-      "Syntax: " + std::string(argv[0]) + " subject clipping [I|U|D|X]\n";
-  paramError +=
-      "\tThe last parameter is optional. It can be I (Intersection), U "
-      "(Union), D (Difference) or X (eXclusive or)\n";
-  paramError += "\tThe last parameter default value is I\n";
-  if (argc < 3) fatalError(paramError, 1);
-  const std::string ope = "IUDX";
-  if (argc > 3 && ope.find(argv[3][0]) == std::string::npos)
-    fatalError(paramError, 2);
+PYBIND11_MODULE(_martinez, m) {
+  m.doc() = R"pbdoc(
+        Python binding of polygon clipping algorithm by F. Martínez et al.
+        ------------------------------------------------------------------
+        .. currentmodule: martinez
+        .. autosummary::
+           :toctree: _generate
 
-  cbop::Polygon subj, clip;
-  if (!subj.open(argv[1])) {
-    std::string fileError =
-        std::string(argv[1]) + " does not exist or has a bad format\n";
-    fatalError(fileError, 3);
-  }
-  if (!clip.open(argv[2])) {
-    std::string fileError =
-        std::string(argv[2]) + " does not exist or has a bad format\n";
-    fatalError(fileError, 3);
-  }
-  // The parameters are correct
-  cbop::BooleanOpType op = cbop::INTERSECTION;
+    )pbdoc";
 
-  if (argc > 3) {
-    switch (argv[3][0]) {
-      case 'U':
-        op = cbop::UNION;
-        break;
-      case 'D':
-        op = cbop::DIFFERENCE;
-        break;
-      case 'X':
-        op = cbop::XOR;
-        break;
-    }
-  }
+  py::class_<cbop::Point_2>(m, "Point_2")
+      .def(py::init<double, double>(), py::arg("x")=0., py::arg("y")=0.)
+      .def_property_readonly("x", &cbop::Point_2::x)
+      .def_property_readonly("y", &cbop::Point_2::y);
 
-  cbop::Polygon result;
-  clock_t start = clock();
-  cbop::compute(subj, clip, result, op);
-  clock_t stop = clock();
-  std::cout << (stop - start) / double(CLOCKS_PER_SEC) << " seconds\n";
-  //	std::cout << result;
-  return 0;
+#ifdef VERSION_INFO
+          m.attr("__version__") = VERSION_INFO;
+#else
+          m.attr("__version__") = "dev";
+#endif
 }

@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  martinez:
+    build:
+      context: .
+      args:
+        - PYTHON_IMAGE=${CPYTHON_IMAGE_NAME}
+        - PYTHON_IMAGE_VERSION=${CPYTHON_IMAGE_VERSION}
+    image: lycantropos/martinez-cpython:0.0.0
+    volumes:
+      - ./martinez/:/opt/martinez/martinez/
+      - ./tests/:/opt/martinez/tests/
+      - ./README.md:/opt/martinez/README.md
+      - ./requirements.txt:/opt/martinez/requirements.txt
+      - ./requirements-tests.txt:/opt/martinez/requirements-tests.txt
+      - ./setup.py:/opt/martinez/setup.py
+      - ./pytest.ini:/opt/martinez/pytest.ini
+    entrypoint: pytest
