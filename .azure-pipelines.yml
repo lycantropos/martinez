@@ -53,3 +53,12 @@ jobs:
         displayName: 'Upload coverage'
         env:
           CODECOV_TOKEN: $(CODECOV_TOKEN)
+      - script: build.bat
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        displayName: 'Build wheels'
+      - script: twine upload --skip-existing dist/*
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        displayName: 'Deploy wheels'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: $(TWINE_PASSWORD)
