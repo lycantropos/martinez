@@ -1,3 +1,4 @@
+import math
 from typing import Tuple
 
 from hypothesis import given
@@ -33,6 +34,9 @@ def test_triangle_inequality(points_triplet: Tuple[Point, Point, Point]
                              ) -> None:
     first_point, second_point, third_point = points_triplet
 
-    assert (first_point.distance_to(second_point)
-            <= (first_point.distance_to(third_point)
-                + third_point.distance_to(second_point)))
+    straight_distance = first_point.distance_to(second_point)
+    workaround_distance = (first_point.distance_to(third_point)
+                           + third_point.distance_to(second_point))
+
+    assert (straight_distance <= workaround_distance
+            or math.isclose(straight_distance, workaround_distance))
