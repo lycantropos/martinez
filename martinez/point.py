@@ -19,3 +19,9 @@ class Point:
     @property
     def y(self) -> Scalar:
         return self._y
+
+    def __eq__(self, other: 'Point') -> bool:
+        if not isinstance(other, Point):
+            return NotImplemented
+        else:
+            return self._x == other._x and self._y == other._y
