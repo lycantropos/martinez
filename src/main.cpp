@@ -21,7 +21,7 @@ PYBIND11_MODULE(_martinez, m) {
              stream << self;
              return std::string(stream.str());
            })
-      .def("dist", &cbop::Point_2::dist)
+      .def("distance_to", &cbop::Point_2::dist)
       .def_property_readonly("x", &cbop::Point_2::x)
       .def_property_readonly("y", &cbop::Point_2::y);
 
