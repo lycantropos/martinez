@@ -1,3 +1,6 @@
+from typing import Any
+
+import pytest
 from _martinez import Point_2
 from hypothesis import given
 
@@ -31,3 +34,9 @@ def test_connection_with_inequality(first_point: Point_2,
                                     second_point: Point_2) -> None:
     assert equivalence(not first_point == second_point,
                        first_point != second_point)
+
+
+@given(strategies.points, strategies.non_points)
+def test_non_point(point: Point_2, non_point: Any) -> None:
+    with pytest.raises(TypeError):
+        assert point == non_point
