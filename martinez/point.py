@@ -29,4 +29,4 @@ class Point:
             return self._x == other._x and self._y == other._y
 
     def distance_to(self, other: 'Point') -> Scalar:
-        return math.sqrt((self._x - other._x) ** 2 - (self._y - other._y) ** 2)
+        return math.sqrt((self._x - other._x) ** 2 + (self._y - other._y) ** 2)
