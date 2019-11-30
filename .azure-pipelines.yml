@@ -90,7 +90,6 @@ jobs:
       - task: UsePythonVersion@0
         inputs:
           versionSpec: '$(python.version)'
-          architecture: '$(python.architecture)'
       - script: python -m pip install --upgrade pip setuptools
         displayName: 'Install packaging tools'
       - script: python -m pip install --upgrade codecov
