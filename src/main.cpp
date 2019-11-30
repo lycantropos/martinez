@@ -7,11 +7,6 @@ namespace py = pybind11;
 PYBIND11_MODULE(_martinez, m) {
   m.doc() = R"pbdoc(
         Python binding of polygon clipping algorithm by F. Martínez et al.
-        ------------------------------------------------------------------
-        .. currentmodule: martinez
-        .. autosummary::
-           :toctree: _generate
-
     )pbdoc";
 
   py::class_<cbop::Point_2>(m, "Point_2")
