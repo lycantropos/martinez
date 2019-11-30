@@ -27,7 +27,7 @@ class Point_2 {
   double y() const { return _y; }
   Bbox_2 bbox() const { return Bbox_2(_x, _y, _x, _y); }
   /** Distance to other point */
-  float dist(const Point_2& p) const {
+  double dist(const Point_2& p) const {
     double dx = x() - p.x();
     double dy = y() - p.y();
     return sqrt(dx * dx + dy * dy);
