@@ -1,3 +1,5 @@
+import math
+
 from reprit.base import generate_repr
 
 from .hints import Scalar
@@ -25,3 +27,6 @@ class Point:
             return NotImplemented
         else:
             return self._x == other._x and self._y == other._y
+
+    def distance_to(self, other: 'Point') -> Scalar:
+        return math.sqrt((self._x - other._x) ** 2 - (self._y - other._y) ** 2)
