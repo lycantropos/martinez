@@ -18,6 +18,7 @@ PYBIND11_MODULE(_martinez, m) {
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
       .def("__eq__", [](const cbop::Point_2& self,
                         const cbop::Point_2& other) { return self == other; })
+      .def("dist", &cbop::Point_2::dist)
       .def_property_readonly("x", &cbop::Point_2::x)
       .def_property_readonly("y", &cbop::Point_2::y);
 
