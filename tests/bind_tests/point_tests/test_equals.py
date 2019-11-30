@@ -1,8 +1,8 @@
 from _martinez import Point_2
 from hypothesis import given
+
 from tests.utils import (equivalence,
                          implication)
-
 from . import strategies
 
 
