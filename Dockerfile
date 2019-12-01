@@ -14,10 +14,10 @@ COPY requirements-tests.txt .
 RUN python -m pip install --force-reinstall -r requirements-tests.txt
 
 COPY README.md .
-COPY pytest.ini .
 COPY setup.py .
 COPY src src/
 COPY martinez martinez/
-COPY tests/ tests/
-
 RUN python -m pip install .
+
+COPY pytest.ini .
+COPY tests/ tests/
