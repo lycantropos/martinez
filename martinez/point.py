@@ -2,6 +2,7 @@ import math
 
 from reprit.base import generate_repr
 
+from .bounding_box import BoundingBox
 from .hints import Scalar
 
 
@@ -21,6 +22,10 @@ class Point:
     @property
     def y(self) -> Scalar:
         return self._y
+
+    @property
+    def bounding_box(self) -> BoundingBox:
+        return BoundingBox(self._x, self._y, self._x, self._y)
 
     def __eq__(self, other: 'Point') -> bool:
         return (self._x == other._x and self._y == other._y
