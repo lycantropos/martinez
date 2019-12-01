@@ -1,12 +1,17 @@
+from typing import Tuple
+
 from hypothesis import given
 
 from martinez.bounding_box import BoundingBox
+from martinez.hints import Scalar
 from . import strategies
 
 
-@given(strategies.floats, strategies.floats,
-       strategies.floats, strategies.floats)
-def test_basic(x_min: float, x_max: float, y_min: float, y_max: float) -> None:
+@given(strategies.scalars_quadruples)
+def test_basic(scalars_quadruple: Tuple[Scalar, Scalar, Scalar, Scalar]
+               ) -> None:
+    x_min, y_min, x_max, y_max = scalars_quadruple
+
     result = BoundingBox(x_min, y_min, x_max, y_max)
 
     assert result.x_min == x_min
