@@ -23,10 +23,9 @@ class Point:
         return self._y
 
     def __eq__(self, other: 'Point') -> bool:
-        if not isinstance(other, Point):
-            return NotImplemented
-        else:
-            return self._x == other._x and self._y == other._y
+        return (self._x == other._x and self._y == other._y
+                if isinstance(other, Point)
+                else NotImplemented)
 
     def distance_to(self, other: 'Point') -> Scalar:
         return math.sqrt((self._x - other._x) ** 2 + (self._y - other._y) ** 2)
