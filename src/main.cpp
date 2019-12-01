@@ -7,6 +7,8 @@
 
 namespace py = pybind11;
 
+const std::string module_name = "_martinez";
+
 PYBIND11_MODULE(_martinez, m) {
   m.doc() = R"pbdoc(
         Python binding of polygon clipping algorithm by F. Martínez et al.
@@ -14,14 +16,15 @@ PYBIND11_MODULE(_martinez, m) {
 
   py::class_<cbop::Point_2>(m, "Point")
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
-      .def("__eq__", [](const cbop::Point_2& self,
-                        const cbop::Point_2& other) { return self == other; })
       .def("__repr__",
-           [](const cbop::Point_2& self) {
+           [&](const cbop::Point_2& self) {
              std::ostringstream stream;
-             stream << self;
+             stream << module_name + ".Point(" << self.x() << ", " << self.y()
+                    << ")";
              return std::string(stream.str());
            })
+      .def("__eq__", [](const cbop::Point_2& self,
+                        const cbop::Point_2& other) { return self == other; })
       .def("distance_to", &cbop::Point_2::dist)
       .def_property_readonly("x", &cbop::Point_2::x)
       .def_property_readonly("y", &cbop::Point_2::y)
