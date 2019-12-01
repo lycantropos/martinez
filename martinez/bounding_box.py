@@ -30,3 +30,12 @@ class BoundingBox:
     @property
     def y_max(self) -> Scalar:
         return self._y_max
+
+    def __eq__(self, other: 'BoundingBox') -> bool:
+        if not isinstance(other, BoundingBox):
+            return NotImplemented
+        else:
+            return (self._x_min == other._x_min
+                    and self._y_min == other._y_min
+                    and self._x_max == other._x_max
+                    and self._y_max == other._y_max)
