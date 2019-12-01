@@ -2,6 +2,7 @@
 
 #include <sstream>
 
+#include "bbox_2.h"
 #include "point_2.h"
 
 namespace py = pybind11;
@@ -24,6 +25,14 @@ PYBIND11_MODULE(_martinez, m) {
       .def("distance_to", &cbop::Point_2::dist)
       .def_property_readonly("x", &cbop::Point_2::x)
       .def_property_readonly("y", &cbop::Point_2::y);
+
+  py::class_<cbop::Bbox_2>(m, "BoundingBox")
+      .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
+           py::arg("y_min") = 0., py::arg("x_max") = 0., py::arg("y_max") = 0.)
+      .def_property_readonly("x_min", &cbop::Bbox_2::xmin)
+      .def_property_readonly("y_min", &cbop::Bbox_2::ymin)
+      .def_property_readonly("x_max", &cbop::Bbox_2::xmax)
+      .def_property_readonly("y_max", &cbop::Bbox_2::ymax);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
