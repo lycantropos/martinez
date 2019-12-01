@@ -1,5 +1,3 @@
-from typing import Any
-
 from hypothesis import given
 
 from martinez.bounding_box import BoundingBox
@@ -35,9 +33,3 @@ def test_connection_with_inequality(first_bounding_box: BoundingBox,
                                     second_bounding_box: BoundingBox) -> None:
     assert equivalence(not first_bounding_box == second_bounding_box,
                        first_bounding_box != second_bounding_box)
-
-
-@given(strategies.bounding_boxes, strategies.non_bounding_boxes)
-def test_non_bounding_box(bounding_box: BoundingBox,
-                          non_bounding_box: Any) -> None:
-    assert bounding_box != non_bounding_box

@@ -22,4 +22,3 @@ def scalars_to_bounding_boxes(scalars: Strategy[Scalar]
 
 
 bounding_boxes = scalars_strategies.flatmap(scalars_to_bounding_boxes)
-non_bounding_boxes = strategies.builds(object)
