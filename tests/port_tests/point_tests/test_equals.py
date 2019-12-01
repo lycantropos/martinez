@@ -1,5 +1,3 @@
-from typing import Any
-
 from hypothesis import given
 
 from martinez.point import Point
@@ -33,8 +31,3 @@ def test_connection_with_inequality(first_point: Point,
                                     second_point: Point) -> None:
     assert equivalence(not first_point == second_point,
                        first_point != second_point)
-
-
-@given(strategies.points, strategies.non_points)
-def test_non_point(point: Point, non_point: Any) -> None:
-    assert point != non_point

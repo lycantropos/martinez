@@ -39,4 +39,3 @@ def scalars_to_points_triplets(scalars: Strategy[Scalar]
 
 
 points_triplets = scalars_strategies.flatmap(scalars_to_points_triplets)
-non_points = strategies.builds(object)
