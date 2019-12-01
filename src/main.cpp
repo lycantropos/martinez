@@ -24,7 +24,8 @@ PYBIND11_MODULE(_martinez, m) {
            })
       .def("distance_to", &cbop::Point_2::dist)
       .def_property_readonly("x", &cbop::Point_2::x)
-      .def_property_readonly("y", &cbop::Point_2::y);
+      .def_property_readonly("y", &cbop::Point_2::y)
+      .def_property_readonly("bounding_box", &cbop::Point_2::bbox);
 
   py::class_<cbop::Bbox_2>(m, "BoundingBox")
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
