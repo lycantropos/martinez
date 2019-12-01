@@ -24,7 +24,7 @@ def to_decimals(*,
                 min_value: Optional[Scalar] = None,
                 max_value: Optional[Scalar] = None,
                 allow_nan: bool = False,
-                allow_infinity: bool = False) -> Strategy:
+                allow_infinity: bool = False) -> Strategy[Decimal]:
     return (strategies.floats(min_value=min_value,
                               max_value=max_value,
                               allow_nan=allow_nan,
@@ -36,7 +36,7 @@ def to_floats(*,
               min_value: Optional[Scalar] = None,
               max_value: Optional[Scalar] = None,
               allow_nan: bool = False,
-              allow_infinity: bool = False) -> Strategy:
+              allow_infinity: bool = False) -> Strategy[float]:
     return (strategies.floats(min_value=min_value,
                               max_value=max_value,
                               allow_nan=allow_nan,
@@ -47,7 +47,8 @@ def to_floats(*,
 def to_fractions(*,
                  min_value: Optional[Scalar] = None,
                  max_value: Optional[Scalar] = None,
-                 max_denominator: Optional[Scalar] = None) -> Strategy:
+                 max_denominator: Optional[Scalar] = None
+                 ) -> Strategy[Fraction]:
     return (strategies.fractions(min_value=min_value,
                                  max_value=max_value,
                                  max_denominator=max_denominator)
@@ -56,7 +57,7 @@ def to_fractions(*,
 
 def to_integers(*,
                 min_value: Optional[Scalar] = None,
-                max_value: Optional[Scalar] = None) -> Strategy:
+                max_value: Optional[Scalar] = None) -> Strategy[int]:
     return (strategies.integers(min_value=min_value,
                                 max_value=max_value)
             .map(to_recoverable_significant_digits_count))
