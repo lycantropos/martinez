@@ -11,7 +11,7 @@ PYBIND11_MODULE(_martinez, m) {
         Python binding of polygon clipping algorithm by F. Martínez et al.
     )pbdoc";
 
-  py::class_<cbop::Point_2>(m, "Point_2")
+  py::class_<cbop::Point_2>(m, "Point")
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
       .def("__eq__", [](const cbop::Point_2& self,
                         const cbop::Point_2& other) { return self == other; })

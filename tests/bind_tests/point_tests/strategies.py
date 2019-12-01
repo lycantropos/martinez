@@ -1,7 +1,7 @@
-from _martinez import Point_2
+from _martinez import Point
 from hypothesis import strategies
 
 from tests.strategies import floats
 
-points = strategies.builds(Point_2, floats, floats)
+points = strategies.builds(Point, floats, floats)
 non_points = strategies.builds(object)
