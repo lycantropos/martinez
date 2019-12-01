@@ -39,3 +39,9 @@ class BoundingBox:
                     and self._y_min == other._y_min
                     and self._x_max == other._x_max
                     and self._y_max == other._y_max)
+
+    def __add__(self, other: 'BoundingBox') -> 'BoundingBox':
+        return BoundingBox(min(self._x_min, other._x_min),
+                           min(self._y_min, other._y_min),
+                           max(self._x_max, other._x_max),
+                           max(self._y_max, other._y_max))
