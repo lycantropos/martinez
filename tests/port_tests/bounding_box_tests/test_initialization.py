@@ -1,7 +1,7 @@
 from hypothesis import given
 
 from martinez.bounding_box import BoundingBox
-from tests import strategies
+from . import strategies
 
 
 @given(strategies.floats, strategies.floats,
