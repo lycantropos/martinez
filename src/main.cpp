@@ -38,7 +38,8 @@ PYBIND11_MODULE(_martinez, m) {
       .def_property_readonly("x_min", &cbop::Bbox_2::xmin)
       .def_property_readonly("y_min", &cbop::Bbox_2::ymin)
       .def_property_readonly("x_max", &cbop::Bbox_2::xmax)
-      .def_property_readonly("y_max", &cbop::Bbox_2::ymax);
+      .def_property_readonly("y_max", &cbop::Bbox_2::ymax)
+      .def("__add__", &cbop::Bbox_2::operator+);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
