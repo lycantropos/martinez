@@ -29,6 +29,12 @@ PYBIND11_MODULE(_martinez, m) {
   py::class_<cbop::Bbox_2>(m, "BoundingBox")
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
            py::arg("y_min") = 0., py::arg("x_max") = 0., py::arg("y_max") = 0.)
+      .def("__eq__",
+           [](const cbop::Bbox_2& self, const cbop::Bbox_2& other) {
+             return self.xmin() == other.xmin() &&
+                    self.ymin() == other.ymin() &&
+                    self.xmax() == other.xmax() && self.ymax() == other.ymax();
+           })
       .def_property_readonly("x_min", &cbop::Bbox_2::xmin)
       .def_property_readonly("y_min", &cbop::Bbox_2::ymin)
       .def_property_readonly("x_max", &cbop::Bbox_2::xmax)
