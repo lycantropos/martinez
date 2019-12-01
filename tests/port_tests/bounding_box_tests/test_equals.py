@@ -1,6 +1,5 @@
 from typing import Any
 
-import pytest
 from hypothesis import given
 
 from martinez.bounding_box import BoundingBox
@@ -41,5 +40,4 @@ def test_connection_with_inequality(first_bounding_box: BoundingBox,
 @given(strategies.bounding_boxes, strategies.non_bounding_boxes)
 def test_non_bounding_box(bounding_box: BoundingBox,
                           non_bounding_box: Any) -> None:
-    with pytest.raises(TypeError):
-        assert bounding_box == non_bounding_box
+    assert bounding_box != non_bounding_box
