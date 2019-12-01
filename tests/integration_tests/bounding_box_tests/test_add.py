@@ -15,4 +15,10 @@ def test_basic(first_bound_with_ported_boxes_pair: Tuple[Bound, Ported],
     first_bound, first_ported = first_bound_with_ported_boxes_pair
     second_bound, second_ported = second_bound_with_ported_boxes_pair
 
+    bound_result = first_bound + second_bound
+    ported_result = first_ported + second_ported
 
+    assert bound_result.x_min == ported_result.x_min
+    assert bound_result.y_min == ported_result.y_min
+    assert bound_result.x_max == ported_result.x_max
+    assert bound_result.y_max == ported_result.y_max
