@@ -2,7 +2,7 @@ from _martinez import Point as Bound
 from hypothesis import given
 
 from martinez.point import Point as Ported
-from tests import strategies
+from . import strategies
 
 
 @given(strategies.floats, strategies.floats)
