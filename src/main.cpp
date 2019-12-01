@@ -33,6 +33,14 @@ PYBIND11_MODULE(_martinez, m) {
   py::class_<cbop::Bbox_2>(m, "BoundingBox")
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
            py::arg("y_min") = 0., py::arg("x_max") = 0., py::arg("y_max") = 0.)
+      .def("__repr__",
+           [&](const cbop::Bbox_2& self) {
+             std::ostringstream stream;
+             stream << module_name + ".BoundingBox(" << self.xmin() << ", "
+                    << self.ymin() << ", " << self.xmax() << ", " << self.ymax()
+                    << ")";
+             return std::string(stream.str());
+           })
       .def("__eq__",
            [](const cbop::Bbox_2& self, const cbop::Bbox_2& other) {
              return self.xmin() == other.xmin() &&
