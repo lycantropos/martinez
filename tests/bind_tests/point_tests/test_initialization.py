@@ -1,7 +1,7 @@
 from _martinez import Point
 from hypothesis import given
 
-from tests import strategies
+from . import strategies
 
 
 @given(strategies.floats, strategies.floats)
