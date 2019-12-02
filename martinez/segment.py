@@ -34,3 +34,7 @@ class Segment:
     @property
     def is_degenerate(self) -> bool:
         return self.source == self.target
+
+    @property
+    def is_vertical(self) -> bool:
+        return self.source.x == self.target.x
