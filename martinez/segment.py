@@ -30,3 +30,7 @@ class Segment:
     def min(self) -> Point:
         return min(self.source, self.target,
                    key=points_key)
+
+    @property
+    def is_degenerate(self) -> bool:
+        return self.source == self.target
