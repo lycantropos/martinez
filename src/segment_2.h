@@ -51,9 +51,8 @@ class Segment_2 {
   bool degenerate() const { return s == t; }
   bool is_vertical() const { return s.x() == t.x(); }
   /** Change the segment orientation */
-  Segment_2& changeOrientation() {
-    std::swap(s, t);
-    return *this;
+  Segment_2 changeOrientation() {
+    return Segment_2(t, s);
   }
 
  private:
