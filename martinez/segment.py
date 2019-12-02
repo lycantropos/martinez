@@ -38,3 +38,7 @@ class Segment:
     @property
     def is_vertical(self) -> bool:
         return self.source.x == self.target.x
+
+    @property
+    def reversed(self) -> 'Segment':
+        return Segment(self.target, self.source)
