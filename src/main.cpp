@@ -86,8 +86,10 @@ PYBIND11_MODULE(MODULE_NAME, m) {
              return self.source() == other.source() &&
                     self.target() == other.target();
            })
-      .def_property_readonly("source", &cbop::Segment_2::source)
-      .def_property_readonly("target", &cbop::Segment_2::target);
+      .def_property("source", &cbop::Segment_2::source,
+                    &cbop::Segment_2::setSource)
+      .def_property("target", &cbop::Segment_2::target,
+                    &cbop::Segment_2::setTarget);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
