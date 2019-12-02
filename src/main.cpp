@@ -1,5 +1,7 @@
 #include <pybind11/pybind11.h>
 
+#include <iomanip>
+#include <limits>
 #include <sstream>
 
 #include "bbox_2.h"
@@ -7,9 +9,11 @@
 
 namespace py = pybind11;
 
-const std::string module_name = "_martinez";
+#define MODULE_NAME _martinez
+#define C_STR_HELPER(a) #a
+#define C_STR(a) C_STR_HELPER(a)
 
-PYBIND11_MODULE(_martinez, m) {
+PYBIND11_MODULE(MODULE_NAME, m) {
   m.doc() = R"pbdoc(
         Python binding of polygon clipping algorithm by F. Martínez et al.
     )pbdoc";
@@ -17,10 +21,11 @@ PYBIND11_MODULE(_martinez, m) {
   py::class_<cbop::Point_2>(m, "Point")
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
       .def("__repr__",
-           [&](const cbop::Point_2& self) {
+           [](const cbop::Point_2& self) {
              std::ostringstream stream;
-             stream << module_name + ".Point(" << self.x() << ", " << self.y()
-                    << ")";
+             stream.precision(std::numeric_limits<double>::digits10);
+             stream << std::fixed << C_STR(MODULE_NAME) ".Point(" << self.x()
+                    << ", " << self.y() << ")";
              return std::string(stream.str());
            })
       .def("__eq__", [](const cbop::Point_2& self,
@@ -34,11 +39,12 @@ PYBIND11_MODULE(_martinez, m) {
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
            py::arg("y_min") = 0., py::arg("x_max") = 0., py::arg("y_max") = 0.)
       .def("__repr__",
-           [&](const cbop::Bbox_2& self) {
+           [](const cbop::Bbox_2& self) {
              std::ostringstream stream;
-             stream << module_name + ".BoundingBox(" << self.xmin() << ", "
-                    << self.ymin() << ", " << self.xmax() << ", " << self.ymax()
-                    << ")";
+             stream.precision(std::numeric_limits<double>::digits10);
+             stream << std::fixed << C_STR(MODULE_NAME) ".BoundingBox("
+                    << self.xmin() << ", " << self.ymin() << ", " << self.xmax()
+                    << ", " << self.ymax() << ")";
              return std::string(stream.str());
            })
       .def("__eq__",
