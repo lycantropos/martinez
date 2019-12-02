@@ -6,6 +6,7 @@
 
 #include "bbox_2.h"
 #include "point_2.h"
+#include "segment_2.h"
 
 namespace py = pybind11;
 
@@ -58,6 +59,13 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("x", &cbop::Point_2::x)
       .def_property_readonly("y", &cbop::Point_2::y)
       .def_property_readonly("bounding_box", &cbop::Point_2::bbox);
+
+  py::class_<cbop::Segment_2>(m, "Segment")
+      .def(py::init<cbop::Point_2, cbop::Point_2>(),
+           py::arg("source") = cbop::Point_2(),
+           py::arg("target") = cbop::Point_2())
+      .def_property_readonly("source", &cbop::Segment_2::source)
+      .def_property_readonly("target", &cbop::Segment_2::target);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
