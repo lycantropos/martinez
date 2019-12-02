@@ -25,3 +25,8 @@ class Segment:
     def max(self) -> Point:
         return max(self.source, self.target,
                    key=points_key)
+
+    @property
+    def min(self) -> Point:
+        return min(self.source, self.target,
+                   key=points_key)
