@@ -89,7 +89,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property("source", &cbop::Segment_2::source,
                     &cbop::Segment_2::setSource)
       .def_property("target", &cbop::Segment_2::target,
-                    &cbop::Segment_2::setTarget);
+                    &cbop::Segment_2::setTarget)
+      .def_property_readonly("max", &cbop::Segment_2::max);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
