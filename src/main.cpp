@@ -15,12 +15,20 @@ namespace py = pybind11;
 #define C_STR(a) C_STR_HELPER(a)
 #define BOUNDING_BOX_NAME "BoundingBox"
 #define POINT_NAME "Point"
+#define SEGMENT_NAME "Segment"
 
 std::ostringstream make_stream() {
   std::ostringstream stream;
   stream.precision(std::numeric_limits<double>::digits10);
   stream << std::fixed;
   return stream;
+}
+
+std::string point_repr(const cbop::Point_2& self) {
+  auto stream = make_stream();
+  stream << C_STR(MODULE_NAME) "." POINT_NAME "(" << self.x() << ", "
+         << self.y() << ")";
+  return stream.str();
 }
 
 PYBIND11_MODULE(MODULE_NAME, m) {
@@ -53,13 +61,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
-      .def("__repr__",
-           [](const cbop::Point_2& self) -> std::string {
-             auto stream = make_stream();
-             stream << C_STR(MODULE_NAME) "." POINT_NAME "(" << self.x() << ", "
-                    << self.y() << ")";
-             return stream.str();
-           })
+      .def("__repr__", point_repr)
       .def("__eq__", [](const cbop::Point_2& self,
                         const cbop::Point_2& other) { return self == other; })
       .def("distance_to", &cbop::Point_2::dist)
@@ -67,10 +69,18 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("y", &cbop::Point_2::y)
       .def_property_readonly("bounding_box", &cbop::Point_2::bbox);
 
-  py::class_<cbop::Segment_2>(m, "Segment")
+  py::class_<cbop::Segment_2>(m, SEGMENT_NAME)
       .def(py::init<cbop::Point_2, cbop::Point_2>(),
            py::arg("source") = cbop::Point_2(),
            py::arg("target") = cbop::Point_2())
+      .def("__repr__",
+           [](const cbop::Segment_2& self) -> std::string {
+             auto stream = make_stream();
+             stream << C_STR(MODULE_NAME) "." SEGMENT_NAME "("
+                    << point_repr(self.source()) << ", "
+                    << point_repr(self.target()) << ")";
+             return stream.str();
+           })
       .def("__eq__",
            [](const cbop::Segment_2& self, const cbop::Segment_2& other) {
              return self.source() == other.source() &&
