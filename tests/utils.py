@@ -1,7 +1,9 @@
-from _martinez import BoundingBox as BoundBoundingBox
+from _martinez import (BoundingBox as BoundBoundingBox,
+                       Point as BoundPoint)
 from hypothesis.searchstrategy import SearchStrategy
 
 from martinez.bounding_box import BoundingBox as PortedBoundingBox
+from martinez.point import Point as PortedPoint
 
 Strategy = SearchStrategy
 
@@ -21,3 +23,8 @@ def are_bound_ported_bounding_boxes_equal(
             and bound_bounding_box.y_min == ported_bounding_box.y_min
             and bound_bounding_box.x_max == ported_bounding_box.x_max
             and bound_bounding_box.y_max == ported_bounding_box.y_max)
+
+
+def are_bound_ported_points_equal(bound_point: BoundPoint,
+                                  ported_point: PortedPoint) -> bool:
+    return bound_point.x == ported_point.x and bound_point.y == ported_point.y
