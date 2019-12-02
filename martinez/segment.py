@@ -1,3 +1,5 @@
+from reprit.base import generate_repr
+
 from .point import Point
 
 
@@ -7,6 +9,8 @@ class Segment:
     def __init__(self, source: Point, target: Point):
         self._source = source
         self._target = target
+
+    __repr__ = generate_repr(__init__)
 
     @property
     def source(self) -> Point:
