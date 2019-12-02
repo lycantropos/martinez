@@ -1,6 +1,10 @@
+from operator import attrgetter
+
 from reprit.base import generate_repr
 
 from .point import Point
+
+points_key = attrgetter('x', 'y')
 
 
 class Segment:
@@ -16,3 +20,8 @@ class Segment:
         return (self.source == other.source and self.target == other.target
                 if isinstance(other, Segment)
                 else NotImplemented)
+
+    @property
+    def max(self) -> Point:
+        return max(self.source, self.target,
+                   key=points_key)
