@@ -20,7 +20,7 @@ namespace py = pybind11;
 std::ostringstream make_stream() {
   std::ostringstream stream;
   stream.precision(std::numeric_limits<double>::digits10);
-  stream << std::fixed;
+  stream.setf(std::ios::fixed);
   return stream;
 }
 
