@@ -91,7 +91,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property("target", &cbop::Segment_2::target,
                     &cbop::Segment_2::setTarget)
       .def_property_readonly("max", &cbop::Segment_2::max)
-      .def_property_readonly("min", &cbop::Segment_2::min);
+      .def_property_readonly("min", &cbop::Segment_2::min)
+      .def_property_readonly("is_degenerate", &cbop::Segment_2::degenerate);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
