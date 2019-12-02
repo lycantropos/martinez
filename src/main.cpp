@@ -71,6 +71,11 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def(py::init<cbop::Point_2, cbop::Point_2>(),
            py::arg("source") = cbop::Point_2(),
            py::arg("target") = cbop::Point_2())
+      .def("__eq__",
+           [](const cbop::Segment_2& self, const cbop::Segment_2& other) {
+             return self.source() == other.source() &&
+                    self.target() == other.target();
+           })
       .def_property_readonly("source", &cbop::Segment_2::source)
       .def_property_readonly("target", &cbop::Segment_2::target);
 
