@@ -1,9 +1,11 @@
 from _martinez import (BoundingBox as BoundBoundingBox,
-                       Point as BoundPoint)
+                       Point as BoundPoint,
+                       Segment as BoundSegment)
 from hypothesis.searchstrategy import SearchStrategy
 
 from martinez.bounding_box import BoundingBox as PortedBoundingBox
 from martinez.point import Point as PortedPoint
+from martinez.segment import Segment as PortedSegment
 
 Strategy = SearchStrategy
 
@@ -28,3 +30,11 @@ def are_bound_ported_bounding_boxes_equal(
 def are_bound_ported_points_equal(bound_point: BoundPoint,
                                   ported_point: PortedPoint) -> bool:
     return bound_point.x == ported_point.x and bound_point.y == ported_point.y
+
+
+def are_bound_ported_segments_equal(bound_segment: BoundSegment,
+                                    ported_segment: PortedSegment) -> bool:
+    return (are_bound_ported_points_equal(bound_segment.source,
+                                          ported_segment.source)
+            and are_bound_ported_points_equal(bound_segment.target,
+                                              ported_segment.target))
