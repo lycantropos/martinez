@@ -7,6 +7,10 @@ from martinez.point import Point
 from tests.utils import Strategy
 
 
+def scalars_to_points(scalars: Strategy[Scalar]) -> Strategy[Point]:
+    return strategies.builds(Point, scalars, scalars)
+
+
 def scalars_to_points_pairs(scalars: Strategy[Scalar]
                             ) -> Strategy[Tuple[Point, Point]]:
     points_strategy = strategies.builds(Point, scalars, scalars)

@@ -5,6 +5,7 @@ from hypothesis import strategies
 from martinez.hints import Scalar
 from martinez.point import Point
 from tests.strategies import (scalars_strategies,
+                              scalars_to_points,
                               scalars_to_points_pairs)
 from tests.utils import Strategy
 
@@ -15,12 +16,6 @@ def scalars_to_pairs(scalars: Strategy[Scalar]
 
 
 scalars_pairs = scalars_strategies.flatmap(scalars_to_pairs)
-
-
-def scalars_to_points(scalars: Strategy[Scalar]) -> Strategy[Point]:
-    return strategies.builds(Point, scalars, scalars)
-
-
 points = scalars_strategies.flatmap(scalars_to_points)
 points_pairs = scalars_strategies.flatmap(scalars_to_points_pairs)
 
