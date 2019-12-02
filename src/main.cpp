@@ -13,23 +13,31 @@ namespace py = pybind11;
 #define MODULE_NAME _martinez
 #define C_STR_HELPER(a) #a
 #define C_STR(a) C_STR_HELPER(a)
+#define BOUNDING_BOX_NAME "BoundingBox"
+#define POINT_NAME "Point"
+
+std::ostringstream make_stream() {
+  std::ostringstream stream;
+  stream.precision(std::numeric_limits<double>::digits10);
+  stream << std::fixed;
+  return stream;
+}
 
 PYBIND11_MODULE(MODULE_NAME, m) {
   m.doc() = R"pbdoc(
         Python binding of polygon clipping algorithm by F. Martínez et al.
     )pbdoc";
 
-  py::class_<cbop::Bbox_2>(m, "BoundingBox")
+  py::class_<cbop::Bbox_2>(m, BOUNDING_BOX_NAME)
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
            py::arg("y_min") = 0., py::arg("x_max") = 0., py::arg("y_max") = 0.)
       .def("__repr__",
-           [](const cbop::Bbox_2& self) {
-             std::ostringstream stream;
-             stream.precision(std::numeric_limits<double>::digits10);
-             stream << std::fixed << C_STR(MODULE_NAME) ".BoundingBox("
+           [](const cbop::Bbox_2& self) -> std::string {
+             auto stream = make_stream();
+             stream << C_STR(MODULE_NAME) "." BOUNDING_BOX_NAME "("
                     << self.xmin() << ", " << self.ymin() << ", " << self.xmax()
                     << ", " << self.ymax() << ")";
-             return std::string(stream.str());
+             return stream.str();
            })
       .def("__eq__",
            [](const cbop::Bbox_2& self, const cbop::Bbox_2& other) {
@@ -43,15 +51,14 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("y_max", &cbop::Bbox_2::ymax)
       .def("__add__", &cbop::Bbox_2::operator+);
 
-  py::class_<cbop::Point_2>(m, "Point")
+  py::class_<cbop::Point_2>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
       .def("__repr__",
-           [](const cbop::Point_2& self) {
-             std::ostringstream stream;
-             stream.precision(std::numeric_limits<double>::digits10);
-             stream << std::fixed << C_STR(MODULE_NAME) ".Point(" << self.x()
-                    << ", " << self.y() << ")";
-             return std::string(stream.str());
+           [](const cbop::Point_2& self) -> std::string {
+             auto stream = make_stream();
+             stream << C_STR(MODULE_NAME) "." POINT_NAME "(" << self.x() << ", "
+                    << self.y() << ")";
+             return stream.str();
            })
       .def("__eq__", [](const cbop::Point_2& self,
                         const cbop::Point_2& other) { return self == other; })
