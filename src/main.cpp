@@ -93,7 +93,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("max", &cbop::Segment_2::max)
       .def_property_readonly("min", &cbop::Segment_2::min)
       .def_property_readonly("is_degenerate", &cbop::Segment_2::degenerate)
-      .def_property_readonly("is_vertical", &cbop::Segment_2::is_vertical);
+      .def_property_readonly("is_vertical", &cbop::Segment_2::is_vertical)
+      .def_property_readonly("reversed", &cbop::Segment_2::changeOrientation);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
