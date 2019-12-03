@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include <iomanip>
 #include <limits>
@@ -60,7 +61,24 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def("__add__", &cbop::Bbox_2::operator+);
 
   py::class_<cbop::Contour>(m, "Contour")
-      .def(py::init<>());
+      .def(py::init<const std::vector<cbop::Point_2>&,
+                    const std::vector<unsigned int>&, bool>(),
+           py::arg("points"), py::arg("holes"), py::arg("external"))
+      .def_property_readonly(
+          "points",
+          [](const cbop::Contour& self) -> std::vector<cbop::Point_2> {
+            return std::vector<cbop::Point_2>(self.begin(), self.end());
+          })
+      .def_property_readonly(
+          "holes",
+          [](const cbop::Contour& self) -> std::vector<unsigned int> {
+            std::vector<unsigned int> result;
+            for (unsigned int index = 0; index < self.nholes(); ++index)
+              result.push_back(self.hole(index));
+            return result;
+          })
+      .def_property("external", &cbop::Contour::external,
+                    &cbop::Contour::setExternal);
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
