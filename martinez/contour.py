@@ -44,3 +44,6 @@ class Contour:
 
     def add_hole(self, hole: int) -> None:
         self._holes.append(hole)
+
+    def clear_holes(self) -> None:
+        self._holes.clear()
