@@ -38,3 +38,6 @@ class Contour:
                 and self._is_external is other._is_external
                 if isinstance(other, Contour)
                 else NotImplemented)
+
+    def add(self, point: Point) -> None:
+        self._points.append(point)
