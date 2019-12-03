@@ -13,7 +13,8 @@ from tests.utils import transpose
 
 booleans = strategies.booleans()
 floats = floats
-non_negative_integers_lists = strategies.lists(strategies.integers(0, 65535))
+non_negative_integers = strategies.integers(0, 65535)
+non_negative_integers_lists = strategies.lists(non_negative_integers)
 bound_with_ported_points_pairs = strategies.builds(
         to_bound_with_ported_points_pair, floats, floats)
 bound_with_ported_points_lists_pairs = strategies.lists(
