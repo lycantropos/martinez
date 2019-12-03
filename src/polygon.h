@@ -23,6 +23,12 @@ class Contour {
   typedef std::vector<Point_2>::const_iterator const_iterator;
 
   Contour() : _points(), _holes(), _external(true), _precomputedCC(false) {}
+  Contour(const std::vector<Point_2>& points,
+          const std::vector<unsigned int>& holes, bool external)
+      : _points(points),
+        _holes(holes),
+        _external(external),
+        _precomputedCC(false) {}
 
   /** Get the p-th vertex of the external contour */
   Point_2& vertex(unsigned int p) { return _points[p]; }
