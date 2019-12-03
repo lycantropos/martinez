@@ -1,5 +1,8 @@
 from typing import (Any,
-                    Iterable)
+                    Iterable,
+                    List,
+                    Tuple,
+                    TypeVar)
 
 from _martinez import (BoundingBox as BoundBoundingBox,
                        Point as BoundPoint,
@@ -21,6 +24,17 @@ def implication(antecedent: bool, consequent: bool) -> bool:
     return not antecedent or consequent
 
 
+FirstCoordinate = TypeVar('FirstCoordinate')
+SecondCoordinate = TypeVar('SecondCoordinate')
+
+
+def transpose(elements: List[Tuple[FirstCoordinate, SecondCoordinate]]
+              ) -> Tuple[List[FirstCoordinate], List[SecondCoordinate]]:
+    if not elements:
+        return [], []
+    return tuple(map(list, zip(*elements)))
+
+
 def capacity(iterable: Iterable[Any]) -> int:
     return sum(1 for _ in iterable)
 
@@ -37,6 +51,12 @@ def are_bound_ported_bounding_boxes_equal(
 def are_bound_ported_points_equal(bound_point: BoundPoint,
                                   ported_point: PortedPoint) -> bool:
     return bound_point.x == ported_point.x and bound_point.y == ported_point.y
+
+
+def are_bound_ported_list_points_equal(bound_points: List[BoundPoint],
+                                       ported_points: List[PortedPoint]
+                                       ) -> bool:
+    return all(map(are_bound_ported_points_equal, bound_points, ported_points))
 
 
 def are_bound_ported_segments_equal(bound_segment: BoundSegment,
