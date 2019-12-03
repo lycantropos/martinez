@@ -63,7 +63,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
   py::class_<cbop::Contour>(m, "Contour")
       .def(py::init<const std::vector<cbop::Point_2>&,
                     const std::vector<unsigned int>&, bool>(),
-           py::arg("points"), py::arg("holes"), py::arg("external"))
+           py::arg("points"), py::arg("holes"), py::arg("is_external"))
       .def_property_readonly(
           "points",
           [](const cbop::Contour& self) -> std::vector<cbop::Point_2> {
@@ -77,7 +77,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
               result.push_back(self.hole(index));
             return result;
           })
-      .def_property("external", &cbop::Contour::external,
+      .def_property("is_external", &cbop::Contour::external,
                     &cbop::Contour::setExternal);
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
