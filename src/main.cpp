@@ -119,7 +119,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("holes", contour_to_holes)
       .def_property("is_external", &cbop::Contour::external,
                     &cbop::Contour::setExternal)
-      .def("add", &cbop::Contour::add);
+      .def("add", &cbop::Contour::add)
+      .def("add_hole", &cbop::Contour::addHole);
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
