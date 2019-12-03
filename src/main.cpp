@@ -6,6 +6,7 @@
 
 #include "bbox_2.h"
 #include "point_2.h"
+#include "polygon.h"
 #include "segment_2.h"
 
 namespace py = pybind11;
@@ -57,6 +58,9 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("x_max", &cbop::Bbox_2::xmax)
       .def_property_readonly("y_max", &cbop::Bbox_2::ymax)
       .def("__add__", &cbop::Bbox_2::operator+);
+
+  py::class_<cbop::Contour>(m, "Contour")
+      .def(py::init<>());
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
