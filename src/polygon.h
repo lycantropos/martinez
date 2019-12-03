@@ -22,7 +22,7 @@ class Contour {
   typedef std::vector<Point_2>::iterator iterator;
   typedef std::vector<Point_2>::const_iterator const_iterator;
 
-  Contour() : _points(), holes(), _external(true), _precomputedCC(false) {}
+  Contour() : _points(), _holes(), _external(true), _precomputedCC(false) {}
 
   /** Get the p-th vertex of the external contour */
   Point_2& vertex(unsigned int p) { return _points[p]; }
@@ -56,18 +56,18 @@ class Contour {
   void erase(iterator i) { _points.erase(i); }
   void clear() {
     _points.clear();
-    holes.clear();
+    _holes.clear();
   }
-  void clearHoles() { holes.clear(); }
+  void clearHoles() { _holes.clear(); }
   iterator begin() { return _points.begin(); }
   iterator end() { return _points.end(); }
   const_iterator begin() const { return _points.begin(); }
   const_iterator end() const { return _points.end(); }
   Point_2& back() { return _points.back(); }
   const Point_2& back() const { return _points.back(); }
-  void addHole(unsigned int ind) { holes.push_back(ind); }
-  unsigned int nholes() const { return holes.size(); }
-  unsigned int hole(unsigned int p) const { return holes[p]; }
+  void addHole(unsigned int ind) { _holes.push_back(ind); }
+  unsigned int nholes() const { return _holes.size(); }
+  unsigned int hole(unsigned int p) const { return _holes[p]; }
   bool external() const { return _external; }
   void setExternal(bool e) { _external = e; }
 
@@ -76,7 +76,7 @@ class Contour {
   std::vector<Point_2> _points;
   /** Holes of the contour. They are stored as the indexes of the holes in a
    * polygon class */
-  std::vector<unsigned int> holes;
+  std::vector<unsigned int> _holes;
   bool _external;  // is the contour an external contour? (i.e., is it not a
                    // hole?)
   bool _precomputedCC;
