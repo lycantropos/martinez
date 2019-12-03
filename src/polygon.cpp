@@ -165,8 +165,8 @@ std::istream& cbop::operator>>(std::istream& is, Polygon& p) {
 namespace {  // start of anonymous namespace
 struct SweepEvent;
 struct SegmentComp
-    : public std::binary_function<SweepEvent*, SweepEvent*, bool> {
-  bool operator()(SweepEvent* e1, SweepEvent* e2);
+    : public std::binary_function<const SweepEvent*, const SweepEvent*, bool> {
+  bool operator()(const SweepEvent* e1, const SweepEvent* e2) const;
 };
 
 struct SweepEvent {
@@ -198,8 +198,8 @@ struct SweepEvent {
 };
 
 struct SweepEventComp
-    : public std::binary_function<SweepEvent*, SweepEvent*, bool> {
-  bool operator()(SweepEvent* e1, SweepEvent* e2) {
+    : public std::binary_function<const SweepEvent*, const SweepEvent*, bool> {
+  bool operator()(const SweepEvent* e1, const SweepEvent* e2) const {
     if (e1->point.x() < e2->point.x())  // Different x coordinate
       return true;
     if (e2->point.x() < e1->point.x())  // Different x coordinate
@@ -219,7 +219,7 @@ struct SweepEventComp
 };
 }  // end of anonymous namespace
 
-bool SegmentComp::operator()(SweepEvent* le1, SweepEvent* le2) {
+bool SegmentComp::operator()(const SweepEvent* le1, const SweepEvent* le2) const {
   if (le1 == le2) return false;
   if (signedArea(le1->point, le1->otherEvent->point, le2->point) != 0 ||
       signedArea(le1->point, le1->otherEvent->point, le2->otherEvent->point) !=

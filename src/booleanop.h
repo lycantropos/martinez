@@ -35,11 +35,8 @@ enum EdgeType {
 enum PolygonType { SUBJECT, CLIPPING };
 
 struct SweepEvent;  // forward declaration
-struct SegmentComp
-    : public std::binary_function<SweepEvent*, SweepEvent*,
-                                  bool> {  // for sorting edges in the sweep
-                                           // line (sl)
-  bool operator()(SweepEvent* le1, SweepEvent* le2);
+struct SegmentComp{
+  bool operator()(const SweepEvent* le1, const SweepEvent* le2) const;
 };
 
 struct SweepEvent {

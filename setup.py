@@ -3,6 +3,7 @@ import tempfile
 from collections import defaultdict
 from distutils.ccompiler import CCompiler
 from distutils.errors import CompileError
+from glob import glob
 from pathlib import Path
 
 import pybind11
@@ -100,8 +101,7 @@ setup(name=martinez.__name__,
       install_requires=Path('requirements.txt').read_text(),
       cmdclass={'build_ext': BuildExt},
       ext_modules=[Extension('_' + martinez.__name__,
-                             ['src/main.cpp', 'src/polygon.cpp',
-                              'src/utilities.cpp'],
+                             glob('src/*.cpp'),
                              include_dirs=[pybind11.get_include(),
                                            pybind11.get_include(True)],
                              language='c++')],
