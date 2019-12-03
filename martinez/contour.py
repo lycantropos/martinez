@@ -31,3 +31,10 @@ class Contour:
     @property
     def is_external(self) -> bool:
         return self._is_external
+
+    def __eq__(self, other: 'Contour') -> bool:
+        return (self._points == other._points
+                and self._holes == other._holes
+                and self._is_external is other._is_external
+                if isinstance(other, Contour)
+                else NotImplemented)
