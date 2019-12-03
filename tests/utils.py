@@ -1,3 +1,6 @@
+from typing import (Any,
+                    Iterable)
+
 from _martinez import (BoundingBox as BoundBoundingBox,
                        Point as BoundPoint,
                        Segment as BoundSegment)
@@ -16,6 +19,10 @@ def equivalence(left_statement: bool, right_statement: bool) -> bool:
 
 def implication(antecedent: bool, consequent: bool) -> bool:
     return not antecedent or consequent
+
+
+def capacity(iterable: Iterable[Any]) -> int:
+    return sum(1 for _ in iterable)
 
 
 def are_bound_ported_bounding_boxes_equal(
