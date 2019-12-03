@@ -41,3 +41,6 @@ class Contour:
 
     def add(self, point: Point) -> None:
         self._points.append(point)
+
+    def add_hole(self, hole: int) -> None:
+        self._holes.append(hole)
