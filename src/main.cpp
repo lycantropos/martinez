@@ -3,6 +3,7 @@
 
 #include <iomanip>
 #include <limits>
+#include <numeric>
 #include <sstream>
 
 #include "bbox_2.h"
@@ -16,8 +17,19 @@ namespace py = pybind11;
 #define C_STR_HELPER(a) #a
 #define C_STR(a) C_STR_HELPER(a)
 #define BOUNDING_BOX_NAME "BoundingBox"
+#define CONTOUR_NAME "Contour"
 #define POINT_NAME "Point"
 #define SEGMENT_NAME "Segment"
+
+std::string join(const std::vector<std::string>& elements,
+                 const std::string& separator) {
+  if (elements.empty()) return std::string();
+  return std::accumulate(
+      std::next(std::begin(elements)), std::end(elements), elements[0],
+      [&separator](const std::string& result, const std::string& value) {
+        return result + separator + value;
+      });
+};
 
 std::ostringstream make_stream() {
   std::ostringstream stream;
@@ -30,6 +42,17 @@ std::string point_repr(const cbop::Point_2& self) {
   stream << C_STR(MODULE_NAME) "." POINT_NAME "(" << self.x() << ", "
          << self.y() << ")";
   return stream.str();
+}
+
+std::vector<cbop::Point_2> contour_to_points(const cbop::Contour& self) {
+  return std::vector<cbop::Point_2>(self.begin(), self.end());
+}
+
+std::vector<unsigned int> contour_to_holes(const cbop::Contour& self) {
+  std::vector<unsigned int> result;
+  for (unsigned int index = 0; index < self.nholes(); ++index)
+    result.push_back(self.hole(index));
+  return result;
 }
 
 PYBIND11_MODULE(MODULE_NAME, m) {
@@ -60,29 +83,33 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("y_max", &cbop::Bbox_2::ymax)
       .def("__add__", &cbop::Bbox_2::operator+);
 
-  py::class_<cbop::Contour>(m, "Contour")
+  py::class_<cbop::Contour>(m, CONTOUR_NAME)
       .def(py::init<const std::vector<cbop::Point_2>&,
                     const std::vector<unsigned int>&, bool>(),
            py::arg("points"), py::arg("holes"), py::arg("is_external"))
+      .def("__repr__",
+           [](const cbop::Contour& self) -> std::string {
+             std::vector<std::string> points_reprs;
+             for (auto& point : contour_to_points(self))
+               points_reprs.push_back(point_repr(point));
+             std::vector<std::string> holes_reprs;
+             for (auto hole : contour_to_holes(self))
+               holes_reprs.push_back(std::to_string(hole));
+             auto stream = make_stream();
+             stream << C_STR(MODULE_NAME) "." CONTOUR_NAME "("
+                    << "[" << join(points_reprs, ", ") << "]" << ", "
+                    << "[" << join(holes_reprs, ", ") << "]" << ", "
+                    << py::bool_(self.external()) << ")";
+             return stream.str();
+           })
       .def(
           "__iter__",
           [](const cbop::Contour& self) {
             return py::make_iterator(self.begin(), self.end());
           },
           py::keep_alive<0, 1>())
-      .def_property_readonly(
-          "points",
-          [](const cbop::Contour& self) -> std::vector<cbop::Point_2> {
-            return std::vector<cbop::Point_2>(self.begin(), self.end());
-          })
-      .def_property_readonly(
-          "holes",
-          [](const cbop::Contour& self) -> std::vector<unsigned int> {
-            std::vector<unsigned int> result;
-            for (unsigned int index = 0; index < self.nholes(); ++index)
-              result.push_back(self.hole(index));
-            return result;
-          })
+      .def_property_readonly("points", contour_to_points)
+      .def_property_readonly("holes", contour_to_holes)
       .def_property("is_external", &cbop::Contour::external,
                     &cbop::Contour::setExternal);
 
