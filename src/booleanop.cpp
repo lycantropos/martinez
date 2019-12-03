@@ -43,7 +43,8 @@ std::string SweepEvent::toString() const {
 
 // le1 and le2 are the left events of line segments (le1->point,
 // le1->otherEvent->point) and (le2->point, le2->otherEvent->point)
-bool SegmentComp::operator()(const SweepEvent* le1, const SweepEvent* le2) const {
+bool SegmentComp::operator()(const SweepEvent* le1,
+                             const SweepEvent* le2) const {
   if (le1 == le2) return false;
   if (signedArea(le1->point, le1->otherEvent->point, le2->point) != 0 ||
       signedArea(le1->point, le1->otherEvent->point, le2->otherEvent->point) !=

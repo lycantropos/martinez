@@ -35,7 +35,7 @@ enum EdgeType {
 enum PolygonType { SUBJECT, CLIPPING };
 
 struct SweepEvent;  // forward declaration
-struct SegmentComp{
+struct SegmentComp {
   bool operator()(const SweepEvent* le1, const SweepEvent* le2) const;
 };
 
