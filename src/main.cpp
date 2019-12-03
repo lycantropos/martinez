@@ -64,6 +64,12 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def(py::init<const std::vector<cbop::Point_2>&,
                     const std::vector<unsigned int>&, bool>(),
            py::arg("points"), py::arg("holes"), py::arg("is_external"))
+      .def(
+          "__iter__",
+          [](const cbop::Contour& self) {
+            return py::make_iterator(self.begin(), self.end());
+          },
+          py::keep_alive<0, 1>())
       .def_property_readonly(
           "points",
           [](const cbop::Contour& self) -> std::vector<cbop::Point_2> {
