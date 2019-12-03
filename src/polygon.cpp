@@ -38,8 +38,8 @@ bool Contour::counterclockwise() {
 }
 
 void Contour::move(double x, double y) {
-  for (unsigned int i = 0; i < points.size(); i++)
-    points[i] = Point_2(points[i].x() + x, points[i].y() + y);
+  for (unsigned int i = 0; i < _points.size(); i++)
+    _points[i] = Point_2(_points[i].x() + x, _points[i].y() + y);
 }
 
 std::ostream& cbop::operator<<(std::ostream& o, Contour& c) {
