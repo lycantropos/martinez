@@ -119,6 +119,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("holes", contour_to_holes)
       .def_property("is_external", &cbop::Contour::external,
                     &cbop::Contour::setExternal)
+      .def_property_readonly("is_counterclockwise",
+                             &cbop::Contour::counterclockwise)
       .def("add", &cbop::Contour::add)
       .def("add_hole", &cbop::Contour::addHole)
       .def("clear_holes", &cbop::Contour::clearHoles);
