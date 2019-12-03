@@ -18,23 +18,30 @@
 
 using namespace cbop;
 
-Bbox_2 Contour::bbox() const {
-  if (nvertices() == 0) return Bbox_2();
-  Bbox_2 b = vertex(0).bbox();
-  for (unsigned int i = 1; i < nvertices(); ++i) b = b + vertex(i).bbox();
-  return b;
-}
+Contour::Contour()
+    : _points(), _holes(), _external(true), _counterclockwise(false) {}
 
-bool Contour::counterclockwise() {
-  if (_precomputedCC) return _CC;
-  _precomputedCC = true;
+Contour::Contour(const std::vector<cbop::Point_2>& points,
+                 const std::vector<unsigned int>& holes, bool external)
+    : _points(points), _holes(holes), _external(external) {
+  if (!nvertices()) {
+    _counterclockwise = true;
+    return;
+  }
   double area = 0.0;
   for (unsigned int c = 0; c < nvertices() - 1; c++)
     area +=
         vertex(c).x() * vertex(c + 1).y() - vertex(c + 1).x() * vertex(c).y();
   area += vertex(nvertices() - 1).x() * vertex(0).y() -
           vertex(0).x() * vertex(nvertices() - 1).y();
-  return _CC = area >= 0.0;
+  _counterclockwise = area >= 0.0;
+}
+
+Bbox_2 Contour::bbox() const {
+  if (nvertices() == 0) return Bbox_2();
+  Bbox_2 b = vertex(0).bbox();
+  for (unsigned int i = 1; i < nvertices(); ++i) b = b + vertex(i).bbox();
+  return b;
 }
 
 void Contour::move(double x, double y) {

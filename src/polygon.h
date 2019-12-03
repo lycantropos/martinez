@@ -22,13 +22,9 @@ class Contour {
   typedef std::vector<Point_2>::iterator iterator;
   typedef std::vector<Point_2>::const_iterator const_iterator;
 
-  Contour() : _points(), _holes(), _external(true), _precomputedCC(false) {}
+  Contour();
   Contour(const std::vector<Point_2>& points,
-          const std::vector<unsigned int>& holes, bool external)
-      : _points(points),
-        _holes(holes),
-        _external(external),
-        _precomputedCC(false) {}
+          const std::vector<unsigned int>& holes, bool external);
 
   /** Get the p-th vertex of the external contour */
   Point_2& vertex(unsigned int p) { return _points[p]; }
@@ -43,12 +39,12 @@ class Contour {
   /** Get the bounding box */
   Bbox_2 bbox() const;
   /** Return if the contour is counterclockwise oriented */
-  bool counterclockwise();
+  bool counterclockwise() const { return _counterclockwise; }
   /** Return if the contour is clockwise oriented */
-  bool clockwise() { return !counterclockwise(); }
+  bool clockwise() const { return !_counterclockwise; }
   void changeOrientation() {
     std::reverse(_points.begin(), _points.end());
-    _CC = !_CC;
+    _counterclockwise = !_counterclockwise;
   }
   void setClockwise() {
     if (counterclockwise()) changeOrientation();
@@ -85,8 +81,7 @@ class Contour {
   std::vector<unsigned int> _holes;
   bool _external;  // is the contour an external contour? (i.e., is it not a
                    // hole?)
-  bool _precomputedCC;
-  bool _CC;
+  bool _counterclockwise;
 };
 
 std::ostream& operator<<(std::ostream& o, Contour& c);
