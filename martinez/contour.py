@@ -32,6 +32,14 @@ class Contour:
     def is_external(self) -> bool:
         return self._is_external
 
+    @property
+    def is_counterclockwise(self) -> bool:
+        points = self._points
+        signed_area = sum(points[index - 1].x * points[index].y
+                          - points[index].x * points[index - 1].y
+                          for index in range(len(points)))
+        return signed_area >= 0
+
     def __eq__(self, other: 'Contour') -> bool:
         return (self._points == other._points
                 and self._holes == other._holes
