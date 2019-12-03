@@ -97,10 +97,17 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                holes_reprs.push_back(std::to_string(hole));
              auto stream = make_stream();
              stream << C_STR(MODULE_NAME) "." CONTOUR_NAME "("
-                    << "[" << join(points_reprs, ", ") << "]" << ", "
-                    << "[" << join(holes_reprs, ", ") << "]" << ", "
-                    << py::bool_(self.external()) << ")";
+                    << "[" << join(points_reprs, ", ") << "]"
+                    << ", "
+                    << "[" << join(holes_reprs, ", ") << "]"
+                    << ", " << py::bool_(self.external()) << ")";
              return stream.str();
+           })
+      .def("__eq__",
+           [](const cbop::Contour& self, const cbop::Contour& other) {
+             return contour_to_points(self) == contour_to_points(other) &&
+                    contour_to_holes(self) == contour_to_holes(other) &&
+                    self.external() == other.external();
            })
       .def(
           "__iter__",
