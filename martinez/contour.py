@@ -17,6 +17,9 @@ class Contour:
 
     __repr__ = generate_repr(__init__)
 
+    def __iter__(self) -> Iterator[Point]:
+        return iter(self._points)
+
     @property
     def points(self) -> List[Point]:
         return self._points
