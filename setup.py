@@ -53,8 +53,7 @@ class BuildExt(build_ext):
                              'unix': []})
 
     if sys.platform == 'darwin':
-        darwin_args = ['-stdlib=libc++', '-mmacosx-version-min=10.7',
-                       '-fno-sized-deallocation']
+        darwin_args = ['-stdlib=libc++', '-mmacosx-version-min=10.7']
         compile_args['unix'] += darwin_args
         link_args['unix'] += darwin_args
 
