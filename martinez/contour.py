@@ -69,3 +69,6 @@ class Contour:
 
     def clear_holes(self) -> None:
         self._holes.clear()
+
+    def reverse(self) -> None:
+        self._points = self._points[::-1]
