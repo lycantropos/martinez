@@ -38,9 +38,10 @@ class Contour:
     @property
     def is_counterclockwise(self) -> bool:
         points = self._points
-        signed_area = sum(points[index - 1].x * points[index].y
-                          - points[index].x * points[index - 1].y
-                          for index in range(len(points)))
+        signed_area = sum(
+                points[index].x * points[(index + 1) % len(points)].y
+                - points[(index + 1) % len(points)].x * points[index].y
+                for index in range(len(points)))
         return signed_area >= 0
 
     @property
