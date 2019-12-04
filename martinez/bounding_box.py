@@ -1,6 +1,6 @@
 from reprit.base import generate_repr
 
-from martinez.hints import Scalar
+from .hints import Scalar
 
 
 class BoundingBox:
