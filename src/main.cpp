@@ -119,6 +119,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("holes", contour_to_holes)
       .def_property("is_external", &cbop::Contour::external,
                     &cbop::Contour::setExternal)
+      .def_property_readonly("is_clockwise", &cbop::Contour::clockwise)
       .def_property_readonly("is_counterclockwise",
                              &cbop::Contour::counterclockwise)
       .def_property_readonly("bounding_box", &cbop::Contour::bbox)
