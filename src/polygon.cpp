@@ -19,22 +19,25 @@
 using namespace cbop;
 
 Contour::Contour()
-    : _points(), _holes(), _external(true), _counterclockwise(false) {}
+    : _points(), _holes(), _external(true), _precomputedCC(false) {}
 
 Contour::Contour(const std::vector<cbop::Point_2>& points,
                  const std::vector<unsigned int>& holes, bool external)
-    : _points(points), _holes(holes), _external(external) {
-  if (!nvertices()) {
-    _counterclockwise = true;
-    return;
-  }
+    : _points(points),
+      _holes(holes),
+      _external(external),
+      _precomputedCC(false) {}
+
+bool Contour::counterclockwise() {
+  if (_precomputedCC) return _CC;
+  _precomputedCC = true;
   double area = 0.0;
-  for (unsigned int index = 0; index < nvertices() - 1; ++index)
-    area += vertex(index).x() * vertex(index + 1).y() -
-            vertex(index + 1).x() * vertex(index).y();
+  for (unsigned int c = 0; c < nvertices() - 1; c++)
+    area +=
+        vertex(c).x() * vertex(c + 1).y() - vertex(c + 1).x() * vertex(c).y();
   area += vertex(nvertices() - 1).x() * vertex(0).y() -
           vertex(0).x() * vertex(nvertices() - 1).y();
-  _counterclockwise = area >= 0.0;
+  return _CC = area >= 0.0;
 }
 
 Bbox_2 Contour::bbox() const {

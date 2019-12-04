@@ -39,12 +39,12 @@ class Contour {
   /** Get the bounding box */
   Bbox_2 bbox() const;
   /** Return if the contour is counterclockwise oriented */
-  bool counterclockwise() const { return _counterclockwise; }
+  bool counterclockwise();
   /** Return if the contour is clockwise oriented */
-  bool clockwise() const { return !_counterclockwise; }
+  bool clockwise() { return !counterclockwise(); }
   void changeOrientation() {
     std::reverse(_points.begin(), _points.end());
-    if (_points.size() > 1) _counterclockwise = !_counterclockwise;
+    _precomputedCC = false;
   }
   void setClockwise() {
     if (counterclockwise()) changeOrientation();
@@ -81,7 +81,8 @@ class Contour {
   std::vector<unsigned int> _holes;
   bool _external;  // is the contour an external contour? (i.e., is it not a
                    // hole?)
-  bool _counterclockwise;
+  bool _precomputedCC;
+  bool _CC;
 };
 
 std::ostream& operator<<(std::ostream& o, Contour& c);
