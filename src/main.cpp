@@ -63,6 +63,17 @@ PYBIND11_MODULE(MODULE_NAME, m) {
   py::class_<cbop::Bbox_2>(m, BOUNDING_BOX_NAME)
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
            py::arg("y_min") = 0., py::arg("x_max") = 0., py::arg("y_max") = 0.)
+      .def(py::pickle(
+          [](const cbop::Bbox_2& self) {  // __getstate__
+            return py::make_tuple(self.xmin(), self.ymin(), self.xmax(),
+                                  self.ymax());
+          },
+          [](py::tuple tuple) {  // __setstate__
+            if (tuple.size() != 4) throw std::runtime_error("Invalid state!");
+            return cbop::Bbox_2(
+                tuple[0].cast<double>(), tuple[1].cast<double>(),
+                tuple[2].cast<double>(), tuple[3].cast<double>());
+          }))
       .def("__repr__",
            [](const cbop::Bbox_2& self) -> std::string {
              auto stream = make_stream();
