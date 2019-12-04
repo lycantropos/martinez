@@ -1,8 +1,11 @@
+from functools import reduce
+from operator import add
 from typing import (Iterator,
                     List)
 
 from reprit.base import generate_repr
 
+from martinez.bounding_box import BoundingBox
 from .point import Point
 
 
@@ -39,6 +42,13 @@ class Contour:
                           - points[index].x * points[index - 1].y
                           for index in range(len(points)))
         return signed_area >= 0
+
+    @property
+    def bounding_box(self) -> BoundingBox:
+        if self._points:
+            return reduce(add, [point.bounding_box for point in self._points])
+        else:
+            return BoundingBox(0, 0, 0, 0)
 
     def __eq__(self, other: 'Contour') -> bool:
         return (self._points == other._points
