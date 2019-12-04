@@ -144,7 +144,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def("__repr__", point_repr)
       .def("__eq__", [](const cbop::Point_2& self,
                         const cbop::Point_2& other) { return self == other; })
-      .def("distance_to", &cbop::Point_2::dist)
+      .def("distance_to", &cbop::Point_2::dist, py::arg("other"))
       .def_property_readonly("x", &cbop::Point_2::x)
       .def_property_readonly("y", &cbop::Point_2::y)
       .def_property_readonly("bounding_box", &cbop::Point_2::bbox);
