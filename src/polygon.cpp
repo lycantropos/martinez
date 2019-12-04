@@ -29,9 +29,9 @@ Contour::Contour(const std::vector<cbop::Point_2>& points,
     return;
   }
   double area = 0.0;
-  for (unsigned int c = 0; c < nvertices() - 1; c++)
-    area +=
-        vertex(c).x() * vertex(c + 1).y() - vertex(c + 1).x() * vertex(c).y();
+  for (unsigned int index = 0; index < nvertices() - 1; ++index)
+    area += vertex(index).x() * vertex(index + 1).y() -
+            vertex(index + 1).x() * vertex(index).y();
   area += vertex(nvertices() - 1).x() * vertex(0).y() -
           vertex(0).x() * vertex(nvertices() - 1).y();
   _counterclockwise = area >= 0.0;
