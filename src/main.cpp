@@ -134,7 +134,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("is_counterclockwise",
                              &cbop::Contour::counterclockwise)
       .def_property_readonly("bounding_box", &cbop::Contour::bbox)
-      .def("add", &cbop::Contour::add)
+      .def("add", &cbop::Contour::add, py::arg("add"))
       .def("add_hole", &cbop::Contour::addHole)
       .def("clear_holes", &cbop::Contour::clearHoles)
       .def("reverse", &cbop::Contour::changeOrientation);
