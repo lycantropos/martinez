@@ -18,26 +18,29 @@
 
 using namespace cbop;
 
-Contour::Contour()
-    : _points(), _holes(), _external(true), _precomputedCC(false) {}
+static bool are_counterclockwise(const std::vector<Point_2>& points) {
+  if (points.size() <= 1) return true;
+  double area = 0.0;
+  for (size_t index = 0; index < points.size() - 1; ++index)
+    area += points[index].x() * points[index + 1].y() -
+            points[index + 1].x() * points[index].y();
+  area += points[points.size() - 1].x() * points[0].y() -
+          points[0].x() * points[points.size() - 1].y();
+  return area >= 0.0;
+}
+
+Contour::Contour() : _points(), _holes(), _external(true), _CC(true) {}
 
 Contour::Contour(const std::vector<cbop::Point_2>& points,
                  const std::vector<unsigned int>& holes, bool external)
     : _points(points),
       _holes(holes),
       _external(external),
-      _precomputedCC(false) {}
+      _CC(are_counterclockwise(points)) {}
 
-bool Contour::counterclockwise() {
-  if (_precomputedCC) return _CC;
-  _precomputedCC = true;
-  double area = 0.0;
-  for (unsigned int c = 0; c < nvertices() - 1; c++)
-    area +=
-        vertex(c).x() * vertex(c + 1).y() - vertex(c + 1).x() * vertex(c).y();
-  area += vertex(nvertices() - 1).x() * vertex(0).y() -
-          vertex(0).x() * vertex(nvertices() - 1).y();
-  return _CC = area >= 0.0;
+void Contour::changeOrientation() {
+  std::reverse(_points.begin(), _points.end());
+  _CC = are_counterclockwise(_points);
 }
 
 Bbox_2 Contour::bbox() const {
