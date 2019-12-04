@@ -141,6 +141,15 @@ PYBIND11_MODULE(MODULE_NAME, m) {
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
+      .def(py::pickle(
+          [](const cbop::Point_2& self) {  // __getstate__
+            return py::make_tuple(self.x(), self.y());
+          },
+          [](py::tuple tuple) {  // __setstate__
+            if (tuple.size() != 2) throw std::runtime_error("Invalid state!");
+            return cbop::Point_2(tuple[0].cast<double>(),
+                                 tuple[1].cast<double>());
+          }))
       .def("__repr__", point_repr)
       .def("__eq__", [](const cbop::Point_2& self,
                         const cbop::Point_2& other) { return self == other; })
