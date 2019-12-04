@@ -58,7 +58,7 @@ class BuildExt(build_ext):
         compile_args['unix'] += darwin_args
         link_args['unix'] += darwin_args
 
-    def build_extensions(self):
+    def build_extensions(self) -> None:
         compiler_type = self.compiler.compiler_type
         compile_args = self.compile_args[compiler_type]
         link_args = self.link_args[compiler_type]
