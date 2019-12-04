@@ -162,6 +162,15 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def(py::init<cbop::Point_2, cbop::Point_2>(),
            py::arg("source") = cbop::Point_2(),
            py::arg("target") = cbop::Point_2())
+      .def(py::pickle(
+          [](const cbop::Segment_2& self) {  // __getstate__
+            return py::make_tuple(self.source(), self.target());
+          },
+          [](py::tuple tuple) {  // __setstate__
+            if (tuple.size() != 2) throw std::runtime_error("Invalid state!");
+            return cbop::Segment_2(tuple[0].cast<cbop::Point_2>(),
+                                   tuple[1].cast<cbop::Point_2>());
+          }))
       .def("__repr__",
            [](const cbop::Segment_2& self) -> std::string {
              auto stream = make_stream();
