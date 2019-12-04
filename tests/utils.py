@@ -2,14 +2,17 @@ from typing import (Any,
                     Iterable,
                     List,
                     Tuple,
-                    TypeVar, Union)
+                    TypeVar,
+                    Union)
 
 from _martinez import (BoundingBox as BoundBoundingBox,
+                       Contour as BoundContour,
                        Point as BoundPoint,
                        Segment as BoundSegment)
 from hypothesis.searchstrategy import SearchStrategy
 
 from martinez.bounding_box import BoundingBox as PortedBoundingBox
+from martinez.contour import Contour as PortedContour
 from martinez.point import Point as PortedPoint
 from martinez.segment import Segment as PortedSegment
 
@@ -71,3 +74,10 @@ def is_bounding_box_empty(bounding_box: Union[BoundBoundingBox,
                                               PortedBoundingBox]) -> bool:
     return not (bounding_box.x_min or bounding_box.y_min
                 or bounding_box.x_max or bounding_box.y_max)
+
+
+def are_bound_ported_contours_equal(bound: BoundContour,
+                                    ported: PortedContour) -> bool:
+    return (are_bound_ported_list_points_equal(bound.points, ported.points)
+            and bound.holes == ported.holes
+            and bound.is_external is ported.is_external)
