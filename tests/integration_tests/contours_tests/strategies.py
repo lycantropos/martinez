@@ -7,12 +7,11 @@ from hypothesis import strategies
 
 from martinez.contour import Contour as Ported
 from martinez.point import Point as PortedPoint
-from tests.strategies import floats
+from tests.strategies import single_precision_floats as floats
 from tests.strategies.factories import to_bound_with_ported_points_pair
 from tests.utils import transpose
 
 booleans = strategies.booleans()
-floats = floats
 non_negative_integers = strategies.integers(0, 65535)
 non_negative_integers_lists = strategies.lists(non_negative_integers)
 bound_with_ported_points_pairs = strategies.builds(

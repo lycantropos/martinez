@@ -2,6 +2,7 @@ import math
 import sys
 from decimal import Decimal
 from fractions import Fraction
+from functools import partial
 from typing import (Optional,
                     SupportsFloat)
 
@@ -10,6 +11,8 @@ from hypothesis import strategies
 from martinez.hints import Scalar
 from tests.utils import (Strategy,
                          implication)
+
+MAX_DIGITS_COUNT = sys.float_info.dig
 
 
 def is_non_zero_number_far_from_zero(number: float) -> bool:
@@ -29,7 +32,7 @@ def to_decimals(*,
                               max_value=max_value,
                               allow_nan=allow_nan,
                               allow_infinity=allow_infinity)
-            .map(to_recoverable_significant_digits_count))
+            .map(to_digits_count))
 
 
 def to_floats(*,
@@ -41,7 +44,7 @@ def to_floats(*,
                               max_value=max_value,
                               allow_nan=allow_nan,
                               allow_infinity=allow_infinity)
-            .map(to_recoverable_significant_digits_count))
+            .map(to_digits_count))
 
 
 def to_fractions(*,
@@ -52,7 +55,7 @@ def to_fractions(*,
     return (strategies.fractions(min_value=min_value,
                                  max_value=max_value,
                                  max_denominator=max_denominator)
-            .map(to_recoverable_significant_digits_count))
+            .map(to_digits_count))
 
 
 def to_integers(*,
@@ -60,14 +63,12 @@ def to_integers(*,
                 max_value: Optional[Scalar] = None) -> Strategy[int]:
     return (strategies.integers(min_value=min_value,
                                 max_value=max_value)
-            .map(to_recoverable_significant_digits_count))
+            .map(to_digits_count))
 
 
-def to_recoverable_significant_digits_count(
-        number: SupportsFloat,
-        *,
-        max_digits_count: int = sys.float_info.dig
-) -> SupportsFloat:
+def to_digits_count(number: Scalar,
+                    *,
+                    max_digits_count: int = MAX_DIGITS_COUNT) -> Scalar:
     decimal = to_decimal(number)
     sign, digits, exponent = decimal.as_tuple()
     if len(digits) <= max_digits_count:
@@ -96,3 +97,8 @@ scalars_strategies_factories = {Decimal: to_decimals,
 scalars_strategies = strategies.sampled_from(
         [factory() for factory in scalars_strategies_factories.values()])
 floats = to_floats()
+single_precision_floats = (strategies.floats(allow_nan=False,
+                                             allow_infinity=False)
+                           .map(partial(to_digits_count,
+                                        max_digits_count=
+                                        MAX_DIGITS_COUNT // 2)))
