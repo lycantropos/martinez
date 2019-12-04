@@ -148,7 +148,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def("add", &cbop::Contour::add, py::arg("add"))
       .def("add_hole", &cbop::Contour::addHole, py::arg("hole"))
       .def("clear_holes", &cbop::Contour::clearHoles)
-      .def("reverse", &cbop::Contour::changeOrientation);
+      .def("reverse", &cbop::Contour::changeOrientation)
+      .def("set_clockwise", &cbop::Contour::setClockwise);
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
