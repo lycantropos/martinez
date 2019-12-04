@@ -6,7 +6,7 @@ from hypothesis import given
 
 from martinez.contour import Contour as Ported
 from martinez.point import Point as PortedPoint
-from tests.utils import are_bound_ported_points_equal
+from tests.utils import are_bound_ported_contours_equal
 from . import strategies
 
 
@@ -21,4 +21,4 @@ def test_basic(bound_with_ported_contours_pair: Tuple[Bound, Ported],
     bound.add(bound_point)
     ported.add(ported_point)
 
-    assert are_bound_ported_points_equal(bound.points[-1], ported.points[-1])
+    assert are_bound_ported_contours_equal(bound, ported)
