@@ -87,6 +87,17 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def(py::init<const std::vector<cbop::Point_2>&,
                     const std::vector<unsigned int>&, bool>(),
            py::arg("points"), py::arg("holes"), py::arg("is_external"))
+      .def(py::pickle(
+          [](const cbop::Contour& self) {  // __getstate__
+            return py::make_tuple(contour_to_points(self),
+                                  contour_to_holes(self), self.external());
+          },
+          [](py::tuple tuple) {  // __setstate__
+            if (tuple.size() != 3) throw std::runtime_error("Invalid state!");
+            return cbop::Contour(tuple[0].cast<std::vector<cbop::Point_2>>(),
+                                 tuple[1].cast<std::vector<unsigned int>>(),
+                                 tuple[2].cast<bool>());
+          }))
       .def("__repr__",
            [](const cbop::Contour& self) -> std::string {
              std::vector<std::string> points_reprs;
