@@ -44,6 +44,10 @@ class Contour:
         return signed_area >= 0
 
     @property
+    def is_clockwise(self) -> bool:
+        return not self.is_counterclockwise
+
+    @property
     def bounding_box(self) -> BoundingBox:
         if self._points:
             return reduce(add, [point.bounding_box for point in self._points])
