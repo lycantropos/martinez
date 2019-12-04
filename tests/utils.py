@@ -2,7 +2,7 @@ from typing import (Any,
                     Iterable,
                     List,
                     Tuple,
-                    TypeVar)
+                    TypeVar, Union)
 
 from _martinez import (BoundingBox as BoundBoundingBox,
                        Point as BoundPoint,
@@ -65,3 +65,9 @@ def are_bound_ported_segments_equal(bound_segment: BoundSegment,
                                           ported_segment.source)
             and are_bound_ported_points_equal(bound_segment.target,
                                               ported_segment.target))
+
+
+def is_bounding_box_empty(bounding_box: Union[BoundBoundingBox,
+                                              PortedBoundingBox]) -> bool:
+    return not (bounding_box.x_min or bounding_box.y_min
+                or bounding_box.x_max or bounding_box.y_max)
