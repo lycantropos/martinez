@@ -77,3 +77,7 @@ class Contour:
     def set_clockwise(self) -> None:
         if self.is_counterclockwise:
             self.reverse()
+
+    def set_counterclockwise(self) -> None:
+        if self.is_clockwise:
+            self.reverse()
