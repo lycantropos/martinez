@@ -44,7 +44,7 @@ class Contour {
   bool clockwise() const { return !_counterclockwise; }
   void changeOrientation() {
     std::reverse(_points.begin(), _points.end());
-    _counterclockwise = !_counterclockwise;
+    if (!_points.empty()) _counterclockwise = !_counterclockwise;
   }
   void setClockwise() {
     if (counterclockwise()) changeOrientation();
