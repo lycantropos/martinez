@@ -6,6 +6,7 @@ from typing import (Iterator,
 from reprit.base import generate_repr
 
 from martinez.bounding_box import BoundingBox
+from martinez.hints import Scalar
 from .point import Point
 
 
@@ -70,6 +71,10 @@ class Contour:
 
     def clear_holes(self) -> None:
         self._holes.clear()
+
+    def move(self, x: Scalar, y: Scalar) -> None:
+        self._points = [Point(point.x + x, point.y + y)
+                        for point in self._points]
 
     def reverse(self) -> None:
         self._points = self._points[::-1]
