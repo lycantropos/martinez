@@ -125,7 +125,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("bounding_box", &cbop::Contour::bbox)
       .def("add", &cbop::Contour::add)
       .def("add_hole", &cbop::Contour::addHole)
-      .def("clear_holes", &cbop::Contour::clearHoles);
+      .def("clear_holes", &cbop::Contour::clearHoles)
+      .def("reverse", &cbop::Contour::changeOrientation);
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
