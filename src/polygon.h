@@ -89,6 +89,7 @@ class Polygon {
   typedef std::vector<Contour>::const_iterator const_iterator;
 
   Polygon() : _contours() {}
+  Polygon(const std::vector<Contour>& contours) : _contours(contours) {}
 
   // Get the polygon from a text file */
   bool open(const std::string& filename);
