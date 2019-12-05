@@ -56,6 +56,11 @@ static std::vector<unsigned int> contour_to_holes(const cbop::Contour& self) {
   return result;
 }
 
+static std::vector<cbop::Contour> polygon_to_contours(
+    const cbop::Polygon& self) {
+  return std::vector<cbop::Contour>(self.begin(), self.end());
+}
+
 static bool are_contours_equal(const cbop::Contour& self,
                                const cbop::Contour& other) {
   return contour_to_points(self) == contour_to_points(other) &&
@@ -178,6 +183,13 @@ PYBIND11_MODULE(MODULE_NAME, m) {
 
   py::class_<cbop::Polygon>(m, POLYGON_NAME)
       .def(py::init<const std::vector<cbop::Contour>&>(), py::arg("contours"))
+      .def(py::pickle(
+          [](const cbop::Polygon& self) {  // __getstate__
+            return polygon_to_contours(self);
+          },
+          [](const std::vector<cbop::Contour>& contours) {  // __setstate__
+            return cbop::Polygon(contours);
+          }))
       .def("__repr__",
            [](const cbop::Polygon& self) -> std::string {
              auto stream = make_stream();
@@ -196,11 +208,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                if (!are_contours_equal(self[index], other[index])) return false;
              return true;
            })
-      .def_property_readonly(
-          "contours",
-          [](const cbop::Polygon& self) -> std::vector<cbop::Contour> {
-            return std::vector<cbop::Contour>(self.begin(), self.end());
-          });
+      .def_property_readonly("contours", polygon_to_contours);
 
   py::class_<cbop::Segment_2>(m, SEGMENT_NAME)
       .def(py::init<cbop::Point_2, cbop::Point_2>(),
