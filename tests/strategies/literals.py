@@ -112,3 +112,8 @@ single_precision_floats = (strategies.floats(allow_nan=False,
                            .map(partial(to_digits_count,
                                         max_digits_count=
                                         MAX_DIGITS_COUNT // 2)))
+unsigned_integers = strategies.integers(0, 65535)
+unsigned_integers_lists = strategies.lists(unsigned_integers)
+non_negative_integers = strategies.integers(0)
+non_negative_integers_lists = strategies.lists(non_negative_integers)
+booleans = strategies.booleans()
