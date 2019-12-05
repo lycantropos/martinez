@@ -25,3 +25,11 @@ class Polygon:
 
     def __iter__(self) -> Iterator[Contour]:
         return iter(self._contours)
+
+    def join(self, other: 'Polygon') -> None:
+        contours_count = len(self._contours)
+        self._contours.extend(Contour(contour.points,
+                                      [hole + contours_count
+                                       for hole in contour.holes],
+                                      contour.is_external)
+                              for contour in other._contours)
