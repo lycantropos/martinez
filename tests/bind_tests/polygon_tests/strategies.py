@@ -1,5 +1,6 @@
 from _martinez import (Contour,
-                       Point)
+                       Point,
+                       Polygon)
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
@@ -15,3 +16,4 @@ points_lists = strategies.lists(points)
 contours = strategies.builds(Contour, points_lists,
                              non_negative_integers_lists, booleans)
 contours_lists = strategies.lists(contours)
+polygons = strategies.builds(Polygon, contours_lists)
