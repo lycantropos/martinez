@@ -1,4 +1,5 @@
-from typing import List
+from typing import (Iterator,
+                    List)
 
 from reprit.base import generate_repr
 
@@ -21,3 +22,6 @@ class Polygon:
         return (self._contours == other._contours
                 if isinstance(other, Polygon)
                 else NotImplemented)
+
+    def __iter__(self) -> Iterator[Contour]:
+        return iter(self._contours)
