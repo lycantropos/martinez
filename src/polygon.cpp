@@ -89,19 +89,19 @@ void Polygon::join(const Polygon& pol) {
 
 unsigned Polygon::nvertices() const {
   unsigned int nv = 0;
-  for (unsigned int i = 0; i < ncontours(); i++) nv += contours[i].nvertices();
+  for (unsigned int i = 0; i < ncontours(); i++) nv += _contours[i].nvertices();
   return nv;
 }
 
 Bbox_2 Polygon::bbox() const {
   if (ncontours() == 0) return Bbox_2();
-  Bbox_2 bb = contours[0].bbox();
-  for (unsigned int i = 1; i < ncontours(); i++) bb = bb + contours[i].bbox();
+  Bbox_2 bb = _contours[0].bbox();
+  for (unsigned int i = 1; i < ncontours(); i++) bb = bb + _contours[i].bbox();
   return bb;
 }
 
 void Polygon::move(double x, double y) {
-  for (unsigned int i = 0; i < contours.size(); i++) contours[i].move(x, y);
+  for (unsigned int i = 0; i < _contours.size(); i++) _contours[i].move(x, y);
 }
 
 std::ostream& cbop::operator<<(std::ostream& o, Polygon& p) {

@@ -88,18 +88,18 @@ class Polygon {
   typedef std::vector<Contour>::iterator iterator;
   typedef std::vector<Contour>::const_iterator const_iterator;
 
-  Polygon() : contours() {}
+  Polygon() : _contours() {}
 
   // Get the polygon from a text file */
   bool open(const std::string& filename);
   void join(const Polygon& pol);
   /** Get the p-th contour */
-  Contour& contour(unsigned int p) { return contours[p]; }
-  const Contour& contour(unsigned int p) const { return contours[p]; }
-  Contour& operator[](unsigned int p) { return contours[p]; }
-  const Contour& operator[](unsigned int p) const { return contours[p]; }
+  Contour& contour(unsigned int p) { return _contours[p]; }
+  const Contour& contour(unsigned int p) const { return _contours[p]; }
+  Contour& operator[](unsigned int p) { return _contours[p]; }
+  const Contour& operator[](unsigned int p) const { return _contours[p]; }
   /** Number of contours */
-  unsigned int ncontours() const { return contours.size(); }
+  unsigned int ncontours() const { return _contours.size(); }
   /** Number of vertices */
   unsigned int nvertices() const;
   /** Get the bounding box */
@@ -107,22 +107,22 @@ class Polygon {
 
   void move(double x, double y);
 
-  void push_back(const Contour& c) { contours.push_back(c); }
-  Contour& back() { return contours.back(); }
-  const Contour& back() const { return contours.back(); }
-  void pop_back() { contours.pop_back(); }
-  void erase(iterator i) { contours.erase(i); }
-  void clear() { contours.clear(); }
+  void push_back(const Contour& c) { _contours.push_back(c); }
+  Contour& back() { return _contours.back(); }
+  const Contour& back() const { return _contours.back(); }
+  void pop_back() { _contours.pop_back(); }
+  void erase(iterator i) { _contours.erase(i); }
+  void clear() { _contours.clear(); }
 
-  iterator begin() { return contours.begin(); }
-  iterator end() { return contours.end(); }
-  const_iterator begin() const { return contours.begin(); }
-  const_iterator end() const { return contours.end(); }
+  iterator begin() { return _contours.begin(); }
+  iterator end() { return _contours.end(); }
+  const_iterator begin() const { return _contours.begin(); }
+  const_iterator end() const { return _contours.end(); }
   void computeHoles();
 
  private:
   /** Set of contours conforming the polygon */
-  std::vector<Contour> contours;
+  std::vector<Contour> _contours;
 };
 
 std::ostream& operator<<(std::ostream& o, Polygon& p);
