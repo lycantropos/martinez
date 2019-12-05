@@ -56,6 +56,13 @@ static std::vector<unsigned int> contour_to_holes(const cbop::Contour& self) {
   return result;
 }
 
+static bool are_contours_equal(const cbop::Contour& self,
+                               const cbop::Contour& other) {
+  return contour_to_points(self) == contour_to_points(other) &&
+         contour_to_holes(self) == contour_to_holes(other) &&
+         self.external() == other.external();
+}
+
 static std::string contour_repr(const cbop::Contour& self) {
   std::vector<std::string> points_reprs;
   for (auto& point : contour_to_points(self))
@@ -127,12 +134,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                                  tuple[2].cast<bool>());
           }))
       .def("__repr__", contour_repr)
-      .def("__eq__",
-           [](const cbop::Contour& self, const cbop::Contour& other) {
-             return contour_to_points(self) == contour_to_points(other) &&
-                    contour_to_holes(self) == contour_to_holes(other) &&
-                    self.external() == other.external();
-           })
+      .def("__eq__", are_contours_equal)
       .def(
           "__iter__",
           [](const cbop::Contour& self) {
@@ -186,6 +188,13 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                     << "[" << join(contours_reprs, ", ") << "]"
                     << ")";
              return stream.str();
+           })
+      .def("__eq__",
+           [](const cbop::Polygon& self, const cbop::Polygon& other) {
+             if (self.ncontours() != other.ncontours()) return false;
+             for (size_t index = 0; index < self.ncontours(); ++index)
+               if (!are_contours_equal(self[index], other[index])) return false;
+             return true;
            })
       .def_property_readonly(
           "contours",
