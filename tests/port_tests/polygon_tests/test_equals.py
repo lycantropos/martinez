@@ -1,6 +1,6 @@
-from _martinez import Polygon
 from hypothesis import given
 
+from martinez.polygon import Polygon
 from tests.utils import (equivalence,
                          implication)
 from . import strategies
