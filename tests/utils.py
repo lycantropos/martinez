@@ -8,12 +8,14 @@ from typing import (Any,
 from _martinez import (BoundingBox as BoundBoundingBox,
                        Contour as BoundContour,
                        Point as BoundPoint,
+                       Polygon as BoundPolygon,
                        Segment as BoundSegment)
 from hypothesis.searchstrategy import SearchStrategy
 
 from martinez.bounding_box import BoundingBox as PortedBoundingBox
 from martinez.contour import Contour as PortedContour
 from martinez.point import Point as PortedPoint
+from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
 
 Strategy = SearchStrategy
@@ -81,3 +83,9 @@ def are_bound_ported_contours_equal(bound: BoundContour,
     return (are_bound_ported_list_points_equal(bound.points, ported.points)
             and bound.holes == ported.holes
             and bound.is_external is ported.is_external)
+
+
+def are_bound_ported_polygons_equal(bound: BoundPolygon,
+                                    ported: PortedPolygon) -> bool:
+    return all(map(are_bound_ported_contours_equal,
+                   bound.contours, ported.contours))
