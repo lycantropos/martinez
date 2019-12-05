@@ -21,8 +21,8 @@ namespace py = pybind11;
 #define POINT_NAME "Point"
 #define SEGMENT_NAME "Segment"
 
-std::string join(const std::vector<std::string>& elements,
-                 const std::string& separator) {
+static std::string join(const std::vector<std::string>& elements,
+                        const std::string& separator) {
   if (elements.empty()) return std::string();
   return std::accumulate(
       std::next(std::begin(elements)), std::end(elements), elements[0],
@@ -31,24 +31,24 @@ std::string join(const std::vector<std::string>& elements,
       });
 };
 
-std::ostringstream make_stream() {
+static std::ostringstream make_stream() {
   std::ostringstream stream;
   stream.precision(std::numeric_limits<double>::digits10 + 2);
   return stream;
 }
 
-std::string point_repr(const cbop::Point_2& self) {
+static std::string point_repr(const cbop::Point_2& self) {
   auto stream = make_stream();
   stream << C_STR(MODULE_NAME) "." POINT_NAME "(" << self.x() << ", "
          << self.y() << ")";
   return stream.str();
 }
 
-std::vector<cbop::Point_2> contour_to_points(const cbop::Contour& self) {
+static std::vector<cbop::Point_2> contour_to_points(const cbop::Contour& self) {
   return std::vector<cbop::Point_2>(self.begin(), self.end());
 }
 
-std::vector<unsigned int> contour_to_holes(const cbop::Contour& self) {
+static std::vector<unsigned int> contour_to_holes(const cbop::Contour& self) {
   std::vector<unsigned int> result;
   for (unsigned int index = 0; index < self.nholes(); ++index)
     result.push_back(self.hole(index));
