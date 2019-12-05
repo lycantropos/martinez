@@ -19,6 +19,7 @@ namespace py = pybind11;
 #define BOUNDING_BOX_NAME "BoundingBox"
 #define CONTOUR_NAME "Contour"
 #define POINT_NAME "Point"
+#define POLYGON_NAME "Polygon"
 #define SEGMENT_NAME "Segment"
 
 static std::string join(const std::vector<std::string>& elements,
@@ -53,6 +54,22 @@ static std::vector<unsigned int> contour_to_holes(const cbop::Contour& self) {
   for (unsigned int index = 0; index < self.nholes(); ++index)
     result.push_back(self.hole(index));
   return result;
+}
+
+static std::string contour_repr(const cbop::Contour& self) {
+  std::vector<std::string> points_reprs;
+  for (auto& point : contour_to_points(self))
+    points_reprs.push_back(point_repr(point));
+  std::vector<std::string> holes_reprs;
+  for (auto hole : contour_to_holes(self))
+    holes_reprs.push_back(std::to_string(hole));
+  auto stream = make_stream();
+  stream << C_STR(MODULE_NAME) "." CONTOUR_NAME "("
+         << "[" << join(points_reprs, ", ") << "]"
+         << ", "
+         << "[" << join(holes_reprs, ", ") << "]"
+         << ", " << py::bool_(self.external()) << ")";
+  return stream.str();
 }
 
 PYBIND11_MODULE(MODULE_NAME, m) {
@@ -109,22 +126,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                                  tuple[1].cast<std::vector<unsigned int>>(),
                                  tuple[2].cast<bool>());
           }))
-      .def("__repr__",
-           [](const cbop::Contour& self) -> std::string {
-             std::vector<std::string> points_reprs;
-             for (auto& point : contour_to_points(self))
-               points_reprs.push_back(point_repr(point));
-             std::vector<std::string> holes_reprs;
-             for (auto hole : contour_to_holes(self))
-               holes_reprs.push_back(std::to_string(hole));
-             auto stream = make_stream();
-             stream << C_STR(MODULE_NAME) "." CONTOUR_NAME "("
-                    << "[" << join(points_reprs, ", ") << "]"
-                    << ", "
-                    << "[" << join(holes_reprs, ", ") << "]"
-                    << ", " << py::bool_(self.external()) << ")";
-             return stream.str();
-           })
+      .def("__repr__", contour_repr)
       .def("__eq__",
            [](const cbop::Contour& self, const cbop::Contour& other) {
              return contour_to_points(self) == contour_to_points(other) &&
@@ -172,8 +174,19 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("y", &cbop::Point_2::y)
       .def_property_readonly("bounding_box", &cbop::Point_2::bbox);
 
-  py::class_<cbop::Polygon>(m, "Polygon")
+  py::class_<cbop::Polygon>(m, POLYGON_NAME)
       .def(py::init<const std::vector<cbop::Contour>&>(), py::arg("contours"))
+      .def("__repr__",
+           [](const cbop::Polygon& self) -> std::string {
+             auto stream = make_stream();
+             std::vector<std::string> contours_reprs;
+             for (auto& contour : self)
+               contours_reprs.push_back(contour_repr(contour));
+             stream << C_STR(MODULE_NAME) "." POLYGON_NAME "("
+                    << "[" << join(contours_reprs, ", ") << "]"
+                    << ")";
+             return stream.str();
+           })
       .def_property_readonly(
           "contours",
           [](const cbop::Polygon& self) -> std::vector<cbop::Contour> {
