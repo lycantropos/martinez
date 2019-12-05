@@ -214,7 +214,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
             return py::make_iterator(self.begin(), self.end());
           },
           py::keep_alive<0, 1>())
-      .def_property_readonly("contours", polygon_to_contours);
+      .def_property_readonly("contours", polygon_to_contours)
+      .def("join", &cbop::Polygon::join);
 
   py::class_<cbop::Segment_2>(m, SEGMENT_NAME)
       .def(py::init<cbop::Point_2, cbop::Point_2>(),
