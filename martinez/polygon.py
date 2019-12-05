@@ -1,8 +1,11 @@
+from functools import reduce
+from operator import add
 from typing import (Iterator,
                     List)
 
 from reprit.base import generate_repr
 
+from .bounding_box import BoundingBox
 from .contour import Contour
 
 
@@ -25,6 +28,14 @@ class Polygon:
 
     def __iter__(self) -> Iterator[Contour]:
         return iter(self._contours)
+
+    @property
+    def bounding_box(self) -> BoundingBox:
+        if self._contours:
+            return reduce(add, [contour.bounding_box
+                                for contour in self._contours])
+        else:
+            return BoundingBox(0, 0, 0, 0)
 
     def join(self, other: 'Polygon') -> None:
         contours_count = len(self._contours)
