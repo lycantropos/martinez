@@ -208,6 +208,12 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                if (!are_contours_equal(self[index], other[index])) return false;
              return true;
            })
+      .def(
+          "__iter__",
+          [](const cbop::Polygon& self) {
+            return py::make_iterator(self.begin(), self.end());
+          },
+          py::keep_alive<0, 1>())
       .def_property_readonly("contours", polygon_to_contours);
 
   py::class_<cbop::Segment_2>(m, SEGMENT_NAME)
