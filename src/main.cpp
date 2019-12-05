@@ -173,7 +173,12 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("bounding_box", &cbop::Point_2::bbox);
 
   py::class_<cbop::Polygon>(m, "Polygon")
-      .def(py::init<const std::vector<cbop::Contour>&>(), py::arg("contours"));
+      .def(py::init<const std::vector<cbop::Contour>&>(), py::arg("contours"))
+      .def_property_readonly(
+          "contours",
+          [](const cbop::Polygon& self) -> std::vector<cbop::Contour> {
+            return std::vector<cbop::Contour>(self.begin(), self.end());
+          });
 
   py::class_<cbop::Segment_2>(m, SEGMENT_NAME)
       .def(py::init<cbop::Point_2, cbop::Point_2>(),
