@@ -16,3 +16,8 @@ class Polygon:
     @property
     def contours(self) -> List[Contour]:
         return self._contours
+
+    def __eq__(self, other: 'Polygon') -> bool:
+        return (self._contours == other._contours
+                if isinstance(other, Polygon)
+                else NotImplemented)
