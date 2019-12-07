@@ -105,9 +105,6 @@ class Polygon {
   unsigned int nvertices() const;
   /** Get the bounding box */
   Bbox_2 bbox() const;
-
-  void move(double x, double y);
-
   void push_back(const Contour& c) { _contours.push_back(c); }
   Contour& back() { return _contours.back(); }
   const Contour& back() const { return _contours.back(); }

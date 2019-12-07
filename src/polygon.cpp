@@ -100,10 +100,6 @@ Bbox_2 Polygon::bbox() const {
   return bb;
 }
 
-void Polygon::move(double x, double y) {
-  for (unsigned int i = 0; i < _contours.size(); i++) _contours[i].move(x, y);
-}
-
 std::ostream& cbop::operator<<(std::ostream& o, Polygon& p) {
   o << p.ncontours() << std::endl;
   for (unsigned int i = 0; i < p.ncontours(); i++)  // write the contours
