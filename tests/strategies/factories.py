@@ -23,6 +23,14 @@ def scalars_to_ported_points_pairs(scalars: Strategy[Scalar]
     return strategies.tuples(points_strategy, points_strategy)
 
 
+def scalars_to_ported_points_triplets(scalars: Strategy[Scalar]
+                                      ) -> Strategy[Tuple[PortedPoint,
+                                                          PortedPoint,
+                                                          PortedPoint]]:
+    points_strategy = strategies.builds(PortedPoint, scalars, scalars)
+    return strategies.tuples(points_strategy, points_strategy, points_strategy)
+
+
 def to_bound_with_ported_points_pair(x: float, y: float
                                      ) -> Tuple[BoundPoint, PortedPoint]:
     return BoundPoint(x, y), PortedPoint(x, y)
