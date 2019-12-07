@@ -1,6 +1,7 @@
 from typing import (Any,
                     Iterable,
                     List,
+                    Sequence,
                     Tuple,
                     TypeVar,
                     Union)
@@ -89,3 +90,20 @@ def are_bound_ported_polygons_equal(bound: BoundPolygon,
                                     ported: PortedPolygon) -> bool:
     return all(map(are_bound_ported_contours_equal,
                    bound.contours, ported.contours))
+
+
+Domain = TypeVar('Domain')
+
+
+def permute(sequence: Sequence[Domain],
+            permutation: Sequence[int]) -> Iterable[Domain]:
+    return map(sequence.__getitem__, permutation)
+
+
+def is_even_permutation(permutation: Sequence[int]) -> bool:
+    counter = 0
+    for index in range(len(permutation)):
+        for next_index in range(index + 1, len(permutation)):
+            if permutation[index] > permutation[next_index]:
+                counter += 1
+    return not counter % 2
