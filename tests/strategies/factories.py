@@ -8,7 +8,8 @@ from hypothesis import strategies
 from martinez.contour import Contour as PortedContour
 from martinez.hints import Scalar
 from martinez.point import Point as PortedPoint
-from tests.utils import Strategy
+from tests.utils import (PortedPointsTriplet,
+                         Strategy)
 
 
 def scalars_to_ported_points(scalars: Strategy[Scalar]
@@ -24,9 +25,7 @@ def scalars_to_ported_points_pairs(scalars: Strategy[Scalar]
 
 
 def scalars_to_ported_points_triplets(scalars: Strategy[Scalar]
-                                      ) -> Strategy[Tuple[PortedPoint,
-                                                          PortedPoint,
-                                                          PortedPoint]]:
+                                      ) -> Strategy[PortedPointsTriplet]:
     points_strategy = strategies.builds(PortedPoint, scalars, scalars)
     return strategies.tuples(points_strategy, points_strategy, points_strategy)
 

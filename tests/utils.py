@@ -20,6 +20,8 @@ from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
 
 Strategy = SearchStrategy
+BoundPointsTriplet = Tuple[BoundPoint, BoundPoint, BoundPoint]
+PortedPointsTriplet = Tuple[PortedPoint, PortedPoint, PortedPoint]
 
 
 def equivalence(left_statement: bool, right_statement: bool) -> bool:
@@ -34,11 +36,13 @@ FirstCoordinate = TypeVar('FirstCoordinate')
 SecondCoordinate = TypeVar('SecondCoordinate')
 
 
-def transpose(elements: List[Tuple[FirstCoordinate, SecondCoordinate]]
-              ) -> Tuple[List[FirstCoordinate], List[SecondCoordinate]]:
-    if not elements:
-        return [], []
-    return tuple(map(list, zip(*elements)))
+def transpose(sequence: Sequence[Tuple[FirstCoordinate, SecondCoordinate]]
+              ) -> Tuple[Sequence[FirstCoordinate],
+                         Sequence[SecondCoordinate]]:
+    sequence_type = type(sequence)
+    if not sequence:
+        return sequence_type(), sequence_type()
+    return tuple(map(sequence_type, zip(*sequence)))
 
 
 def capacity(iterable: Iterable[Any]) -> int:
