@@ -4,8 +4,7 @@ from _martinez import (Point,
                        sign)
 from hypothesis import given
 
-from tests.utils import (equivalence,
-                         is_even_permutation,
+from tests.utils import (is_even_permutation,
                          permute)
 from . import strategies
 
@@ -26,9 +25,6 @@ def test_permutations(first_point: Point,
     result = sign(first_point, second_point, third_point)
 
     points = [first_point, second_point, third_point]
-    assert (all(sign(*points) == result
-                for points in permutations(points))
-            if result == 0
-            else all(equivalence(is_even_permutation(permutation),
-                                 sign(*permute(points, permutation)) == result)
-                     for permutation in permutations(range(3))))
+    assert all(sign(*permute(points, permutation)) ==
+               (result if is_even_permutation(permutation) else -result)
+               for permutation in permutations(range(3)))
