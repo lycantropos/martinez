@@ -35,7 +35,6 @@ class Contour {
   }
   /** Number of vertices and edges */
   unsigned nvertices() const { return _points.size(); }
-  unsigned nedges() const { return _points.size(); }
   /** Get the bounding box */
   Bbox_2 bbox() const;
   /** Return if the contour is counterclockwise oriented */
