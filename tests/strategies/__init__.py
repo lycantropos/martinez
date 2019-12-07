@@ -1,8 +1,10 @@
 from .factories import (scalars_to_ported_points,
+                        scalars_to_ported_points_lists,
                         scalars_to_ported_points_pairs,
                         scalars_to_ported_points_triplets,
                         to_bound_with_ported_contours_pair,
-                        to_bound_with_ported_points_pair)
+                        to_bound_with_ported_points_pair,
+                        to_bound_with_ported_segments_pair)
 from .literals import (booleans,
                        floats,
                        non_negative_integers,

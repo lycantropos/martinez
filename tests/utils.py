@@ -20,7 +20,9 @@ from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
 
 Strategy = SearchStrategy
+BoundPointsPair = Tuple[BoundPoint, BoundPoint]
 BoundPointsTriplet = Tuple[BoundPoint, BoundPoint, BoundPoint]
+PortedPointsPair = Tuple[PortedPoint, PortedPoint]
 PortedPointsTriplet = Tuple[PortedPoint, PortedPoint, PortedPoint]
 
 
