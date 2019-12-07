@@ -90,7 +90,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
         Python binding of polygon clipping algorithm by F. Martínez et al.
     )pbdoc";
 
-  m.def("sign", &cbop::sign);
+  m.def("sign", &cbop::sign, pybind11::arg("first_point"),
+        pybind11::arg("second_point"), pybind11::arg("third_point"));
 
   py::class_<cbop::Bbox_2>(m, BOUNDING_BOX_NAME)
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
