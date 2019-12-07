@@ -50,7 +50,6 @@ class Contour {
     if (clockwise()) changeOrientation();
   }
 
-  void move(double x, double y);
   void add(const Point_2& s) { _points.push_back(s); }
   void erase(iterator i) { _points.erase(i); }
   void clear() {

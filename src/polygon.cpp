@@ -50,11 +50,6 @@ Bbox_2 Contour::bbox() const {
   return b;
 }
 
-void Contour::move(double x, double y) {
-  for (unsigned int i = 0; i < _points.size(); i++)
-    _points[i] = Point_2(_points[i].x() + x, _points[i].y() + y);
-}
-
 std::ostream& cbop::operator<<(std::ostream& o, Contour& c) {
   o << c.nvertices() << '\n';
   Contour::iterator i = c.begin();
