@@ -14,6 +14,8 @@ from tests.utils import (Strategy,
 
 MAX_DIGITS_COUNT = sys.float_info.dig
 
+booleans = strategies.booleans()
+
 
 def is_non_zero_number_far_from_zero(number: float) -> bool:
     return implication(bool(number), bool(number ** 3))
@@ -27,43 +29,51 @@ def to_decimals(*,
                 min_value: Optional[Scalar] = None,
                 max_value: Optional[Scalar] = None,
                 allow_nan: bool = False,
-                allow_infinity: bool = False) -> Strategy[Decimal]:
+                allow_infinity: bool = False,
+                max_digits_count: int = MAX_DIGITS_COUNT) -> Strategy[Decimal]:
     return (strategies.floats(min_value=min_value,
                               max_value=max_value,
                               allow_nan=allow_nan,
                               allow_infinity=allow_infinity)
-            .map(to_digits_count))
+            .map(partial(to_digits_count,
+                         max_digits_count=max_digits_count)))
 
 
 def to_floats(*,
               min_value: Optional[Scalar] = None,
               max_value: Optional[Scalar] = None,
               allow_nan: bool = False,
-              allow_infinity: bool = False) -> Strategy[float]:
+              allow_infinity: bool = False,
+              max_digits_count: int = MAX_DIGITS_COUNT) -> Strategy[float]:
     return (strategies.floats(min_value=min_value,
                               max_value=max_value,
                               allow_nan=allow_nan,
                               allow_infinity=allow_infinity)
-            .map(to_digits_count))
+            .map(partial(to_digits_count,
+                         max_digits_count=max_digits_count)))
 
 
 def to_fractions(*,
                  min_value: Optional[Scalar] = None,
                  max_value: Optional[Scalar] = None,
-                 max_denominator: Optional[Scalar] = None
+                 max_denominator: Optional[Scalar] = None,
+                 max_digits_count: int = MAX_DIGITS_COUNT
                  ) -> Strategy[Fraction]:
     return (strategies.fractions(min_value=min_value,
                                  max_value=max_value,
                                  max_denominator=max_denominator)
-            .map(to_digits_count))
+            .map(partial(to_digits_count,
+                         max_digits_count=max_digits_count)))
 
 
 def to_integers(*,
                 min_value: Optional[Scalar] = None,
-                max_value: Optional[Scalar] = None) -> Strategy[int]:
+                max_value: Optional[Scalar] = None,
+                max_digits_count: int = MAX_DIGITS_COUNT) -> Strategy[int]:
     return (strategies.integers(min_value=min_value,
                                 max_value=max_value)
-            .map(to_digits_count))
+            .map(partial(to_digits_count,
+                         max_digits_count=max_digits_count)))
 
 
 def to_digits_count(number: Scalar,
@@ -107,13 +117,13 @@ scalars_strategies_factories = {Decimal: to_decimals,
 scalars_strategies = strategies.sampled_from(
         [factory() for factory in scalars_strategies_factories.values()])
 floats = to_floats()
-single_precision_floats = (strategies.floats(allow_nan=False,
-                                             allow_infinity=False)
-                           .map(partial(to_digits_count,
-                                        max_digits_count=
-                                        MAX_DIGITS_COUNT // 2)))
+single_precision_floats = to_floats(max_digits_count=MAX_DIGITS_COUNT // 2)
+single_precision_scalars_strategies = strategies.sampled_from(
+        [factory(max_digits_count=MAX_DIGITS_COUNT // 2)
+         if type_ is float
+         else factory()
+         for type_, factory in scalars_strategies_factories.items()])
 unsigned_integers = strategies.integers(0, 65535)
 unsigned_integers_lists = strategies.lists(unsigned_integers)
 non_negative_integers = strategies.integers(0)
 non_negative_integers_lists = strategies.lists(non_negative_integers)
-booleans = strategies.booleans()
