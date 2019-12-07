@@ -10,6 +10,7 @@
 #include "point_2.h"
 #include "polygon.h"
 #include "segment_2.h"
+#include "utilities.h"
 
 namespace py = pybind11;
 
@@ -88,6 +89,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
   m.doc() = R"pbdoc(
         Python binding of polygon clipping algorithm by F. Martínez et al.
     )pbdoc";
+
+  m.def("sign", &cbop::sign);
 
   py::class_<cbop::Bbox_2>(m, BOUNDING_BOX_NAME)
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
