@@ -115,7 +115,6 @@ class Polygon {
   iterator end() { return _contours.end(); }
   const_iterator begin() const { return _contours.begin(); }
   const_iterator end() const { return _contours.end(); }
-  void computeHoles();
 
  private:
   /** Set of contours conforming the polygon */
