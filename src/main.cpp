@@ -90,6 +90,25 @@ PYBIND11_MODULE(MODULE_NAME, m) {
         Python binding of polygon clipping algorithm by F. Martínez et al.
     )pbdoc";
 
+  m.def(
+      "find_intersections",
+      [](const cbop::Segment_2& first_segment,
+         const cbop::Segment_2& second_segment) -> py::tuple {
+        cbop::Point_2 first_intersection_point, second_intersection_point;
+        int intersections_count = cbop::findIntersection(
+            first_segment, second_segment, first_intersection_point,
+            second_intersection_point);
+        switch (intersections_count) {
+          case 0:
+            return py::make_tuple(intersections_count, py::none(), py::none());
+          case 1:
+            return py::make_tuple(intersections_count, first_intersection_point,
+                                  py::none());
+          default:
+            return py::make_tuple(intersections_count, first_intersection_point,
+                                  second_intersection_point);
+        }
+      });
   m.def("sign", &cbop::sign, pybind11::arg("first_point"),
         pybind11::arg("second_point"), pybind11::arg("third_point"));
 
