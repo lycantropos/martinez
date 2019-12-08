@@ -1,6 +1,5 @@
 from typing import (Any,
                     Iterable,
-                    List,
                     Sequence,
                     Tuple,
                     TypeVar,
@@ -65,10 +64,12 @@ def are_bound_ported_points_equal(bound_point: BoundPoint,
     return bound_point.x == ported_point.x and bound_point.y == ported_point.y
 
 
-def are_bound_ported_list_points_equal(bound_points: List[BoundPoint],
-                                       ported_points: List[PortedPoint]
-                                       ) -> bool:
-    return all(map(are_bound_ported_points_equal, bound_points, ported_points))
+def are_bound_ported_points_sequences_equal(
+        bound_points: Sequence[BoundPoint],
+        ported_points: Sequence[PortedPoint]) -> bool:
+    return (len(bound_points) == len(ported_points)
+            and all(map(are_bound_ported_points_equal,
+                        bound_points, ported_points)))
 
 
 def are_bound_ported_segments_equal(bound_segment: BoundSegment,
@@ -87,7 +88,8 @@ def is_bounding_box_empty(bounding_box: Union[BoundBoundingBox,
 
 def are_bound_ported_contours_equal(bound: BoundContour,
                                     ported: PortedContour) -> bool:
-    return (are_bound_ported_list_points_equal(bound.points, ported.points)
+    return (are_bound_ported_points_sequences_equal(bound.points,
+                                                    ported.points)
             and bound.holes == ported.holes
             and bound.is_external is ported.is_external)
 
