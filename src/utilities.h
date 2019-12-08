@@ -40,11 +40,5 @@ inline int sign(const Point_2& p1, const Point_2& p2, const Point_2& o) {
   return (det < 0 ? -1 : (det > 0 ? +1 : 0));
 }
 
-inline bool pointInTriangle(const Segment_2& s, const Point_2& o,
-                            const Point_2& p) {
-  int x = sign(s.source(), s.target(), p);
-  return ((x == sign(s.target(), o, p)) && (x == sign(o, s.source(), p)));
-}
-
 }  // end of namespace cbop
 #endif
