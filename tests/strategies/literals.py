@@ -120,7 +120,7 @@ floats = to_floats()
 single_precision_floats = to_floats(max_digits_count=MAX_DIGITS_COUNT // 2)
 single_precision_scalars_strategies = strategies.sampled_from(
         [factory(max_digits_count=MAX_DIGITS_COUNT // 2)
-         if type_ is float
+         if type_ is float or type_ is Decimal
          else factory()
          for type_, factory in scalars_strategies_factories.items()])
 unsigned_integers = strategies.integers(0, 65535)
