@@ -69,7 +69,7 @@ def find_intersections(first_segment: Segment, second_segment: Segment,
         first_intersection_point = Point(first_source.x + s * first_vector.x,
                                          first_source.y + s * first_vector.y)
         if first_intersection_point.distance_to(first_source) < threshold:
-            first_intersection_point = first_segment.source
+            first_intersection_point = first_source
         elif first_intersection_point.distance_to(first_target) < threshold:
             first_intersection_point = first_target
         elif first_intersection_point.distance_to(second_source) < threshold:
@@ -101,11 +101,11 @@ def find_intersections(first_segment: Segment, second_segment: Segment,
                                          first_source.y
                                          + first_coefficient * first_vector.y)
         if first_intersection_point.distance_to(first_source) < threshold:
-            first_intersection_point = first_segment.source
+            first_intersection_point = first_source
         elif first_intersection_point.distance_to(first_target) < threshold:
             first_intersection_point = first_target
         elif first_intersection_point.distance_to(second_source) < threshold:
-            first_intersection_point = second_segment.source
+            first_intersection_point = second_source
         elif first_intersection_point.distance_to(second_target) < threshold:
             first_intersection_point = second_target
         if intersections_count > 1:
