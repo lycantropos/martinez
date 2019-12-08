@@ -43,6 +43,12 @@ def scalars_to_ported_points_lists(scalars: Strategy[Scalar],
                             max_size=max_size)
 
 
+def scalars_to_ported_segments(scalars: Strategy[Scalar]
+                               ) -> Strategy[PortedSegment]:
+    points_strategy = scalars_to_ported_points(scalars)
+    return strategies.builds(PortedSegment, points_strategy, points_strategy)
+
+
 def to_bound_with_ported_points_pair(x: float, y: float
                                      ) -> Tuple[BoundPoint, PortedPoint]:
     return BoundPoint(x, y), PortedPoint(x, y)
