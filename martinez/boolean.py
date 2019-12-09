@@ -15,3 +15,9 @@ class OperationType(enum.IntEnum):
     UNION = 1
     DIFFERENCE = 2
     XOR = 3
+
+
+@enum.unique
+class PolygonType(enum.IntEnum):
+    SUBJECT = 0
+    CLIPPING = 1
