@@ -7,14 +7,10 @@ from _martinez import (EdgeType,
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
-                              floats,
-                              unsigned_integers,
-                              unsigned_integers_lists)
+                              floats)
 from tests.utils import Strategy
 
 booleans = booleans
-non_negative_integers = unsigned_integers
-non_negative_integers_lists = unsigned_integers_lists
 points = strategies.builds(Point, floats, floats)
 polygons_types = strategies.sampled_from(list(PolygonType.__members__
                                               .values()))
