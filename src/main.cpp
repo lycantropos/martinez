@@ -114,23 +114,23 @@ PYBIND11_MODULE(MODULE_NAME, m) {
         pybind11::arg("second_point"), pybind11::arg("third_point"));
 
   py::enum_<cbop::EdgeType>(m, "EdgeType")
-   .value("NORMAL", cbop::EdgeType::NORMAL)
-   .value("NON_CONTRIBUTING", cbop::EdgeType::NON_CONTRIBUTING)
-   .value("SAME_TRANSITION", cbop::EdgeType::SAME_TRANSITION)
-   .value("DIFFERENT_TRANSITION", cbop::EdgeType::DIFFERENT_TRANSITION)
-   .export_values();
+      .value("NORMAL", cbop::EdgeType::NORMAL)
+      .value("NON_CONTRIBUTING", cbop::EdgeType::NON_CONTRIBUTING)
+      .value("SAME_TRANSITION", cbop::EdgeType::SAME_TRANSITION)
+      .value("DIFFERENT_TRANSITION", cbop::EdgeType::DIFFERENT_TRANSITION)
+      .export_values();
 
   py::enum_<cbop::BooleanOpType>(m, "OperationType")
-   .value("INTERSECTION", cbop::BooleanOpType::INTERSECTION)
-   .value("UNION", cbop::BooleanOpType::UNION)
-   .value("DIFFERENCE", cbop::BooleanOpType::DIFFERENCE)
-   .value("XOR", cbop::BooleanOpType::XOR)
-   .export_values();
+      .value("INTERSECTION", cbop::BooleanOpType::INTERSECTION)
+      .value("UNION", cbop::BooleanOpType::UNION)
+      .value("DIFFERENCE", cbop::BooleanOpType::DIFFERENCE)
+      .value("XOR", cbop::BooleanOpType::XOR)
+      .export_values();
 
   py::enum_<cbop::PolygonType>(m, "PolygonType")
-   .value("SUBJECT", cbop::PolygonType::SUBJECT)
-   .value("CLIPPING", cbop::PolygonType::CLIPPING)
-   .export_values();
+      .value("SUBJECT", cbop::PolygonType::SUBJECT)
+      .value("CLIPPING", cbop::PolygonType::CLIPPING)
+      .export_values();
 
   py::class_<cbop::Bbox_2>(m, BOUNDING_BOX_NAME)
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
