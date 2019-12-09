@@ -1,4 +1,5 @@
 from typing import (Any,
+                    Hashable,
                     Iterable,
                     Sequence,
                     Tuple,
@@ -48,6 +49,16 @@ def transpose(sequence: Sequence[Tuple[FirstCoordinate, SecondCoordinate]]
 
 def capacity(iterable: Iterable[Any]) -> int:
     return sum(1 for _ in iterable)
+
+
+def all_unique(iterable: Iterable[Hashable]) -> bool:
+    seen = set()
+    for element in iterable:
+        if element not in seen:
+            seen.add(element)
+        else:
+            return False
+    return True
 
 
 def are_bound_ported_bounding_boxes_equal(
