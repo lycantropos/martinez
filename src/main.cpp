@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include "bbox_2.h"
+#include "booleanop.h"
 #include "point_2.h"
 #include "polygon.h"
 #include "segment_2.h"
@@ -111,6 +112,13 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       });
   m.def("sign", &cbop::sign, pybind11::arg("first_point"),
         pybind11::arg("second_point"), pybind11::arg("third_point"));
+
+  py::enum_<cbop::BooleanOpType>(m, "OperationType")
+   .value("INTERSECTION", cbop::BooleanOpType::INTERSECTION)
+   .value("UNION", cbop::BooleanOpType::UNION)
+   .value("DIFFERENCE", cbop::BooleanOpType::DIFFERENCE)
+   .value("XOR", cbop::BooleanOpType::XOR)
+   .export_values();
 
   py::class_<cbop::Bbox_2>(m, BOUNDING_BOX_NAME)
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
