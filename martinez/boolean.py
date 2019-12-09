@@ -6,8 +6,13 @@ from reprit.base import generate_repr
 from .point import Point
 
 
+class _EnumBase(enum.IntEnum):
+    def __repr__(self) -> str:
+        return self.__class__.__qualname__ + '.' + self.name
+
+
 @enum.unique
-class EdgeType(enum.IntEnum):
+class EdgeType(_EnumBase):
     NORMAL = 0
     NON_CONTRIBUTING = 1
     SAME_TRANSITION = 2
@@ -15,7 +20,7 @@ class EdgeType(enum.IntEnum):
 
 
 @enum.unique
-class OperationType(enum.IntEnum):
+class OperationType(_EnumBase):
     INTERSECTION = 0
     UNION = 1
     DIFFERENCE = 2
@@ -23,7 +28,7 @@ class OperationType(enum.IntEnum):
 
 
 @enum.unique
-class PolygonType(enum.IntEnum):
+class PolygonType(_EnumBase):
     SUBJECT = 0
     CLIPPING = 1
 
