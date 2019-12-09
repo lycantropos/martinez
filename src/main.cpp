@@ -20,9 +20,12 @@ namespace py = pybind11;
 #define C_STR(a) C_STR_HELPER(a)
 #define BOUNDING_BOX_NAME "BoundingBox"
 #define CONTOUR_NAME "Contour"
+#define EDGE_TYPE_NAME "EdgeType"
 #define POINT_NAME "Point"
 #define POLYGON_NAME "Polygon"
+#define POLYGON_TYPE_NAME "PolygonType"
 #define SEGMENT_NAME "Segment"
+#define SWEEP_EVENT_NAME "SweepEvent"
 
 static std::string join(const std::vector<std::string>& elements,
                         const std::string& separator) {
@@ -44,6 +47,33 @@ static std::string point_repr(const cbop::Point_2& self) {
   auto stream = make_stream();
   stream << C_STR(MODULE_NAME) "." POINT_NAME "(" << self.x() << ", "
          << self.y() << ")";
+  return stream.str();
+}
+
+static std::string polygon_type_repr(const cbop::PolygonType& type) {
+  auto stream = make_stream();
+  stream << C_STR(MODULE_NAME) "." POLYGON_TYPE_NAME "(" << type << ")";
+  return stream.str();
+}
+
+static std::string edge_type_repr(const cbop::EdgeType& type) {
+  auto stream = make_stream();
+  stream << C_STR(MODULE_NAME) "." EDGE_TYPE_NAME "(" << type << ")";
+  return stream.str();
+}
+
+static std::string bool_repr(bool value) { return py::str(py::bool_(value)); }
+
+static std::string sweep_event_repr(const cbop::SweepEvent& self) {
+  auto left_repr = bool_repr(self.left);
+  std::string other_event_repr = self.otherEvent == nullptr
+                                     ? std::string(py::str(py::none()))
+                                     : sweep_event_repr(*self.otherEvent);
+  auto stream = make_stream();
+  stream << C_STR(MODULE_NAME) "." SWEEP_EVENT_NAME "(" << left_repr << ", "
+         << point_repr(self.point) << ", " << other_event_repr << ", "
+         << polygon_type_repr(self.pol) << ", " << edge_type_repr(self.type)
+         << ")";
   return stream.str();
 }
 
@@ -95,7 +125,7 @@ static std::string contour_repr(const cbop::Contour& self) {
          << "[" << join(points_reprs, ", ") << "]"
          << ", "
          << "[" << join(holes_reprs, ", ") << "]"
-         << ", " << py::bool_(self.external()) << ")";
+         << ", " << bool_repr(self.external()) << ")";
   return stream.str();
 }
 
@@ -126,7 +156,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
   m.def("sign", &cbop::sign, pybind11::arg("first_point"),
         pybind11::arg("second_point"), pybind11::arg("third_point"));
 
-  py::enum_<cbop::EdgeType>(m, "EdgeType")
+  py::enum_<cbop::EdgeType>(m, EDGE_TYPE_NAME)
       .value("NORMAL", cbop::EdgeType::NORMAL)
       .value("NON_CONTRIBUTING", cbop::EdgeType::NON_CONTRIBUTING)
       .value("SAME_TRANSITION", cbop::EdgeType::SAME_TRANSITION)
@@ -140,7 +170,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .value("XOR", cbop::BooleanOpType::XOR)
       .export_values();
 
-  py::enum_<cbop::PolygonType>(m, "PolygonType")
+  py::enum_<cbop::PolygonType>(m, POLYGON_TYPE_NAME)
       .value("SUBJECT", cbop::PolygonType::SUBJECT)
       .value("CLIPPING", cbop::PolygonType::CLIPPING)
       .export_values();
@@ -309,12 +339,13 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("is_vertical", &cbop::Segment_2::is_vertical)
       .def_property_readonly("reversed", &cbop::Segment_2::changeOrientation);
 
-  py::class_<cbop::SweepEvent>(m, "SweepEvent")
+  py::class_<cbop::SweepEvent>(m, SWEEP_EVENT_NAME)
       .def(py::init<bool, const cbop::Point_2&, cbop::SweepEvent*,
                     cbop::PolygonType, cbop::EdgeType>(),
            py::arg("left"), py::arg("point"), py::arg("other_event"),
            py::arg("polygon_type"), py::arg("edge_type"))
       .def("__eq__", are_sweep_events_equal)
+      .def("__repr__", sweep_event_repr)
       .def_readwrite("left", &cbop::SweepEvent::left)
       .def_readwrite("point", &cbop::SweepEvent::point)
       .def_readwrite("other_event", &cbop::SweepEvent::otherEvent)
