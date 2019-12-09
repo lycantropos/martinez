@@ -14,7 +14,7 @@ def test_basic(sweep_event: SweepEvent) -> None:
     assert SweepEvent.__qualname__ in result
 
 
-@given(strategies.root_sweep_events)
+@given(strategies.leaf_sweep_events)
 def test_round_trip(sweep_event: SweepEvent) -> None:
     result = repr(sweep_event)
 

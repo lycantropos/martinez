@@ -27,8 +27,8 @@ def extend_sweep_events(strategy: Strategy[Optional[SweepEvent]]
     return strategy.flatmap(expand)
 
 
-root_sweep_events = strategies.builds(SweepEvent, booleans, points,
+leaf_sweep_events = strategies.builds(SweepEvent, booleans, points,
                                       strategies.none(),
                                       polygons_types, edges_types)
-sweep_events = strategies.recursive(root_sweep_events, extend_sweep_events)
+sweep_events = strategies.recursive(leaf_sweep_events, extend_sweep_events)
 maybe_sweep_events = strategies.none() | sweep_events
