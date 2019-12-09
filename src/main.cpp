@@ -127,6 +127,11 @@ PYBIND11_MODULE(MODULE_NAME, m) {
    .value("XOR", cbop::BooleanOpType::XOR)
    .export_values();
 
+  py::enum_<cbop::PolygonType>(m, "PolygonType")
+   .value("SUBJECT", cbop::PolygonType::SUBJECT)
+   .value("CLIPPING", cbop::PolygonType::CLIPPING)
+   .export_values();
+
   py::class_<cbop::Bbox_2>(m, BOUNDING_BOX_NAME)
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
            py::arg("y_min") = 0., py::arg("x_max") = 0., py::arg("y_max") = 0.)
