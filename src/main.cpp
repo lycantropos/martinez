@@ -70,6 +70,19 @@ static bool are_contours_equal(const cbop::Contour& self,
          self.external() == other.external();
 }
 
+static bool are_sweep_events_equal(const cbop::SweepEvent& self,
+                                   const cbop::SweepEvent& other) {
+  if (self.otherEvent != nullptr) {
+    if (other.otherEvent == nullptr)
+      return false;
+    else if (!are_sweep_events_equal(*self.otherEvent, *other.otherEvent))
+      return false;
+  } else if (other.otherEvent != nullptr)
+    return false;
+  return self.left == other.left && self.point == other.point &&
+         self.pol == other.pol && self.type == other.type;
+}
+
 static std::string contour_repr(const cbop::Contour& self) {
   std::vector<std::string> points_reprs;
   for (auto& point : contour_to_points(self))
@@ -301,6 +314,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                     cbop::PolygonType, cbop::EdgeType>(),
            py::arg("left"), py::arg("point"), py::arg("other_event"),
            py::arg("polygon_type"), py::arg("edge_type"))
+      .def("__eq__", are_sweep_events_equal)
       .def_readwrite("left", &cbop::SweepEvent::left)
       .def_readwrite("point", &cbop::SweepEvent::point)
       .def_readwrite("other_event", &cbop::SweepEvent::otherEvent)
