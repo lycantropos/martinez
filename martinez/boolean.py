@@ -46,3 +46,12 @@ class SweepEvent:
         self.edge_type = edge_type
 
     __repr__ = generate_repr(__init__)
+
+    def __eq__(self, other: 'SweepEvent') -> bool:
+        return (self.left is other.left
+                and self.point == other.point
+                and self.other_event == other.other_event
+                and self.polygon_type is other.polygon_type
+                and self.edge_type is other.edge_type
+                if isinstance(other, SweepEvent)
+                else NotImplemented)
