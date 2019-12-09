@@ -296,6 +296,17 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("is_vertical", &cbop::Segment_2::is_vertical)
       .def_property_readonly("reversed", &cbop::Segment_2::changeOrientation);
 
+  py::class_<cbop::SweepEvent>(m, "SweepEvent")
+      .def(py::init<bool, const cbop::Point_2&, cbop::SweepEvent*,
+                    cbop::PolygonType, cbop::EdgeType>(),
+           py::arg("left"), py::arg("point"), py::arg("other_event"),
+           py::arg("polygon_type"), py::arg("edge_type"))
+      .def_readwrite("left", &cbop::SweepEvent::left)
+      .def_readwrite("point", &cbop::SweepEvent::point)
+      .def_readwrite("other_event", &cbop::SweepEvent::otherEvent)
+      .def_readwrite("polygon_type", &cbop::SweepEvent::pol)
+      .def_readwrite("edge_type", &cbop::SweepEvent::type);
+
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
 #else
