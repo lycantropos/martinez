@@ -113,6 +113,13 @@ PYBIND11_MODULE(MODULE_NAME, m) {
   m.def("sign", &cbop::sign, pybind11::arg("first_point"),
         pybind11::arg("second_point"), pybind11::arg("third_point"));
 
+  py::enum_<cbop::EdgeType>(m, "EdgeType")
+   .value("NORMAL", cbop::EdgeType::NORMAL)
+   .value("NON_CONTRIBUTING", cbop::EdgeType::NON_CONTRIBUTING)
+   .value("SAME_TRANSITION", cbop::EdgeType::SAME_TRANSITION)
+   .value("DIFFERENT_TRANSITION", cbop::EdgeType::DIFFERENT_TRANSITION)
+   .export_values();
+
   py::enum_<cbop::BooleanOpType>(m, "OperationType")
    .value("INTERSECTION", cbop::BooleanOpType::INTERSECTION)
    .value("UNION", cbop::BooleanOpType::UNION)
