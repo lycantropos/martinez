@@ -343,7 +343,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def(py::init<bool, const cbop::Point_2&, cbop::SweepEvent*,
                     cbop::PolygonType, cbop::EdgeType>(),
            py::arg("left"), py::arg("point"), py::arg("other_event"),
-           py::arg("polygon_type"), py::arg("edge_type"))
+           py::arg("polygon_type"), py::arg("edge_type"),
+           py::return_value_policy::reference)
       .def("__eq__", are_sweep_events_equal)
       .def("__repr__", sweep_event_repr)
       .def_readwrite("left", &cbop::SweepEvent::left)
