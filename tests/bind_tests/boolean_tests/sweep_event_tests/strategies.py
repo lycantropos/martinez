@@ -15,6 +15,9 @@ points = strategies.builds(Point, floats, floats)
 polygons_types = strategies.sampled_from(list(PolygonType.__members__
                                               .values()))
 edges_types = strategies.sampled_from(list(EdgeType.__members__.values()))
+leaf_sweep_events = strategies.builds(SweepEvent, booleans, points,
+                                      strategies.none(),
+                                      polygons_types, edges_types)
 
 
 def extend_sweep_events(strategy: Strategy[Optional[SweepEvent]]
@@ -23,9 +26,6 @@ def extend_sweep_events(strategy: Strategy[Optional[SweepEvent]]
                              strategy, polygons_types, edges_types)
 
 
-leaf_sweep_events = strategies.builds(SweepEvent, booleans, points,
-                                      strategies.none(),
-                                      polygons_types, edges_types)
 sweep_events = strategies.recursive(leaf_sweep_events, extend_sweep_events)
 
 
