@@ -35,12 +35,13 @@ class PolygonType(_EnumBase):
 
 
 class SweepEvent:
-    __slots__ = ('left', 'point', 'other_event', 'polygon_type', 'edge_type')
+    __slots__ = ('is_left', 'point', 'other_event', 'polygon_type',
+                 'edge_type')
 
-    def __init__(self, left: bool, point: Point,
+    def __init__(self, is_left: bool, point: Point,
                  other_event: Optional['SweepEvent'],
                  polygon_type: PolygonType, edge_type: EdgeType) -> None:
-        self.left = left
+        self.is_left = is_left
         self.point = point
         self.other_event = other_event
         self.polygon_type = polygon_type
@@ -49,7 +50,7 @@ class SweepEvent:
     __repr__ = generate_repr(__init__)
 
     def __eq__(self, other: 'SweepEvent') -> bool:
-        return (self.left is other.left
+        return (self.is_left is other.is_left
                 and self.point == other.point
                 and self.other_event == other.other_event
                 and self.polygon_type is other.polygon_type
