@@ -4,6 +4,7 @@ from typing import Optional
 from reprit.base import generate_repr
 
 from .point import Point
+from .segment import Segment
 
 
 class _EnumBase(enum.IntEnum):
@@ -58,6 +59,14 @@ class SweepEvent:
 
     @property
     def is_vertical(self) -> bool:
+        self.validate()
+        return self.point.x == self.other_event.point.x
+
+    @property
+    def segment(self) -> Segment:
+        self.validate()
+        return Segment(self.point, self.other_event.point)
+
+    def validate(self) -> None:
         if self.other_event is None:
             raise ValueError('No "other_event" found.')
-        return self.point.x == self.other_event.point.x
