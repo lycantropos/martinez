@@ -366,7 +366,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_readwrite("point", &cbop::SweepEvent::point)
       .def_readwrite("other_event", &cbop::SweepEvent::otherEvent)
       .def_readwrite("polygon_type", &cbop::SweepEvent::pol)
-      .def_readwrite("edge_type", &cbop::SweepEvent::type);
+      .def_readwrite("edge_type", &cbop::SweepEvent::type)
+      .def_property_readonly("is_vertical", &cbop::SweepEvent::vertical);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
