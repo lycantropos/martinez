@@ -10,9 +10,11 @@ from _martinez import (BoundingBox as BoundBoundingBox,
                        Contour as BoundContour,
                        Point as BoundPoint,
                        Polygon as BoundPolygon,
-                       Segment as BoundSegment)
+                       Segment as BoundSegment,
+                       SweepEvent as BoundSweepEvent)
 from hypothesis.searchstrategy import SearchStrategy
 
+from martinez.boolean import SweepEvent as PortedSweepEvent
 from martinez.bounding_box import BoundingBox as PortedBoundingBox
 from martinez.contour import Contour as PortedContour
 from martinez.point import Point as PortedPoint
@@ -109,6 +111,20 @@ def are_bound_ported_polygons_equal(bound: BoundPolygon,
                                     ported: PortedPolygon) -> bool:
     return all(map(are_bound_ported_contours_equal,
                    bound.contours, ported.contours))
+
+
+def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
+                                        ported: PortedSweepEvent) -> bool:
+    other_events_are_equal = (
+            equivalence(bound.other_event is None, ported.other_event is None)
+            and (bound.other_event is None
+                 or are_bound_ported_sweep_events_equal(bound.other_event,
+                                                        ported.other_event)))
+    return (bound.left is ported.left
+            and are_bound_ported_points_equal(bound.point, ported.point)
+            and other_events_are_equal
+            and bound.polygon_type == ported.polygon_type
+            and bound.edge_type == ported.edge_type)
 
 
 Domain = TypeVar('Domain')
