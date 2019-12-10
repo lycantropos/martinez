@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <limits>
 #include <numeric>
+#include <set>
 #include <sstream>
 
 #include "bbox_2.h"
@@ -64,17 +65,30 @@ static std::string edge_type_repr(const cbop::EdgeType& type) {
 
 static std::string bool_repr(bool value) { return py::str(py::bool_(value)); }
 
-static std::string sweep_event_repr(const cbop::SweepEvent& self) {
+static std::string sweep_event_repr_impl(
+    const cbop::SweepEvent& self, std::set<const cbop::SweepEvent*>& visited) {
   auto left_repr = bool_repr(self.left);
-  std::string other_event_repr = self.otherEvent == nullptr
-                                     ? std::string(py::str(py::none()))
-                                     : sweep_event_repr(*self.otherEvent);
+  std::string other_event_repr;
+  if (self.otherEvent == nullptr)
+    other_event_repr = std::string(py::str(py::none()));
+  else {
+    if (visited.find(self.otherEvent) == visited.end()) {
+      visited.insert(self.otherEvent);
+      other_event_repr = sweep_event_repr_impl(*self.otherEvent, visited);
+    } else
+      other_event_repr = "...";
+  }
   auto stream = make_stream();
   stream << C_STR(MODULE_NAME) "." SWEEP_EVENT_NAME "(" << left_repr << ", "
          << point_repr(self.point) << ", " << other_event_repr << ", "
          << polygon_type_repr(self.pol) << ", " << edge_type_repr(self.type)
          << ")";
   return stream.str();
+}
+
+static std::string sweep_event_repr(const cbop::SweepEvent& self) {
+  std::set<const cbop::SweepEvent*> visited = {&self};
+  return sweep_event_repr_impl(self, visited);
 }
 
 static std::vector<cbop::Point_2> contour_to_points(const cbop::Contour& self) {
