@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Optional
 
 from hypothesis import strategies
@@ -18,16 +19,33 @@ polygons_types = strategies.sampled_from(list(PolygonType.__members__
 edges_types = strategies.sampled_from(list(EdgeType.__members__.values()))
 
 
-def scalars_to_sweep_events(scalars: Strategy[Scalar]) -> Strategy[SweepEvent]:
-    def from_children(children: Strategy[Optional[SweepEvent]]
-                      ) -> Strategy[SweepEvent]:
-        return strategies.builds(SweepEvent, booleans,
-                                 strategies.builds(Point, scalars, scalars),
-                                 children, polygons_types, edges_types)
+def to_sweep_events(scalars: Strategy[Scalar],
+                    children: Strategy[Optional[SweepEvent]]
+                    ) -> Strategy[SweepEvent]:
+    return strategies.builds(SweepEvent, booleans,
+                             strategies.builds(Point, scalars, scalars),
+                             children, polygons_types, edges_types)
 
-    return strategies.recursive(from_children(strategies.none()),
-                                from_children)
+
+def scalars_to_leaf_sweep_events(scalars: Strategy[Scalar]
+                                 ) -> Strategy[SweepEvent]:
+    return strategies.builds(SweepEvent, booleans,
+                             strategies.builds(Point, scalars, scalars),
+                             strategies.none(), polygons_types, edges_types)
+
+
+leaf_sweep_events = (scalars_strategies
+                     .flatmap(partial(to_sweep_events,
+                                      children=strategies.none())))
+
+
+def scalars_to_sweep_events(scalars: Strategy[Scalar]) -> Strategy[SweepEvent]:
+    return strategies.recursive(to_sweep_events(scalars, strategies.none()),
+                                partial(to_sweep_events, scalars))
 
 
 sweep_events = scalars_strategies.flatmap(scalars_to_sweep_events)
+nested_sweep_events = (scalars_strategies
+                       .flatmap(partial(to_sweep_events,
+                                        children=sweep_events)))
 maybe_sweep_events = strategies.none() | sweep_events
