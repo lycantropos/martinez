@@ -120,7 +120,7 @@ def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
             and (bound.other_event is None
                  or are_bound_ported_sweep_events_equal(bound.other_event,
                                                         ported.other_event)))
-    return (bound.left is ported.left
+    return (bound.is_left is ported.left
             and are_bound_ported_points_equal(bound.point, ported.point)
             and other_events_are_equal
             and bound.polygon_type == ported.polygon_type

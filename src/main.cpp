@@ -362,7 +362,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
            py::return_value_policy::reference)
       .def("__eq__", are_sweep_events_equal)
       .def("__repr__", sweep_event_repr)
-      .def_readwrite("left", &cbop::SweepEvent::left)
+      .def_readwrite("is_left", &cbop::SweepEvent::left)
       .def_readwrite("point", &cbop::SweepEvent::point)
       .def_readwrite("other_event", &cbop::SweepEvent::otherEvent)
       .def_readwrite("polygon_type", &cbop::SweepEvent::pol)
