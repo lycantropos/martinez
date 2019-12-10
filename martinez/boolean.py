@@ -55,3 +55,9 @@ class SweepEvent:
                 and self.edge_type is other.edge_type
                 if isinstance(other, SweepEvent)
                 else NotImplemented)
+
+    @property
+    def is_vertical(self) -> bool:
+        if self.other_event is None:
+            raise ValueError('No "other_event" found.')
+        return self.point.x == self.other_event.point.x
