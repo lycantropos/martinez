@@ -339,7 +339,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("is_vertical", &cbop::Segment_2::is_vertical)
       .def_property_readonly("reversed", &cbop::Segment_2::changeOrientation);
 
-  py::class_<cbop::SweepEvent>(m, SWEEP_EVENT_NAME)
+  py::class_<cbop::SweepEvent, std::unique_ptr<cbop::SweepEvent, py::nodelete>>(
+      m, SWEEP_EVENT_NAME)
       .def(py::init<bool, const cbop::Point_2&, cbop::SweepEvent*,
                     cbop::PolygonType, cbop::EdgeType>(),
            py::arg("left"), py::arg("point"), py::arg("other_event"),
