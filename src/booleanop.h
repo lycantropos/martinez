@@ -14,6 +14,7 @@
 #include <list>
 #include <queue>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #ifdef __STEPBYSTEP
@@ -66,15 +67,25 @@ struct SweepEvent {
   // member functions
   /** Is the line segment (point, otherEvent->point) below point p */
   bool below(const Point_2& p) const {
+    validate();
     return (left) ? signedArea(point, otherEvent->point, p) > 0
                   : signedArea(otherEvent->point, point, p) > 0;
   }
   /** Is the line segment (point, otherEvent->point) above point p */
   bool above(const Point_2& p) const { return !below(p); }
   /** Is the line segment (point, otherEvent->point) a vertical line segment */
-  bool vertical() const { return point.x() == otherEvent->point.x(); }
+  bool vertical() const {
+    validate();
+    return point.x() == otherEvent->point.x();
+  }
   /** Return the line segment associated to the SweepEvent */
-  Segment_2 segment() const { return Segment_2(point, otherEvent->point); }
+  Segment_2 segment() const {
+    validate();
+    return Segment_2(point, otherEvent->point);
+  }
+  void validate() const {
+    if (!otherEvent) throw std::domain_error("No `otherEvent` found.");
+  }
   std::string toString() const;
 };
 
