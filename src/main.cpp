@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <algorithm>
 #include <functional>
 #include <iomanip>
 #include <limits>
@@ -29,6 +30,12 @@ namespace py = pybind11;
 #define POLYGON_TYPE_NAME "PolygonType"
 #define SEGMENT_NAME "Segment"
 #define SWEEP_EVENT_NAME "SweepEvent"
+
+template <class Value>
+static bool value_in_vector(const std::vector<Value>& container, Value value) {
+  return std::find(container.begin(), container.end(), value) !=
+         container.end();
+}
 
 static std::string join(const std::vector<std::string>& elements,
                         const std::string& separator) {
@@ -89,7 +96,7 @@ static std::string sweep_event_repr_impl(
 }
 
 static std::string sweep_event_repr(const cbop::SweepEvent& self) {
-  std::set<const cbop::SweepEvent*> visited = {&self};
+  std::set<const cbop::SweepEvent*> visited = {std::addressof(self)};
   return sweep_event_repr_impl(self, visited);
 }
 
@@ -116,32 +123,41 @@ static bool are_contours_equal(const cbop::Contour& self,
          self.external() == other.external();
 }
 
-static bool are_sweep_events_equal_impl(
-    const cbop::SweepEvent& self, const cbop::SweepEvent& other,
-    std::set<const cbop::SweepEvent*>& visited) {
-  if (visited.find(&self) != visited.end() &&
-      visited.find(&other) != visited.end())
-    return std::addressof(self) == std::addressof(other);
-  if (self.otherEvent != nullptr) {
-    visited.insert(self.otherEvent);
-    if (other.otherEvent == nullptr)
-      return false;
-    else {
-      visited.insert(other.otherEvent);
-      if (!are_sweep_events_equal_impl(*self.otherEvent, *other.otherEvent,
-                                       visited))
-        return false;
-    }
-  } else if (other.otherEvent != nullptr)
-    return false;
+static bool are_sweep_events_equal_flat(const cbop::SweepEvent& self,
+                                        const cbop::SweepEvent& other) {
   return self.left == other.left && self.point == other.point &&
          self.pol == other.pol && self.type == other.type;
 }
 
+static bool fill_children(const cbop::SweepEvent* self,
+std::vector<const cbop::SweepEvent*>& children) {
+  std::vector<const cbop::SweepEvent*> result;
+  const auto* cursor = self;
+  while (!!(cursor = cursor->otherEvent)) {
+    if (value_in_vector(result, cursor))
+      return true;
+    result.push_back(cursor);
+  }
+  return false;
+}
+
 static bool are_sweep_events_equal(const cbop::SweepEvent& self,
                                    const cbop::SweepEvent& other) {
-  std::set<const cbop::SweepEvent*> visited = {&self, &other};
-  return are_sweep_events_equal_impl(self, other, visited);
+  const auto* self_ptr = std::addressof(self);
+  const auto* other_ptr = std::addressof(other);
+  if (self_ptr == other_ptr)
+    return true;
+  if (!are_sweep_events_equal_flat(self, other)) return false;
+  std::vector<const cbop::SweepEvent*> self_children, other_children;
+  auto self_has_cycles = fill_children(self_ptr, self_children);
+  auto other_has_cycles = fill_children(other_ptr, other_children);
+  if (self_has_cycles != other_has_cycles) return false;
+  if (self_children.size() != other_children.size()) return false;
+  for (size_t index = 0; index < self_children.size(); ++index)
+    if (!are_sweep_events_equal_flat(*self_children[index],
+                                     *other_children[index]))
+      return false;
+  return true;
 }
 
 static std::string contour_repr(const cbop::Contour& self) {
