@@ -3,6 +3,7 @@
 
 #include <iomanip>
 #include <limits>
+#include <memory>
 #include <numeric>
 #include <set>
 #include <sstream>
@@ -114,17 +115,32 @@ static bool are_contours_equal(const cbop::Contour& self,
          self.external() == other.external();
 }
 
-static bool are_sweep_events_equal(const cbop::SweepEvent& self,
-                                   const cbop::SweepEvent& other) {
+static bool are_sweep_events_equal_impl(
+    const cbop::SweepEvent& self, const cbop::SweepEvent& other,
+    std::set<const cbop::SweepEvent*>& visited) {
+  if (visited.find(&self) != visited.end() &&
+      visited.find(&other) != visited.end())
+    return std::addressof(self) == std::addressof(other);
   if (self.otherEvent != nullptr) {
+    visited.insert(self.otherEvent);
     if (other.otherEvent == nullptr)
       return false;
-    else if (!are_sweep_events_equal(*self.otherEvent, *other.otherEvent))
-      return false;
+    else {
+      visited.insert(other.otherEvent);
+      if (!are_sweep_events_equal_impl(*self.otherEvent, *other.otherEvent,
+                                       visited))
+        return false;
+    }
   } else if (other.otherEvent != nullptr)
     return false;
   return self.left == other.left && self.point == other.point &&
          self.pol == other.pol && self.type == other.type;
+}
+
+static bool are_sweep_events_equal(const cbop::SweepEvent& self,
+                                   const cbop::SweepEvent& other) {
+  std::set<const cbop::SweepEvent*> visited = {&self, &other};
+  return are_sweep_events_equal_impl(self, other, visited);
 }
 
 static std::string contour_repr(const cbop::Contour& self) {
