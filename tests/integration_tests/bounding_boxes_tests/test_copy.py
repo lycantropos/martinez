@@ -10,16 +10,18 @@ from . import strategies
 
 
 @given(strategies.bound_with_ported_bounding_boxes_pairs)
-def test_shallow(bound_with_ported_boxes_pair: Tuple[Bound, Ported]) -> None:
-    bound, ported = bound_with_ported_boxes_pair
+def test_shallow(bound_with_ported_bounding_boxes_pair: Tuple[Bound, Ported]
+                 ) -> None:
+    bound, ported = bound_with_ported_bounding_boxes_pair
 
     assert are_bound_ported_bounding_boxes_equal(copy.copy(bound),
                                                  copy.copy(ported))
 
 
 @given(strategies.bound_with_ported_bounding_boxes_pairs)
-def test_deep(bound_with_ported_boxes_pair: Tuple[Bound, Ported]) -> None:
-    bound, ported = bound_with_ported_boxes_pair
+def test_deep(bound_with_ported_bounding_boxes_pair: Tuple[Bound, Ported]
+              ) -> None:
+    bound, ported = bound_with_ported_bounding_boxes_pair
 
     assert are_bound_ported_bounding_boxes_equal(copy.deepcopy(bound),
                                                  copy.deepcopy(ported))
