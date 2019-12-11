@@ -8,7 +8,9 @@ from martinez.boolean import (EdgeType,
                               SweepEvent)
 from martinez.hints import Scalar
 from martinez.point import Point
-from tests.strategies import (booleans, scalars_strategies,
+from tests.strategies import (booleans,
+                              make_cyclic,
+                              scalars_strategies,
                               scalars_to_ported_points)
 from tests.utils import Strategy
 
@@ -44,7 +46,8 @@ def scalars_to_sweep_events(scalars: Strategy[Scalar]) -> Strategy[SweepEvent]:
                                 partial(to_sweep_events, scalars))
 
 
-sweep_events = scalars_strategies.flatmap(scalars_to_sweep_events)
+acyclic_sweep_events = scalars_strategies.flatmap(scalars_to_sweep_events)
+sweep_events = strategies.recursive(acyclic_sweep_events, make_cyclic)
 nested_sweep_events = (scalars_strategies
                        .flatmap(partial(to_sweep_events,
                                         children=sweep_events)))

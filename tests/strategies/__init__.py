@@ -1,11 +1,13 @@
-from .factories import (scalars_to_ported_points,
+from .factories import (make_cyclic,
+                        scalars_to_ported_points,
                         scalars_to_ported_points_lists,
                         scalars_to_ported_points_pairs,
                         scalars_to_ported_points_triplets,
                         scalars_to_ported_segments,
                         to_bound_with_ported_contours_pair,
                         to_bound_with_ported_points_pair,
-                        to_bound_with_ported_segments_pair)
+                        to_bound_with_ported_segments_pair,
+                        to_cyclic_sweep_event)
 from .literals import (booleans,
                        floats,
                        non_negative_integers,

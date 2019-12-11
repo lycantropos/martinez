@@ -107,18 +107,43 @@ def are_bound_ported_polygons_equal(bound: BoundPolygon,
                    bound.contours, ported.contours))
 
 
+def to_sweep_event_children_count(sweep_event: Union[BoundSweepEvent,
+                                                     PortedSweepEvent]) -> int:
+    children_ids = set()
+    while sweep_event.other_event is not None:
+        sweep_event = sweep_event.other_event
+        sweep_event_id = id(sweep_event)
+        if sweep_event_id in children_ids:
+            break
+        children_ids.add(sweep_event_id)
+    return len(children_ids)
+
+
+fill_children = PortedSweepEvent._fill_children
+
+
 def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
                                         ported: PortedSweepEvent) -> bool:
-    other_events_are_equal = (
-            equivalence(bound.other_event is None, ported.other_event is None)
-            and (bound.other_event is None
-                 or are_bound_ported_sweep_events_equal(bound.other_event,
-                                                        ported.other_event)))
-    return (bound.is_left is ported.is_left
-            and are_bound_ported_points_equal(bound.point, ported.point)
-            and other_events_are_equal
-            and bound.polygon_type == ported.polygon_type
-            and bound.edge_type == ported.edge_type)
+    bound_children_count = to_sweep_event_children_count(bound)
+    ported_children_count = to_sweep_event_children_count(ported)
+    if bound_children_count != ported_children_count:
+        return False
+
+    def are_fields_equal(bound: BoundSweepEvent,
+                         ported: PortedSweepEvent) -> bool:
+        return (bound.is_left is ported.is_left
+                and are_bound_ported_points_equal(bound.point, ported.point)
+                and bound.polygon_type == ported.polygon_type
+                and bound.edge_type == ported.edge_type)
+
+    if not are_fields_equal(bound, ported):
+        return False
+    bound_children, ported_children = [], []
+    bound_cycle_index = fill_children(bound, bound_children)
+    ported_cycle_index = fill_children(ported, ported_children)
+    if bound_cycle_index != ported_cycle_index:
+        return False
+    return all(map(are_fields_equal, bound_children, ported_children))
 
 
 Domain = TypeVar('Domain')

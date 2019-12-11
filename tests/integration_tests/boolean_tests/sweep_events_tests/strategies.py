@@ -14,7 +14,8 @@ from martinez.boolean import (EdgeType as PortedEdgeType,
 from martinez.point import Point as PortedPoint
 from tests.strategies import (booleans,
                               single_precision_floats as floats,
-                              to_bound_with_ported_points_pair)
+                              to_bound_with_ported_points_pair,
+                              to_cyclic_sweep_event)
 from tests.utils import Strategy
 
 booleans = booleans
@@ -51,7 +52,6 @@ def to_bound_with_ported_sweep_events(
         (bound_polygon_type,
          ported_polygon_type) = bound_with_ported_polygons_types_pair
         bound_edge_type, ported_edge_type = bound_with_ported_edges_types_pair
-
         bound = Bound(is_left, bound_point, bound_other_event,
                       bound_polygon_type,
                       bound_edge_type)
@@ -69,8 +69,31 @@ def to_bound_with_ported_sweep_events(
 nones_pairs = strategies.tuples(*repeat(strategies.none(), 2))
 bound_with_ported_leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(
         nones_pairs)
-bound_with_ported_sweep_events_pairs = strategies.recursive(
+bound_with_ported_acyclic_sweep_events_pairs = strategies.recursive(
         bound_with_ported_leaf_sweep_events_pairs,
         to_bound_with_ported_sweep_events)
+
+
+def make_cyclic(sweep_events_pairs: Strategy[Tuple[Bound, Ported]]
+                ) -> Strategy[Tuple[Bound, Ported]]:
+    def to_cyclic_sweep_events(sweep_events_pair: Tuple[Bound, Ported],
+                               source_index_seed: int,
+                               destination_index_seed: int
+                               ) -> Tuple[Bound, Ported]:
+        bound, ported = sweep_events_pair
+        return (to_cyclic_sweep_event(bound, source_index_seed,
+                                      destination_index_seed),
+                to_cyclic_sweep_event(ported, source_index_seed,
+                                      destination_index_seed))
+
+    return strategies.builds(to_cyclic_sweep_events,
+                             sweep_events_pairs,
+                             strategies.integers(),
+                             strategies.integers())
+
+
+bound_with_ported_sweep_events_pairs = strategies.recursive(
+        bound_with_ported_acyclic_sweep_events_pairs,
+        make_cyclic)
 bound_with_ported_maybe_sweep_events_pairs = (
         nones_pairs | bound_with_ported_sweep_events_pairs)

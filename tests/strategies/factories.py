@@ -1,19 +1,21 @@
 from typing import (List,
                     Optional,
-                    Tuple)
+                    Tuple, TypeVar)
 
 from _martinez import (Contour as BoundContour,
                        Point as BoundPoint,
-                       Segment as BoundSegment)
+                       Segment as BoundSegment,
+                       SweepEvent as BoundSweepEvent)
 from hypothesis import strategies
 
+from martinez.boolean import SweepEvent as PortedSweepEvent
 from martinez.contour import Contour as PortedContour
 from martinez.hints import Scalar
 from martinez.point import Point as PortedPoint
 from martinez.segment import Segment as PortedSegment
 from tests.utils import (PortedPointsPair,
                          PortedPointsTriplet,
-                         Strategy)
+                         Strategy, to_sweep_event_children_count)
 
 
 def scalars_to_ported_points(scalars: Strategy[Scalar]
@@ -73,3 +75,34 @@ def to_bound_with_ported_segments_pair(
 
     return (BoundSegment(bound_source, bound_target),
             PortedSegment(ported_source, ported_target))
+
+
+AnySweepEvent = TypeVar('AnySweepEvent', PortedSweepEvent, BoundSweepEvent)
+
+
+def make_cyclic(sweep_events: Strategy[AnySweepEvent]
+                ) -> Strategy[AnySweepEvent]:
+    return strategies.builds(to_cyclic_sweep_event,
+                             sweep_events,
+                             strategies.integers(),
+                             strategies.integers())
+
+
+def to_cyclic_sweep_event(sweep_event: AnySweepEvent,
+                          source_index_seed: int,
+                          destination_index_seed: int) -> AnySweepEvent:
+    children_count = to_sweep_event_children_count(sweep_event) or 1
+    loop_sweep_event(sweep_event,
+                     source_index_seed % children_count,
+                     destination_index_seed % children_count)
+    return sweep_event
+
+
+def loop_sweep_event(sweep_event: AnySweepEvent,
+                     source_index: int, destination_index: int) -> None:
+    source = destination = sweep_event
+    for _ in range(source_index - 1):
+        source = source.other_event
+    for _ in range(destination_index):
+        destination = destination.other_event
+    source.other_event = destination

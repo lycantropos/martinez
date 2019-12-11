@@ -7,7 +7,8 @@ from _martinez import (EdgeType,
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
-                              floats)
+                              floats,
+                              make_cyclic)
 from tests.utils import Strategy
 
 booleans = booleans
@@ -20,18 +21,13 @@ leaf_sweep_events = strategies.builds(SweepEvent, booleans, points,
                                       polygons_types, edges_types)
 
 
-def extend_sweep_events(strategy: Strategy[Optional[SweepEvent]]
-                        ) -> Strategy[SweepEvent]:
+def to_sweep_events(children: Strategy[Optional[SweepEvent]]
+                    ) -> Strategy[SweepEvent]:
     return strategies.builds(SweepEvent, booleans, points,
-                             strategy, polygons_types, edges_types)
+                             children, polygons_types, edges_types)
 
 
-sweep_events = strategies.recursive(leaf_sweep_events, extend_sweep_events)
-
-
-def is_nested_sweep_event(sweep_event: SweepEvent) -> bool:
-    return sweep_event.other_event is not None
-
-
-nested_sweep_events = sweep_events.filter(is_nested_sweep_event)
+acyclic_sweep_events = strategies.recursive(leaf_sweep_events, to_sweep_events)
+sweep_events = strategies.recursive(acyclic_sweep_events, make_cyclic)
+nested_sweep_events = to_sweep_events(sweep_events)
 maybe_sweep_events = strategies.none() | sweep_events
