@@ -12,7 +12,7 @@ from _martinez import (BoundingBox as BoundBoundingBox,
                        Polygon as BoundPolygon,
                        Segment as BoundSegment,
                        SweepEvent as BoundSweepEvent)
-from hypothesis.searchstrategy import SearchStrategy
+from hypothesis.strategies import SearchStrategy
 
 from martinez.boolean import SweepEvent as PortedSweepEvent
 from martinez.bounding_box import BoundingBox as PortedBoundingBox
