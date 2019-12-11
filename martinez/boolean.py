@@ -1,5 +1,6 @@
 import enum
-from typing import Optional
+from typing import (List,
+                    Optional)
 
 from reprit.base import generate_repr
 
@@ -50,13 +51,41 @@ class SweepEvent:
     __repr__ = generate_repr(__init__)
 
     def __eq__(self, other: 'SweepEvent') -> bool:
-        return (self.is_left is other.is_left
-                and self.point == other.point
-                and self.other_event == other.other_event
-                and self.polygon_type is other.polygon_type
-                and self.edge_type is other.edge_type
+        if self is other:
+            return True
+
+        def are_fields_equal(left: SweepEvent, right: SweepEvent) -> bool:
+            return (left.is_left is right.is_left
+                    and left.point == right.point
+                    and left.polygon_type is right.polygon_type
+                    and left.edge_type is right.edge_type)
+
+        children, other_children = [], []
+        return (are_fields_equal(self, other)
+                and (self._fill_children(children)
+                     == other._fill_children(other_children))
+                and all(are_fields_equal(child, other_child)
+                        for child, other_child in zip(children,
+                                                      other_children))
                 if isinstance(other, SweepEvent)
                 else NotImplemented)
+
+    def _fill_children(self, children: List['SweepEvent']) -> int:
+        cursor = self.other_event
+        while cursor is not None:
+            try:
+                cycle_index = next(index
+                                   for index, child in enumerate(children)
+                                   if child is cursor)
+            except StopIteration:
+                children.append(cursor)
+                cursor = cursor.other_event
+            else:
+                # last child points to already visited one
+                # with this index
+                return cycle_index
+        # has no cycles
+        return -1
 
     @property
     def is_vertical(self) -> bool:
