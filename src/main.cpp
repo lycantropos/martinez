@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <functional>
 #include <iomanip>
 #include <limits>
 #include <memory>
@@ -157,6 +158,35 @@ static std::string contour_repr(const cbop::Contour& self) {
          << "[" << join(holes_reprs, ", ") << "]"
          << ", " << bool_repr(self.external()) << ")";
   return stream.str();
+}
+
+py::tuple sweep_event_get_state(const cbop::SweepEvent& self) {
+  if (!self.otherEvent)
+    return py::make_tuple(self.left, self.point, py::none(), self.pol,
+                          self.type);
+  else
+    return py::make_tuple(self.left, self.point,
+                          sweep_event_get_state(*self.otherEvent), self.pol,
+                          self.type);
+};
+
+cbop::SweepEvent* sweep_event_set_state_impl(py::tuple tuple) {
+  if (tuple.size() != 5) throw std::runtime_error("Invalid state!");
+  auto other_event_state = tuple[2];
+  if (other_event_state.is_none())
+    return new cbop::SweepEvent(
+        tuple[0].cast<bool>(), tuple[1].cast<cbop::Point_2>(), nullptr,
+        tuple[3].cast<cbop::PolygonType>(), tuple[4].cast<cbop::EdgeType>());
+  else {
+    return new cbop::SweepEvent(
+        tuple[0].cast<bool>(), tuple[1].cast<cbop::Point_2>(),
+        sweep_event_set_state_impl(other_event_state.cast<py::tuple>()),
+        tuple[3].cast<cbop::PolygonType>(), tuple[4].cast<cbop::EdgeType>());
+  }
+}
+
+cbop::SweepEvent sweep_event_set_state(py::tuple tuple) {
+  return *sweep_event_set_state_impl(tuple);
 }
 
 PYBIND11_MODULE(MODULE_NAME, m) {
@@ -376,6 +406,11 @@ PYBIND11_MODULE(MODULE_NAME, m) {
            py::arg("left"), py::arg("point"), py::arg("other_event"),
            py::arg("polygon_type"), py::arg("edge_type"),
            py::return_value_policy::reference)
+      .def(py::pickle(
+          static_cast<std::function<py::tuple(const cbop::SweepEvent& self)>>(
+              sweep_event_get_state),
+          static_cast<std::function<cbop::SweepEvent(py::tuple)>>(
+              sweep_event_set_state)))
       .def("__eq__", are_sweep_events_equal)
       .def("__repr__", sweep_event_repr)
       .def_readwrite("is_left", &cbop::SweepEvent::left)
