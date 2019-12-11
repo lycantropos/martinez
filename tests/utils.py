@@ -63,34 +63,28 @@ def all_unique(iterable: Iterable[Hashable]) -> bool:
     return True
 
 
-def are_bound_ported_bounding_boxes_equal(
-        bound_bounding_box: BoundBoundingBox,
-        ported_bounding_box: PortedBoundingBox) -> bool:
-    return (bound_bounding_box.x_min == ported_bounding_box.x_min
-            and bound_bounding_box.y_min == ported_bounding_box.y_min
-            and bound_bounding_box.x_max == ported_bounding_box.x_max
-            and bound_bounding_box.y_max == ported_bounding_box.y_max)
+def are_bound_ported_bounding_boxes_equal(bound: BoundBoundingBox,
+                                          ported: PortedBoundingBox) -> bool:
+    return (bound.x_min == ported.x_min and bound.y_min == ported.y_min
+            and bound.x_max == ported.x_max and bound.y_max == ported.y_max)
 
 
-def are_bound_ported_points_equal(bound_point: BoundPoint,
-                                  ported_point: PortedPoint) -> bool:
-    return bound_point.x == ported_point.x and bound_point.y == ported_point.y
+def are_bound_ported_points_equal(bound: BoundPoint,
+                                  ported: PortedPoint) -> bool:
+    return bound.x == ported.x and bound.y == ported.y
 
 
-def are_bound_ported_points_sequences_equal(
-        bound_points: Sequence[BoundPoint],
-        ported_points: Sequence[PortedPoint]) -> bool:
-    return (len(bound_points) == len(ported_points)
-            and all(map(are_bound_ported_points_equal,
-                        bound_points, ported_points)))
+def are_bound_ported_points_sequences_equal(bound: Sequence[BoundPoint],
+                                            ported: Sequence[PortedPoint]
+                                            ) -> bool:
+    return (len(bound) == len(ported)
+            and all(map(are_bound_ported_points_equal, bound, ported)))
 
 
-def are_bound_ported_segments_equal(bound_segment: BoundSegment,
-                                    ported_segment: PortedSegment) -> bool:
-    return (are_bound_ported_points_equal(bound_segment.source,
-                                          ported_segment.source)
-            and are_bound_ported_points_equal(bound_segment.target,
-                                              ported_segment.target))
+def are_bound_ported_segments_equal(bound: BoundSegment,
+                                    ported: PortedSegment) -> bool:
+    return (are_bound_ported_points_equal(bound.source, ported.source)
+            and are_bound_ported_points_equal(bound.target, ported.target))
 
 
 def is_bounding_box_empty(bounding_box: Union[BoundBoundingBox,
