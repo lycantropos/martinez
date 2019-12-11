@@ -129,29 +129,28 @@ static bool are_sweep_events_equal_flat(const cbop::SweepEvent& self,
          self.pol == other.pol && self.type == other.type;
 }
 
-static bool fill_children(const cbop::SweepEvent* self,
-std::vector<const cbop::SweepEvent*>& children) {
-  std::vector<const cbop::SweepEvent*> result;
+static int fill_children(const cbop::SweepEvent* self,
+                         std::vector<const cbop::SweepEvent*>& children) {
   const auto* cursor = self;
   while (!!(cursor = cursor->otherEvent)) {
-    if (value_in_vector(result, cursor))
-      return true;
-    result.push_back(cursor);
+    auto iterator = std::find(children.begin(), children.end(), cursor);
+    if (iterator != children.end())
+      return std::distance(children.begin(), iterator);
+    children.push_back(cursor);
   }
-  return false;
+  return -1;
 }
 
 static bool are_sweep_events_equal(const cbop::SweepEvent& self,
                                    const cbop::SweepEvent& other) {
   const auto* self_ptr = std::addressof(self);
   const auto* other_ptr = std::addressof(other);
-  if (self_ptr == other_ptr)
-    return true;
+  if (self_ptr == other_ptr) return true;
   if (!are_sweep_events_equal_flat(self, other)) return false;
   std::vector<const cbop::SweepEvent*> self_children, other_children;
-  auto self_has_cycles = fill_children(self_ptr, self_children);
-  auto other_has_cycles = fill_children(other_ptr, other_children);
-  if (self_has_cycles != other_has_cycles) return false;
+  auto self_cycle_index = fill_children(self_ptr, self_children);
+  auto other_cycle_index = fill_children(other_ptr, other_children);
+  if (self_cycle_index != other_cycle_index) return false;
   if (self_children.size() != other_children.size()) return false;
   for (size_t index = 0; index < self_children.size(); ++index)
     if (!are_sweep_events_equal_flat(*self_children[index],
