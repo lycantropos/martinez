@@ -1,4 +1,5 @@
 import enum
+from reprlib import recursive_repr
 from typing import (List,
                     Optional)
 
@@ -48,7 +49,7 @@ class SweepEvent:
         self.polygon_type = polygon_type
         self.edge_type = edge_type
 
-    __repr__ = generate_repr(__init__)
+    __repr__ = recursive_repr()(generate_repr(__init__))
 
     def __eq__(self, other: 'SweepEvent') -> bool:
         if self is other:
