@@ -15,6 +15,15 @@
 
 using namespace cbop;
 
+SweepEvent::SweepEvent()
+    : left(false),
+      point(Point_2()),
+      otherEvent(nullptr),
+      pol(SUBJECT),
+      type(NORMAL),
+      prevInResult(nullptr),
+      inResult(false) {}
+
 SweepEvent::SweepEvent(bool b, const Point_2& p, SweepEvent* other,
                        PolygonType pt, EdgeType et)
     : left(b),
@@ -22,7 +31,7 @@ SweepEvent::SweepEvent(bool b, const Point_2& p, SweepEvent* other,
       otherEvent(other),
       pol(pt),
       type(et),
-      prevInResult(0),
+      prevInResult(nullptr),
       inResult(false) {}
 
 std::string SweepEvent::toString() const {
