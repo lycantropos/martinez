@@ -121,7 +121,7 @@ def to_sweep_event_children_count(sweep_event: Union[BoundSweepEvent,
     return len(children_ids)
 
 
-fill_children = PortedSweepEvent._fill_chain
+fill_sweep_events_chain = PortedSweepEvent._fill_sweep_events_chain
 
 
 def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
@@ -140,12 +140,13 @@ def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
 
     if not are_fields_equal(bound, ported):
         return False
-    bound_children, ported_children = [], []
-    bound_cycle_index = fill_children(bound, bound_children)
-    ported_cycle_index = fill_children(ported, ported_children)
+    bound_chain, ported_chain = [], []
+    bound_cycle_index = fill_sweep_events_chain(bound, bound_chain)
+    ported_cycle_index = fill_sweep_events_chain(ported, ported_chain)
     if bound_cycle_index != ported_cycle_index:
         return False
-    return all(map(are_fields_equal, bound_children, ported_children))
+    return (len(bound_chain) == len(ported_chain)
+            and all(map(are_fields_equal, bound_chain[1:], ported_chain[1:])))
 
 
 Domain = TypeVar('Domain')

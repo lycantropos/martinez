@@ -1,7 +1,13 @@
 import enum
+from functools import (partial,
+                       partialmethod)
+from operator import (attrgetter,
+                      itemgetter)
 from reprlib import recursive_repr
-from typing import (List,
+from typing import (Callable,
+                    List,
                     Optional,
+                    TypeVar,
                     Union)
 
 from reprit.base import generate_repr
@@ -39,6 +45,29 @@ class PolygonType(_EnumBase):
     CLIPPING = 1
 
 
+Domain = TypeVar('Domain')
+
+
+def _fill_chain(start: Domain, chain: List[Domain],
+                to_next: Callable[[Domain], Optional[Domain]]) -> int:
+    chain.append(start)
+    cursor = to_next(start)
+    while cursor is not None:
+        try:
+            cycle_index = next(index
+                               for index, element in enumerate(chain)
+                               if element is cursor)
+        except StopIteration:
+            chain.append(cursor)
+            cursor = to_next(cursor)
+        else:
+            # last element points to already visited one
+            # with this index
+            return cycle_index
+    # has no cycles
+    return ACYCLIC_INDEX
+
+
 SweepEventState = List[Union[bool, Point, Optional[list],
                              PolygonType, EdgeType]]
 
@@ -59,7 +88,7 @@ class SweepEvent:
 
     def __getstate__(self) -> SweepEventState:
         chain = []  # type: List[SweepEvent]
-        cycle_index = self._fill_chain(chain)
+        cycle_index = self._fill_sweep_events_chain(chain)
         states = [[sweep_event.is_left, sweep_event.point, None,
                    sweep_event.polygon_type, sweep_event.edge_type]
                   for sweep_event in chain]
@@ -70,11 +99,11 @@ class SweepEvent:
         return states[0]
 
     def __setstate__(self, state: SweepEventState) -> 'SweepEvent':
-        chain = []  # type: List[SweepEventState]
-        cycle_index = self._fill_states_chain(state, chain)
         (self.is_left, self.point, self.other_event,
          self.polygon_type, self.edge_type) = (state[0], state[1], None,
                                                state[3], state[4])
+        chain = []  # type: List[SweepEventState]
+        cycle_index = self._fill_states_chain(state, chain)
         sweep_events = [self] + [SweepEvent(state[0], state[1], None,
                                             state[3], state[4])
                                  for state in chain[1:]]
@@ -97,7 +126,8 @@ class SweepEvent:
 
         chain, other_chain = [], []
         return (are_fields_equal(self, other)
-                and self._fill_chain(chain) == other._fill_chain(other_chain)
+                and (self._fill_sweep_events_chain(chain)
+                     == other._fill_sweep_events_chain(other_chain))
                 and len(chain) == len(other_chain)
                 and all(are_fields_equal(child, other_child)
                         for child, other_child in zip(chain[1:],
@@ -105,43 +135,11 @@ class SweepEvent:
                 if isinstance(other, SweepEvent)
                 else NotImplemented)
 
-    def _fill_chain(self, chain: List['SweepEvent']) -> int:
-        chain.append(self)
-        cursor = self.other_event
-        while cursor is not None:
-            try:
-                cycle_index = next(index
-                                   for index, element in enumerate(chain)
-                                   if element is cursor)
-            except StopIteration:
-                chain.append(cursor)
-                cursor = cursor.other_event
-            else:
-                # last child points to already visited one
-                # with this index
-                return cycle_index
-        # has no cycles
-        return ACYCLIC_INDEX
-
-    @classmethod
-    def _fill_states_chain(cls, state: SweepEventState,
-                           chain: List[SweepEventState]) -> int:
-        chain.append(state)
-        cursor = state[cls.OTHER_EVENT_STATE_INDEX]
-        while cursor is not None:
-            try:
-                cycle_index = next(index
-                                   for index, child in enumerate(chain)
-                                   if child is cursor)
-            except StopIteration:
-                chain.append(cursor)
-                cursor = cursor[cls.OTHER_EVENT_STATE_INDEX]
-            else:
-                # last child points to already visited one
-                # with this index
-                return cycle_index
-        # has no cycles
-        return ACYCLIC_INDEX
+    _fill_sweep_events_chain = partialmethod(_fill_chain,
+                                             to_next=attrgetter('other_event'))
+    _fill_states_chain = staticmethod(
+            partial(_fill_chain,
+                    to_next=itemgetter(OTHER_EVENT_STATE_INDEX)))
 
     @property
     def is_vertical(self) -> bool:
