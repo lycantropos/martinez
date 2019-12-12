@@ -65,6 +65,7 @@ class SweepEvent:
         return (are_fields_equal(self, other)
                 and (self._fill_children(children)
                      == other._fill_children(other_children))
+                and len(children) == len(other_children)
                 and all(are_fields_equal(child, other_child)
                         for child, other_child in zip(children,
                                                       other_children))
