@@ -48,6 +48,20 @@ static std::string join(const std::vector<std::string>& elements,
       });
 };
 
+const int ACYCLIC_INDEX = -1;
+
+static int fill_sweep_events_chain(
+    const cbop::SweepEvent* self, std::vector<const cbop::SweepEvent*>& chain) {
+  chain.push_back(self);
+  const auto* cursor = self;
+  while (!!(cursor = cursor->otherEvent)) {
+    auto iterator = std::find(chain.begin(), chain.end(), cursor);
+    if (iterator != chain.end()) return std::distance(chain.begin(), iterator);
+    chain.push_back(cursor);
+  }
+  return ACYCLIC_INDEX;
+}
+
 static std::ostringstream make_stream() {
   std::ostringstream stream;
   stream.precision(std::numeric_limits<double>::digits10 + 2);
@@ -63,42 +77,56 @@ static std::string point_repr(const cbop::Point_2& self) {
 
 static std::string polygon_type_repr(const cbop::PolygonType& type) {
   auto stream = make_stream();
-  stream << C_STR(MODULE_NAME) "." POLYGON_TYPE_NAME "(" << type << ")";
+  stream << C_STR(MODULE_NAME) "." POLYGON_TYPE_NAME;
+  switch (type) {
+    case cbop::PolygonType::CLIPPING:
+      stream << ".CLIPPING";
+      break;
+    case cbop::PolygonType::SUBJECT:
+      stream << ".SUBJECT";
+      break;
+  }
   return stream.str();
 }
 
 static std::string edge_type_repr(const cbop::EdgeType& type) {
   auto stream = make_stream();
-  stream << C_STR(MODULE_NAME) "." EDGE_TYPE_NAME "(" << type << ")";
+  stream << C_STR(MODULE_NAME) "." EDGE_TYPE_NAME;
+  switch (type) {
+    case cbop::EdgeType::DIFFERENT_TRANSITION:
+      stream << ".DIFFERENT_TRANSITION";
+      break;
+    case cbop::EdgeType::NON_CONTRIBUTING:
+      stream << ".NON_CONTRIBUTING";
+      break;
+    case cbop::EdgeType::NORMAL:
+      stream << ".NORMAL";
+      break;
+    case cbop::EdgeType::SAME_TRANSITION:
+      stream << ".SAME_TRANSITION";
+      break;
+  }
   return stream.str();
 }
 
 static std::string bool_repr(bool value) { return py::str(py::bool_(value)); }
 
-static std::string sweep_event_repr_impl(
-    const cbop::SweepEvent& self, std::set<const cbop::SweepEvent*>& visited) {
-  auto left_repr = bool_repr(self.left);
-  std::string other_event_repr;
-  if (self.otherEvent == nullptr)
-    other_event_repr = std::string(py::str(py::none()));
-  else {
-    if (visited.find(self.otherEvent) == visited.end()) {
-      visited.insert(self.otherEvent);
-      other_event_repr = sweep_event_repr_impl(*self.otherEvent, visited);
-    } else
-      other_event_repr = "...";
-  }
-  auto stream = make_stream();
-  stream << C_STR(MODULE_NAME) "." SWEEP_EVENT_NAME "(" << left_repr << ", "
-         << point_repr(self.point) << ", " << other_event_repr << ", "
-         << polygon_type_repr(self.pol) << ", " << edge_type_repr(self.type)
-         << ")";
-  return stream.str();
-}
-
 static std::string sweep_event_repr(const cbop::SweepEvent& self) {
-  std::set<const cbop::SweepEvent*> visited = {std::addressof(self)};
-  return sweep_event_repr_impl(self, visited);
+  std::vector<const cbop::SweepEvent*> chain;
+  auto cycle_index = fill_sweep_events_chain(std::addressof(self), chain);
+  auto stream = make_stream();
+  for (const auto* sweep_event : chain)
+    stream << C_STR(MODULE_NAME) "." SWEEP_EVENT_NAME "("
+           << bool_repr(sweep_event->left) << ", "
+           << point_repr(sweep_event->point) << ", ";
+  if (cycle_index == ACYCLIC_INDEX)
+    stream << std::string(py::str(py::none()));
+  else
+    stream << "...";
+  for (auto iterator = chain.rbegin(); iterator != chain.rend(); ++iterator)
+    stream << ", " << polygon_type_repr((*iterator)->pol) << ", "
+           << edge_type_repr((*iterator)->type) << ")";
+  return stream.str();
 }
 
 static std::vector<cbop::Point_2> contour_to_points(const cbop::Contour& self) {
@@ -128,20 +156,6 @@ static bool are_sweep_events_equal_flat(const cbop::SweepEvent& self,
                                         const cbop::SweepEvent& other) {
   return self.left == other.left && self.point == other.point &&
          self.pol == other.pol && self.type == other.type;
-}
-
-const int ACYCLIC_INDEX = -1;
-
-static int fill_sweep_events_chain(
-    const cbop::SweepEvent* self, std::vector<const cbop::SweepEvent*>& chain) {
-  chain.push_back(self);
-  const auto* cursor = self;
-  while (!!(cursor = cursor->otherEvent)) {
-    auto iterator = std::find(chain.begin(), chain.end(), cursor);
-    if (iterator != chain.end()) return std::distance(chain.begin(), iterator);
-    chain.push_back(cursor);
-  }
-  return ACYCLIC_INDEX;
 }
 
 static bool are_sweep_events_equal(const cbop::SweepEvent& self,
