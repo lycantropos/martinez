@@ -110,9 +110,11 @@ def are_bound_ported_polygons_equal(bound: BoundPolygon,
 def to_sweep_event_children_count(sweep_event: Union[BoundSweepEvent,
                                                      PortedSweepEvent]) -> int:
     children_ids = set()
-    while sweep_event.other_event is not None:
-        sweep_event = sweep_event.other_event
-        sweep_event_id = id(sweep_event)
+    cursor = sweep_event
+    while (cursor.other_event is not None
+           and cursor.other_event is not sweep_event):
+        sweep_event = cursor.other_event
+        sweep_event_id = id(cursor)
         if sweep_event_id in children_ids:
             break
         children_ids.add(sweep_event_id)
