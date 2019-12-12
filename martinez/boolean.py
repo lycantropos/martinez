@@ -1,12 +1,15 @@
 import enum
 from reprlib import recursive_repr
 from typing import (List,
-                    Optional)
+                    Optional,
+                    Union)
 
 from reprit.base import generate_repr
 
 from .point import Point
 from .segment import Segment
+
+ACYCLIC_INDEX = -1
 
 
 class _EnumBase(enum.IntEnum):
@@ -36,9 +39,14 @@ class PolygonType(_EnumBase):
     CLIPPING = 1
 
 
+SweepEventState = List[Union[bool, Point, Optional[list],
+                             PolygonType, EdgeType]]
+
+
 class SweepEvent:
     __slots__ = ('is_left', 'point', 'other_event', 'polygon_type',
                  'edge_type')
+    OTHER_EVENT_STATE_INDEX = 2
 
     def __init__(self, is_left: bool, point: Point,
                  other_event: Optional['SweepEvent'],
@@ -48,6 +56,32 @@ class SweepEvent:
         self.other_event = other_event
         self.polygon_type = polygon_type
         self.edge_type = edge_type
+
+    def __getstate__(self) -> SweepEventState:
+        chain = []  # type: List[SweepEvent]
+        cycle_index = self._fill_chain(chain)
+        states = [[sweep_event.is_left, sweep_event.point, None,
+                   sweep_event.polygon_type, sweep_event.edge_type]
+                  for sweep_event in chain]
+        for index in range(len(states) - 1):
+            states[index][self.OTHER_EVENT_STATE_INDEX] = states[index + 1]
+        if cycle_index != ACYCLIC_INDEX:
+            states[-1][self.OTHER_EVENT_STATE_INDEX] = states[cycle_index]
+        return states[0]
+
+    def __setstate__(self, state: SweepEventState) -> 'SweepEvent':
+        chain = []  # type: List[SweepEventState]
+        cycle_index = self._fill_states_chain(state, chain)
+        (self.is_left, self.point, self.other_event,
+         self.polygon_type, self.edge_type) = (state[0], state[1], None,
+                                               state[3], state[4])
+        sweep_events = [self] + [SweepEvent(state[0], state[1], None,
+                                            state[3], state[4])
+                                 for state in chain[1:]]
+        for index in range(len(sweep_events) - 1):
+            sweep_events[index].other_event = sweep_events[index + 1]
+        if cycle_index != ACYCLIC_INDEX:
+            sweep_events[-1].other_event = sweep_events[cycle_index]
 
     __repr__ = recursive_repr()(generate_repr(__init__))
 
@@ -77,8 +111,8 @@ class SweepEvent:
         while cursor is not None:
             try:
                 cycle_index = next(index
-                                   for index, child in enumerate(chain)
-                                   if child is cursor)
+                                   for index, element in enumerate(chain)
+                                   if element is cursor)
             except StopIteration:
                 chain.append(cursor)
                 cursor = cursor.other_event
@@ -87,7 +121,27 @@ class SweepEvent:
                 # with this index
                 return cycle_index
         # has no cycles
-        return -1
+        return ACYCLIC_INDEX
+
+    @classmethod
+    def _fill_states_chain(cls, state: SweepEventState,
+                           chain: List[SweepEventState]) -> int:
+        chain.append(state)
+        cursor = state[cls.OTHER_EVENT_STATE_INDEX]
+        while cursor is not None:
+            try:
+                cycle_index = next(index
+                                   for index, child in enumerate(chain)
+                                   if child is cursor)
+            except StopIteration:
+                chain.append(cursor)
+                cursor = cursor[cls.OTHER_EVENT_STATE_INDEX]
+            else:
+                # last child points to already visited one
+                # with this index
+                return cycle_index
+        # has no cycles
+        return ACYCLIC_INDEX
 
     @property
     def is_vertical(self) -> bool:
