@@ -121,7 +121,7 @@ def to_sweep_event_children_count(sweep_event: Union[BoundSweepEvent,
     return len(children_ids)
 
 
-fill_children = PortedSweepEvent._fill_children
+fill_children = PortedSweepEvent._fill_chain
 
 
 def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,

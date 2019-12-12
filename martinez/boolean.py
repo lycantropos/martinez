@@ -61,26 +61,26 @@ class SweepEvent:
                     and left.polygon_type is right.polygon_type
                     and left.edge_type is right.edge_type)
 
-        children, other_children = [], []
+        chain, other_chain = [], []
         return (are_fields_equal(self, other)
-                and (self._fill_children(children)
-                     == other._fill_children(other_children))
-                and len(children) == len(other_children)
+                and self._fill_chain(chain) == other._fill_chain(other_chain)
+                and len(chain) == len(other_chain)
                 and all(are_fields_equal(child, other_child)
-                        for child, other_child in zip(children,
-                                                      other_children))
+                        for child, other_child in zip(chain[1:],
+                                                      other_chain[1:]))
                 if isinstance(other, SweepEvent)
                 else NotImplemented)
 
-    def _fill_children(self, children: List['SweepEvent']) -> int:
+    def _fill_chain(self, chain: List['SweepEvent']) -> int:
+        chain.append(self)
         cursor = self.other_event
         while cursor is not None:
             try:
                 cycle_index = next(index
-                                   for index, child in enumerate(children)
+                                   for index, child in enumerate(chain)
                                    if child is cursor)
             except StopIteration:
-                children.append(cursor)
+                chain.append(cursor)
                 cursor = cursor.other_event
             else:
                 # last child points to already visited one
