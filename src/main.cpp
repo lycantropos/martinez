@@ -179,8 +179,8 @@ static std::string contour_repr(const cbop::Contour& self) {
 py::list sweep_event_get_state_impl(
     const cbop::SweepEvent* self,
     std::map<const cbop::SweepEvent*, py::list>& cache) {
-  std::map<const cbop::SweepEvent*, py::list>::iterator iterator;
-  if ((iterator = cache.find(self)) != cache.end()) return iterator->second;
+  auto iterator = cache.find(self);
+  if (iterator != cache.end()) return iterator->second;
   auto result = py::list();
   result.append(self->left);
   result.append(self->point);
@@ -200,9 +200,8 @@ py::list sweep_event_get_state(const cbop::SweepEvent& self) {
 
 cbop::SweepEvent* sweep_event_set_state_impl(
     py::list state, std::map<PyObject*, cbop::SweepEvent*>& cache) {
-  std::map<PyObject*, cbop::SweepEvent*>::iterator iterator;
-  if ((iterator = cache.find(state.ptr())) != cache.end())
-    return iterator->second;
+  auto iterator = cache.find(state.ptr());
+  if (iterator != cache.end()) return iterator->second;
   if (state.size() != 5) throw std::runtime_error("Invalid state!");
   cbop::SweepEvent* result = new cbop::SweepEvent(
       state[0].cast<bool>(), state[1].cast<cbop::Point_2>(), nullptr,
