@@ -130,17 +130,18 @@ static bool are_sweep_events_equal_flat(const cbop::SweepEvent& self,
          self.pol == other.pol && self.type == other.type;
 }
 
-static int fill_chain(const cbop::SweepEvent* self,
-                      std::vector<const cbop::SweepEvent*>& chain) {
+const int ACYCLIC_INDEX = -1;
+
+static int fill_sweep_events_chain(
+    const cbop::SweepEvent* self, std::vector<const cbop::SweepEvent*>& chain) {
   chain.push_back(self);
   const auto* cursor = self;
   while (!!(cursor = cursor->otherEvent)) {
     auto iterator = std::find(chain.begin(), chain.end(), cursor);
-    if (iterator != chain.end())
-      return std::distance(chain.begin(), iterator);
+    if (iterator != chain.end()) return std::distance(chain.begin(), iterator);
     chain.push_back(cursor);
   }
-  return -1;
+  return ACYCLIC_INDEX;
 }
 
 static bool are_sweep_events_equal(const cbop::SweepEvent& self,
@@ -150,13 +151,12 @@ static bool are_sweep_events_equal(const cbop::SweepEvent& self,
   if (self_ptr == other_ptr) return true;
   if (!are_sweep_events_equal_flat(self, other)) return false;
   std::vector<const cbop::SweepEvent*> self_chain, other_chain;
-  auto self_cycle_index = fill_chain(self_ptr, self_chain);
-  auto other_cycle_index = fill_chain(other_ptr, other_chain);
+  auto self_cycle_index = fill_sweep_events_chain(self_ptr, self_chain);
+  auto other_cycle_index = fill_sweep_events_chain(other_ptr, other_chain);
   if (self_cycle_index != other_cycle_index) return false;
   if (self_chain.size() != other_chain.size()) return false;
   for (size_t index = 1; index < self_chain.size(); ++index)
-    if (!are_sweep_events_equal_flat(*self_chain[index],
-                                     *other_chain[index]))
+    if (!are_sweep_events_equal_flat(*self_chain[index], *other_chain[index]))
       return false;
   return true;
 }
@@ -177,47 +177,61 @@ static std::string contour_repr(const cbop::Contour& self) {
   return stream.str();
 }
 
-py::list sweep_event_get_state_impl(
-    const cbop::SweepEvent* self,
-    std::map<const cbop::SweepEvent*, py::list>& cache) {
-  auto iterator = cache.find(self);
-  if (iterator != cache.end()) return iterator->second;
+static py::list to_plain_sweep_event_state(const cbop::SweepEvent* self) {
   auto result = py::list();
   result.append(self->left);
   result.append(self->point);
   result.append(py::none());
   result.append(self->pol);
   result.append(self->type);
-  cache[self] = result;
-  if (!self->otherEvent) return result;
-  result[2] = sweep_event_get_state_impl(self->otherEvent, cache);
-  return result;
-};
-
-py::list sweep_event_get_state(const cbop::SweepEvent& self) {
-  std::map<const cbop::SweepEvent*, py::list> cache;
-  return sweep_event_get_state_impl(&self, cache);
-};
-
-cbop::SweepEvent* sweep_event_set_state_impl(
-    py::list state, std::map<PyObject*, cbop::SweepEvent*>& cache) {
-  auto iterator = cache.find(state.ptr());
-  if (iterator != cache.end()) return iterator->second;
-  if (state.size() != 5) throw std::runtime_error("Invalid state!");
-  cbop::SweepEvent* result = new cbop::SweepEvent(
-      state[0].cast<bool>(), state[1].cast<cbop::Point_2>(), nullptr,
-      state[3].cast<cbop::PolygonType>(), state[4].cast<cbop::EdgeType>());
-  cache[state.ptr()] = result;
-  auto other_event_state = state[2];
-  if (other_event_state.is_none()) return result;
-  result->otherEvent =
-      sweep_event_set_state_impl(other_event_state.cast<py::list>(), cache);
   return result;
 }
 
-cbop::SweepEvent sweep_event_set_state(py::list state) {
-  std::map<PyObject*, cbop::SweepEvent*> cache;
-  return *sweep_event_set_state_impl(state, cache);
+static py::list to_sweep_event_state(const cbop::SweepEvent& self) {
+  std::vector<const cbop::SweepEvent*> chain;
+  auto cycle_index = fill_sweep_events_chain(std::addressof(self), chain);
+  std::vector<py::list> states;
+  for (const auto* sweep_event : chain)
+    states.push_back(to_plain_sweep_event_state(sweep_event));
+  for (size_t index = 0; index < states.size() - 1; ++index)
+    states[index][2] = states[index + 1];
+  if (cycle_index != ACYCLIC_INDEX)
+    states[states.size() - 1][2] = states[cycle_index];
+  return states[0];
+};
+
+static int fill_sweep_events_states_chain(py::list& state,
+                                          std::vector<py::list>& chain) {
+  chain.push_back(state);
+  auto cursor = state;
+  while (!cursor[2].is_none()) {
+    cursor = cursor[2].cast<py::list>();
+    auto iterator = std::find(chain.begin(), chain.end(), cursor);
+    if (iterator != chain.end()) return std::distance(chain.begin(), iterator);
+    chain.push_back(cursor);
+  }
+  return ACYCLIC_INDEX;
+}
+
+static cbop::SweepEvent* from_plain_sweep_event_state(const py::list& state) {
+  if (state.size() != 5) throw std::runtime_error("Invalid state!");
+  return new cbop::SweepEvent(
+      state[0].cast<bool>(), state[1].cast<cbop::Point_2>(), nullptr,
+      state[3].cast<cbop::PolygonType>(), state[4].cast<cbop::EdgeType>());
+}
+
+cbop::SweepEvent* from_sweep_event_state(py::list state) {
+  std::vector<py::list> chain;
+  auto cycle_index = fill_sweep_events_states_chain(state, chain);
+  std::vector<cbop::SweepEvent*> sweep_events;
+  for (const auto& state : chain)
+    sweep_events.push_back(from_plain_sweep_event_state(state));
+  for (size_t index = 0; index < sweep_events.size() - 1; ++index)
+    sweep_events[index]->otherEvent = sweep_events[index + 1];
+  if (cycle_index != ACYCLIC_INDEX)
+    sweep_events[sweep_events.size() - 1]->otherEvent =
+        sweep_events[cycle_index];
+  return sweep_events[0];
 }
 
 PYBIND11_MODULE(MODULE_NAME, m) {
@@ -438,10 +452,10 @@ PYBIND11_MODULE(MODULE_NAME, m) {
            py::arg("polygon_type"), py::arg("edge_type"),
            py::return_value_policy::reference)
       .def(py::pickle(
-          static_cast<std::function<py::tuple(const cbop::SweepEvent& self)>>(
-              sweep_event_get_state),
-          static_cast<std::function<cbop::SweepEvent(py::tuple)>>(
-              sweep_event_set_state)))
+          static_cast<std::function<py::list(const cbop::SweepEvent& self)>>(
+              to_sweep_event_state),
+          static_cast<std::function<cbop::SweepEvent*(py::list)>>(
+              from_sweep_event_state)))
       .def("__eq__", are_sweep_events_equal)
       .def("__repr__", sweep_event_repr)
       .def_readwrite("is_left", &cbop::SweepEvent::left)
