@@ -130,14 +130,15 @@ static bool are_sweep_events_equal_flat(const cbop::SweepEvent& self,
          self.pol == other.pol && self.type == other.type;
 }
 
-static int fill_children(const cbop::SweepEvent* self,
-                         std::vector<const cbop::SweepEvent*>& children) {
+static int fill_chain(const cbop::SweepEvent* self,
+                      std::vector<const cbop::SweepEvent*>& chain) {
+  chain.push_back(self);
   const auto* cursor = self;
   while (!!(cursor = cursor->otherEvent)) {
-    auto iterator = std::find(children.begin(), children.end(), cursor);
-    if (iterator != children.end())
-      return std::distance(children.begin(), iterator);
-    children.push_back(cursor);
+    auto iterator = std::find(chain.begin(), chain.end(), cursor);
+    if (iterator != chain.end())
+      return std::distance(chain.begin(), iterator);
+    chain.push_back(cursor);
   }
   return -1;
 }
@@ -148,14 +149,14 @@ static bool are_sweep_events_equal(const cbop::SweepEvent& self,
   const auto* other_ptr = std::addressof(other);
   if (self_ptr == other_ptr) return true;
   if (!are_sweep_events_equal_flat(self, other)) return false;
-  std::vector<const cbop::SweepEvent*> self_children, other_children;
-  auto self_cycle_index = fill_children(self_ptr, self_children);
-  auto other_cycle_index = fill_children(other_ptr, other_children);
+  std::vector<const cbop::SweepEvent*> self_chain, other_chain;
+  auto self_cycle_index = fill_chain(self_ptr, self_chain);
+  auto other_cycle_index = fill_chain(other_ptr, other_chain);
   if (self_cycle_index != other_cycle_index) return false;
-  if (self_children.size() != other_children.size()) return false;
-  for (size_t index = 0; index < self_children.size(); ++index)
-    if (!are_sweep_events_equal_flat(*self_children[index],
-                                     *other_children[index]))
+  if (self_chain.size() != other_chain.size()) return false;
+  for (size_t index = 1; index < self_chain.size(); ++index)
+    if (!are_sweep_events_equal_flat(*self_chain[index],
+                                     *other_chain[index]))
       return false;
   return true;
 }
