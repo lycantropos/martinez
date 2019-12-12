@@ -5,10 +5,8 @@
 #include <functional>
 #include <iomanip>
 #include <limits>
-#include <map>
 #include <memory>
 #include <numeric>
-#include <set>
 #include <sstream>
 
 #include "bbox_2.h"
