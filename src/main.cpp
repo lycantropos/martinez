@@ -5,6 +5,7 @@
 #include <functional>
 #include <iomanip>
 #include <limits>
+#include <map>
 #include <memory>
 #include <numeric>
 #include <set>
@@ -175,33 +176,48 @@ static std::string contour_repr(const cbop::Contour& self) {
   return stream.str();
 }
 
-py::tuple sweep_event_get_state(const cbop::SweepEvent& self) {
-  if (!self.otherEvent)
-    return py::make_tuple(self.left, self.point, py::none(), self.pol,
-                          self.type);
-  else
-    return py::make_tuple(self.left, self.point,
-                          sweep_event_get_state(*self.otherEvent), self.pol,
-                          self.type);
+py::list sweep_event_get_state_impl(
+    const cbop::SweepEvent* self,
+    std::map<const cbop::SweepEvent*, py::list>& cache) {
+  std::map<const cbop::SweepEvent*, py::list>::iterator iterator;
+  if ((iterator = cache.find(self)) != cache.end()) return iterator->second;
+  auto result = py::list();
+  result.append(self->left);
+  result.append(self->point);
+  result.append(py::none());
+  result.append(self->pol);
+  result.append(self->type);
+  cache[self] = result;
+  if (!self->otherEvent) return result;
+  result[2] = sweep_event_get_state_impl(self->otherEvent, cache);
+  return result;
 };
 
-cbop::SweepEvent* sweep_event_set_state_impl(py::tuple tuple) {
-  if (tuple.size() != 5) throw std::runtime_error("Invalid state!");
-  auto other_event_state = tuple[2];
-  if (other_event_state.is_none())
-    return new cbop::SweepEvent(
-        tuple[0].cast<bool>(), tuple[1].cast<cbop::Point_2>(), nullptr,
-        tuple[3].cast<cbop::PolygonType>(), tuple[4].cast<cbop::EdgeType>());
-  else {
-    return new cbop::SweepEvent(
-        tuple[0].cast<bool>(), tuple[1].cast<cbop::Point_2>(),
-        sweep_event_set_state_impl(other_event_state.cast<py::tuple>()),
-        tuple[3].cast<cbop::PolygonType>(), tuple[4].cast<cbop::EdgeType>());
-  }
+py::list sweep_event_get_state(const cbop::SweepEvent& self) {
+  std::map<const cbop::SweepEvent*, py::list> cache;
+  return sweep_event_get_state_impl(&self, cache);
+};
+
+cbop::SweepEvent* sweep_event_set_state_impl(
+    py::list state, std::map<PyObject*, cbop::SweepEvent*>& cache) {
+  std::map<PyObject*, cbop::SweepEvent*>::iterator iterator;
+  if ((iterator = cache.find(state.ptr())) != cache.end())
+    return iterator->second;
+  if (state.size() != 5) throw std::runtime_error("Invalid state!");
+  cbop::SweepEvent* result = new cbop::SweepEvent(
+      state[0].cast<bool>(), state[1].cast<cbop::Point_2>(), nullptr,
+      state[3].cast<cbop::PolygonType>(), state[4].cast<cbop::EdgeType>());
+  cache[state.ptr()] = result;
+  auto other_event_state = state[2];
+  if (other_event_state.is_none()) return result;
+  result->otherEvent =
+      sweep_event_set_state_impl(other_event_state.cast<py::list>(), cache);
+  return result;
 }
 
-cbop::SweepEvent sweep_event_set_state(py::tuple tuple) {
-  return *sweep_event_set_state_impl(tuple);
+cbop::SweepEvent sweep_event_set_state(py::list state) {
+  std::map<PyObject*, cbop::SweepEvent*> cache;
+  return *sweep_event_set_state_impl(state, cache);
 }
 
 PYBIND11_MODULE(MODULE_NAME, m) {
