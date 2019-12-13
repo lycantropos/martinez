@@ -22,14 +22,14 @@ int findIntersection(const Segment_2& seg0, const Segment_2& seg1, Point_2& ip0,
                      Point_2& ip1);
 
 /** Signed area of the triangle (p0, p1, p2) */
-inline float signedArea(const Point_2& p0, const Point_2& p1,
-                        const Point_2& p2) {
+inline double signedArea(const Point_2& p0, const Point_2& p1,
+                         const Point_2& p2) {
   return (p0.x() - p2.x()) * (p1.y() - p2.y()) -
          (p1.x() - p2.x()) * (p0.y() - p2.y());
 }
 
 /** Signed area of the triangle ( (0,0), p1, p2) */
-inline float signedArea(const Point_2& p1, const Point_2& p2) {
+inline double signedArea(const Point_2& p1, const Point_2& p2) {
   return -p2.x() * (p1.y() - p2.y()) - -p2.y() * (p1.x() - p2.x());
 }
 

@@ -68,8 +68,8 @@ struct SweepEvent {
   /** Is the line segment (point, otherEvent->point) below point p */
   bool below(const Point_2& p) const {
     validate();
-    return (left) ? signedArea(point, otherEvent->point, p) > 0
-                  : signedArea(otherEvent->point, point, p) > 0;
+    return (left) ? signedArea(point, otherEvent->point, p) > 0.
+                  : signedArea(otherEvent->point, point, p) > 0.;
   }
   /** Is the line segment (point, otherEvent->point) above point p */
   bool above(const Point_2& p) const { return !below(p); }
@@ -110,7 +110,7 @@ struct SweepEventComp
       return e1->left;
     // Same point, both events are left endpoints or both are right endpoints.
     if (signedArea(e1->point, e1->otherEvent->point, e2->otherEvent->point) !=
-        0)  // not collinear
+        0.)  // not collinear
       return e1->above(
           e2->otherEvent->point);  // the event associate to the bottom segment
                                    // is processed first
