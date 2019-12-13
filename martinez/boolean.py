@@ -152,6 +152,9 @@ class SweepEvent:
         self.validate()
         return Segment(self.point, self.other_event.point)
 
+    def is_above(self, point: Point) -> bool:
+        return not self.is_below(point)
+
     def is_below(self, point: Point) -> bool:
         self.validate()
         return (sign(self.point, self.other_event.point, point) == 1
