@@ -95,7 +95,7 @@ struct SweepEventComp
   /* Compares two sweep events.
      Checks if e1 is placed at the event queue after e2,
      i.e e1 should be processed by the algorithm after e2 */
-  bool operator()(const SweepEvent* e1, const SweepEvent* e2) {
+  bool operator()(const SweepEvent* e1, const SweepEvent* e2) const {
     if (e1->point.x() > e2->point.x())  // Different x-coordinate
       return true;
     if (e2->point.x() > e1->point.x())  // Different x-coordinate
