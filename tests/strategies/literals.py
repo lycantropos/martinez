@@ -6,8 +6,12 @@ from functools import partial
 from typing import (Optional,
                     SupportsFloat)
 
+from _martinez import (EdgeType as BoundEdgeType,
+                       PolygonType as BoundPolygonType)
 from hypothesis import strategies
 
+from martinez.boolean import (EdgeType as PortedEdgeType,
+                              PolygonType as PortedPolygonType)
 from martinez.hints import Scalar
 from tests.utils import (Strategy,
                          implication)
@@ -127,3 +131,11 @@ unsigned_integers = strategies.integers(0, 65535)
 unsigned_integers_lists = strategies.lists(unsigned_integers)
 non_negative_integers = strategies.integers(0)
 non_negative_integers_lists = strategies.lists(non_negative_integers)
+bound_polygons_types = strategies.sampled_from(list(BoundPolygonType
+                                                    .__members__.values()))
+bound_edges_types = strategies.sampled_from(list(BoundEdgeType
+                                                 .__members__.values()))
+ported_polygons_types = strategies.sampled_from(list(PortedPolygonType
+                                                     .__members__.values()))
+ported_edges_types = strategies.sampled_from(list(PortedEdgeType
+                                                  .__members__.values()))
