@@ -14,6 +14,7 @@ from reprit.base import generate_repr
 
 from .point import Point
 from .segment import Segment
+from .utilities import sign
 
 ACYCLIC_INDEX = -1
 
@@ -150,6 +151,12 @@ class SweepEvent:
     def segment(self) -> Segment:
         self.validate()
         return Segment(self.point, self.other_event.point)
+
+    def is_below(self, point: Point) -> bool:
+        self.validate()
+        return (sign(self.point, self.other_event.point, point) == 1
+                if self.is_left
+                else sign(self.other_event.point, self.point, point) == 1)
 
     def validate(self) -> None:
         if self.other_event is None:
