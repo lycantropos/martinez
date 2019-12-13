@@ -247,6 +247,25 @@ cbop::SweepEvent* from_sweep_event_state(py::list state) {
   return sweep_events[0];
 }
 
+class EventsQueueKey {
+ public:
+  const cbop::SweepEvent* event() const { return _event; };
+
+  EventsQueueKey(const cbop::SweepEvent* event) : _event(event){};
+
+  bool operator<(const EventsQueueKey& other) const {
+    static const cbop::SweepEventComp cmp;
+    return cmp(_event, other._event);
+  };
+
+  bool operator==(const EventsQueueKey& other) const {
+    return are_sweep_events_equal(*_event, *other._event);
+  };
+
+ private:
+  const cbop::SweepEvent* _event;
+};
+
 PYBIND11_MODULE(MODULE_NAME, m) {
   m.doc() = R"pbdoc(
         Python binding of polygon clipping algorithm by F. Martínez et al.
@@ -479,6 +498,19 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("segment", &cbop::SweepEvent::segment)
       .def("is_above", &cbop::SweepEvent::above)
       .def("is_below", &cbop::SweepEvent::below);
+
+  py::class_<EventsQueueKey>(m, "EventsQueueKey")
+      .def(py::init<const cbop::SweepEvent*>(), py::arg("event"))
+      .def(py::pickle(
+          [](const EventsQueueKey& key) {
+            return to_sweep_event_state(*key.event());
+          },
+          [](py::list state) {
+            return EventsQueueKey(from_sweep_event_state(state));
+          }))
+      .def(py::self < py::self)
+      .def(py::self == py::self)
+      .def_property_readonly("event", &EventsQueueKey::event);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
