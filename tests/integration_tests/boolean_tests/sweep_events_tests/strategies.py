@@ -95,5 +95,7 @@ def make_cyclic(sweep_events_pairs: Strategy[Tuple[Bound, Ported]]
 bound_with_ported_sweep_events_pairs = strategies.recursive(
         bound_with_ported_acyclic_sweep_events_pairs,
         make_cyclic)
+bound_with_ported_nested_sweep_events_pairs = (
+    to_bound_with_ported_sweep_events(bound_with_ported_sweep_events_pairs))
 bound_with_ported_maybe_sweep_events_pairs = (
         nones_pairs | bound_with_ported_sweep_events_pairs)
