@@ -92,9 +92,9 @@ struct SweepEvent {
 struct SweepEventComp
     : public std::binary_function<SweepEvent, SweepEvent,
                                   bool> {  // for sorting sweep events
-  // Compare two sweep events
-  // Return true means that e1 is placed at the event queue after e2, i.e,, e1
-  // is processed by the algorithm after e2
+  /* Compares two sweep events.
+     Checks if e1 is placed at the event queue after e2,
+     i.e e1 should be processed by the algorithm after e2 */
   bool operator()(const SweepEvent* e1, const SweepEvent* e2) {
     if (e1->point.x() > e2->point.x())  // Different x-coordinate
       return true;
