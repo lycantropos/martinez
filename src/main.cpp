@@ -477,6 +477,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_readwrite("edge_type", &cbop::SweepEvent::type)
       .def_property_readonly("is_vertical", &cbop::SweepEvent::vertical)
       .def_property_readonly("segment", &cbop::SweepEvent::segment)
+      .def("is_above", &cbop::SweepEvent::above)
       .def("is_below", &cbop::SweepEvent::below);
 
 #ifdef VERSION_INFO
