@@ -476,7 +476,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_readwrite("polygon_type", &cbop::SweepEvent::pol)
       .def_readwrite("edge_type", &cbop::SweepEvent::type)
       .def_property_readonly("is_vertical", &cbop::SweepEvent::vertical)
-      .def_property_readonly("segment", &cbop::SweepEvent::segment);
+      .def_property_readonly("segment", &cbop::SweepEvent::segment)
+      .def("is_below", &cbop::SweepEvent::below);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
