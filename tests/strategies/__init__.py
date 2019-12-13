@@ -1,4 +1,5 @@
 from .factories import (make_cyclic,
+                        make_cyclic_bound_with_ported_sweep_events,
                         scalars_to_ported_points,
                         scalars_to_ported_points_lists,
                         scalars_to_ported_points_pairs,
@@ -7,6 +8,7 @@ from .factories import (make_cyclic,
                         to_bound_with_ported_contours_pair,
                         to_bound_with_ported_points_pair,
                         to_bound_with_ported_segments_pair,
+                        to_bound_with_ported_sweep_events,
                         to_cyclic_sweep_event)
 from .literals import (booleans,
                        floats,

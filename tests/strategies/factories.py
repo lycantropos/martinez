@@ -1,21 +1,29 @@
 from typing import (List,
                     Optional,
-                    Tuple, TypeVar)
+                    Tuple,
+                    TypeVar)
 
 from _martinez import (Contour as BoundContour,
+                       EdgeType as BoundEdgeType,
                        Point as BoundPoint,
+                       PolygonType as BoundPolygonType,
                        Segment as BoundSegment,
                        SweepEvent as BoundSweepEvent)
 from hypothesis import strategies
 
-from martinez.boolean import SweepEvent as PortedSweepEvent
+from martinez.boolean import (EdgeType as PortedEdgeType,
+                              PolygonType as PortedPolygonType,
+                              SweepEvent as PortedSweepEvent)
 from martinez.contour import Contour as PortedContour
 from martinez.hints import Scalar
 from martinez.point import Point as PortedPoint
 from martinez.segment import Segment as PortedSegment
-from tests.utils import (PortedPointsPair,
+from tests.utils import (BoundPortedPointsPair,
+                         BoundPortedSweepEventsPair,
+                         PortedPointsPair,
                          PortedPointsTriplet,
-                         Strategy, to_sweep_event_children_count)
+                         Strategy,
+                         to_sweep_event_children_count)
 
 
 def scalars_to_ported_points(scalars: Strategy[Scalar]
@@ -52,7 +60,7 @@ def scalars_to_ported_segments(scalars: Strategy[Scalar]
 
 
 def to_bound_with_ported_points_pair(x: float, y: float
-                                     ) -> Tuple[BoundPoint, PortedPoint]:
+                                     ) -> BoundPortedPointsPair:
     return BoundPoint(x, y), PortedPoint(x, y)
 
 
@@ -67,8 +75,8 @@ def to_bound_with_ported_contours_pair(
 
 
 def to_bound_with_ported_segments_pair(
-        bound_with_ported_sources_pair: Tuple[BoundPoint, PortedPoint],
-        bound_with_ported_targets_pair: Tuple[BoundPoint, PortedPoint]
+        bound_with_ported_sources_pair: BoundPortedPointsPair,
+        bound_with_ported_targets_pair: BoundPortedPointsPair
 ) -> Tuple[BoundSegment, PortedSegment]:
     bound_source, ported_source = bound_with_ported_sources_pair
     bound_target, ported_target = bound_with_ported_targets_pair
@@ -106,3 +114,57 @@ def loop_sweep_event(sweep_event: AnySweepEvent,
     for _ in range(destination_index):
         destination = destination.other_event
     source.other_event = destination
+
+
+def to_bound_with_ported_sweep_events(
+        are_left: Strategy[bool],
+        points_pairs: BoundPortedPointsPair,
+        other_events: Strategy[Tuple[Optional[BoundSweepEvent],
+                                     Optional[PortedSweepEvent]]],
+        polygons_types_pairs: Strategy[Tuple[BoundPolygonType,
+                                             PortedPolygonType]],
+        edges_types_pairs: Strategy[Tuple[BoundEdgeType, PortedEdgeType]]
+) -> Strategy[BoundPortedSweepEventsPair]:
+    def to_sweep_events(
+            is_left: bool,
+            points_pair: BoundPortedPointsPair,
+            other_events_pair: Tuple[Optional[BoundSweepEvent],
+                                     Optional[PortedSweepEvent]],
+            polygons_types_pair: Tuple[BoundPolygonType, PortedPolygonType],
+            edges_types_pair: Tuple[BoundEdgeType, PortedEdgeType]
+    ) -> BoundPortedSweepEventsPair:
+        bound_point, ported_point = points_pair
+        (bound_other_event,
+         ported_other_event) = other_events_pair
+        (bound_polygon_type,
+         ported_polygon_type) = polygons_types_pair
+        bound_edge_type, ported_edge_type = edges_types_pair
+        bound = BoundSweepEvent(is_left, bound_point, bound_other_event,
+                                bound_polygon_type,
+                                bound_edge_type)
+        ported = PortedSweepEvent(is_left, ported_point, ported_other_event,
+                                  ported_polygon_type, ported_edge_type)
+        return bound, ported
+
+    return strategies.builds(to_sweep_events,
+                             are_left, points_pairs, other_events,
+                             polygons_types_pairs, edges_types_pairs)
+
+
+def make_cyclic_bound_with_ported_sweep_events(
+        sweep_events_pairs: Strategy[BoundPortedSweepEventsPair]
+) -> Strategy[BoundPortedSweepEventsPair]:
+    def to_cyclic_sweep_events(sweep_events_pair: BoundPortedSweepEventsPair,
+                               source_index_seed: int,
+                               destination_index_seed: int
+                               ) -> BoundPortedSweepEventsPair:
+        bound, ported = sweep_events_pair
+        return (to_cyclic_sweep_event(bound, source_index_seed,
+                                      destination_index_seed),
+                to_cyclic_sweep_event(ported, source_index_seed,
+                                      destination_index_seed))
+
+    return strategies.builds(to_cyclic_sweep_events,
+                             sweep_events_pairs,
+                             strategies.integers(),
+                             strategies.integers())

@@ -8,13 +8,15 @@ from typing import (Any,
 
 from _martinez import (BoundingBox as BoundBoundingBox,
                        Contour as BoundContour,
+                       EventsQueueKey as BoundEventsQueueKey,
                        Point as BoundPoint,
                        Polygon as BoundPolygon,
                        Segment as BoundSegment,
                        SweepEvent as BoundSweepEvent)
 from hypothesis.strategies import SearchStrategy
 
-from martinez.boolean import SweepEvent as PortedSweepEvent
+from martinez.boolean import (EventsQueueKey as PortedEventsQueueKey,
+                              SweepEvent as PortedSweepEvent)
 from martinez.bounding_box import BoundingBox as PortedBoundingBox
 from martinez.contour import Contour as PortedContour
 from martinez.point import Point as PortedPoint
@@ -26,6 +28,8 @@ BoundPointsPair = Tuple[BoundPoint, BoundPoint]
 BoundPointsTriplet = Tuple[BoundPoint, BoundPoint, BoundPoint]
 PortedPointsPair = Tuple[PortedPoint, PortedPoint]
 PortedPointsTriplet = Tuple[PortedPoint, PortedPoint, PortedPoint]
+BoundPortedPointsPair = Tuple[BoundPoint, PortedPoint]
+BoundPortedSweepEventsPair = Tuple[BoundSweepEvent, PortedSweepEvent]
 
 
 def equivalence(left_statement: bool, right_statement: bool) -> bool:
@@ -147,6 +151,12 @@ def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
         return False
     return (len(bound_chain) == len(ported_chain)
             and all(map(are_fields_equal, bound_chain[1:], ported_chain[1:])))
+
+
+def are_bound_ported_events_queue_keys_equal(bound: BoundEventsQueueKey,
+                                             ported: PortedEventsQueueKey
+                                             ) -> bool:
+    return are_bound_ported_sweep_events_equal(bound.event, ported.event)
 
 
 Domain = TypeVar('Domain')
