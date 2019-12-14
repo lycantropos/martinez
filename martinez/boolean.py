@@ -207,3 +207,16 @@ class EventsQueueKey:
         return (self.event == other.event
                 if isinstance(other, EventsQueueKey)
                 else NotImplemented)
+
+
+class SweepLineKey:
+    __slots__ = ('_event',)
+
+    def __init__(self, event: SweepEvent) -> None:
+        self._event = event
+
+    __repr__ = generate_repr(__init__)
+
+    @property
+    def event(self) -> SweepEvent:
+        return self._event
