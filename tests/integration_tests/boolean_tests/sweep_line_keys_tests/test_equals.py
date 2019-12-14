@@ -16,8 +16,7 @@ def test_basic(first_bound_with_ported_sweep_line_keys_pair: Tuple[Bound,
                                                                     Ported]
                ) -> None:
     first_bound, first_ported = first_bound_with_ported_sweep_line_keys_pair
-    (second_bound,
-     second_ported) = second_bound_with_ported_sweep_line_keys_pair
+    second_bound, second_ported = second_bound_with_ported_sweep_line_keys_pair
 
     assert equivalence(first_bound == second_bound,
                        first_ported == second_ported)
