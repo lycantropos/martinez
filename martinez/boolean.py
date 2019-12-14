@@ -177,3 +177,8 @@ class EventsQueueKey:
     @property
     def event(self) -> SweepEvent:
         return self._event
+
+    def __eq__(self, other: 'EventsQueueKey') -> bool:
+        return (self.event == other.event
+                if isinstance(other, EventsQueueKey)
+                else NotImplemented)
