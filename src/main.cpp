@@ -347,6 +347,13 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                 tuple[0].cast<double>(), tuple[1].cast<double>(),
                 tuple[2].cast<double>(), tuple[3].cast<double>());
           }))
+      .def("__add__", &cbop::Bbox_2::operator+)
+      .def("__eq__",
+           [](const cbop::Bbox_2& self, const cbop::Bbox_2& other) {
+             return self.xmin() == other.xmin() &&
+                    self.ymin() == other.ymin() &&
+                    self.xmax() == other.xmax() && self.ymax() == other.ymax();
+           })
       .def("__repr__",
            [](const cbop::Bbox_2& self) -> std::string {
              auto stream = make_stream();
@@ -355,17 +362,10 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                     << ", " << self.ymax() << ")";
              return stream.str();
            })
-      .def("__eq__",
-           [](const cbop::Bbox_2& self, const cbop::Bbox_2& other) {
-             return self.xmin() == other.xmin() &&
-                    self.ymin() == other.ymin() &&
-                    self.xmax() == other.xmax() && self.ymax() == other.ymax();
-           })
       .def_property_readonly("x_min", &cbop::Bbox_2::xmin)
       .def_property_readonly("y_min", &cbop::Bbox_2::ymin)
       .def_property_readonly("x_max", &cbop::Bbox_2::xmax)
-      .def_property_readonly("y_max", &cbop::Bbox_2::ymax)
-      .def("__add__", &cbop::Bbox_2::operator+);
+      .def_property_readonly("y_max", &cbop::Bbox_2::ymax);
 
   py::class_<cbop::Contour>(m, CONTOUR_NAME)
       .def(py::init<const std::vector<cbop::Point_2>&,
@@ -382,7 +382,6 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                                  tuple[1].cast<std::vector<unsigned int>>(),
                                  tuple[2].cast<bool>());
           }))
-      .def("__repr__", contour_repr)
       .def("__eq__", are_contours_equal)
       .def(
           "__iter__",
@@ -390,6 +389,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
             return py::make_iterator(self.begin(), self.end());
           },
           py::keep_alive<0, 1>())
+      .def("__repr__", contour_repr)
       .def_property_readonly("points", contour_to_points)
       .def_property_readonly("holes", contour_to_holes)
       .def_property("is_external", &cbop::Contour::external,
@@ -432,17 +432,6 @@ PYBIND11_MODULE(MODULE_NAME, m) {
           [](const std::vector<cbop::Contour>& contours) {  // __setstate__
             return cbop::Polygon(contours);
           }))
-      .def("__repr__",
-           [](const cbop::Polygon& self) -> std::string {
-             auto stream = make_stream();
-             std::vector<std::string> contours_reprs;
-             for (auto& contour : self)
-               contours_reprs.push_back(contour_repr(contour));
-             stream << C_STR(MODULE_NAME) "." POLYGON_NAME "("
-                    << "[" << join(contours_reprs, ", ") << "]"
-                    << ")";
-             return stream.str();
-           })
       .def("__eq__",
            [](const cbop::Polygon& self, const cbop::Polygon& other) {
              if (self.ncontours() != other.ncontours()) return false;
@@ -456,6 +445,17 @@ PYBIND11_MODULE(MODULE_NAME, m) {
             return py::make_iterator(self.begin(), self.end());
           },
           py::keep_alive<0, 1>())
+      .def("__repr__",
+           [](const cbop::Polygon& self) -> std::string {
+             auto stream = make_stream();
+             std::vector<std::string> contours_reprs;
+             for (auto& contour : self)
+               contours_reprs.push_back(contour_repr(contour));
+             stream << C_STR(MODULE_NAME) "." POLYGON_NAME "("
+                    << "[" << join(contours_reprs, ", ") << "]"
+                    << ")";
+             return stream.str();
+           })
       .def_property_readonly("bounding_box", &cbop::Polygon::bbox)
       .def_property_readonly("contours", polygon_to_contours)
       .def("join", &cbop::Polygon::join);
@@ -473,6 +473,11 @@ PYBIND11_MODULE(MODULE_NAME, m) {
             return cbop::Segment_2(tuple[0].cast<cbop::Point_2>(),
                                    tuple[1].cast<cbop::Point_2>());
           }))
+      .def("__eq__",
+           [](const cbop::Segment_2& self, const cbop::Segment_2& other) {
+             return self.source() == other.source() &&
+                    self.target() == other.target();
+           })
       .def("__repr__",
            [](const cbop::Segment_2& self) -> std::string {
              auto stream = make_stream();
@@ -480,11 +485,6 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                     << point_repr(self.source()) << ", "
                     << point_repr(self.target()) << ")";
              return stream.str();
-           })
-      .def("__eq__",
-           [](const cbop::Segment_2& self, const cbop::Segment_2& other) {
-             return self.source() == other.source() &&
-                    self.target() == other.target();
            })
       .def_property("source", &cbop::Segment_2::source,
                     &cbop::Segment_2::setSource)
