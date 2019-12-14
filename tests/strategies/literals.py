@@ -139,3 +139,13 @@ ported_polygons_types = strategies.sampled_from(list(PortedPolygonType
                                                      .__members__.values()))
 ported_edges_types = strategies.sampled_from(list(PortedEdgeType
                                                   .__members__.values()))
+bound_with_ported_polygons_types_pairs = strategies.sampled_from(
+        [(BoundPolygonType.__members__[name],
+          PortedPolygonType.__members__[name])
+         for name in (BoundPolygonType.__members__.keys() &
+                      PortedPolygonType.__members__.keys())])
+bound_with_ported_edges_types_pairs = strategies.sampled_from(
+        [(BoundEdgeType.__members__[name],
+          PortedEdgeType.__members__[name])
+         for name in (BoundEdgeType.__members__.keys() &
+                      PortedEdgeType.__members__.keys())])

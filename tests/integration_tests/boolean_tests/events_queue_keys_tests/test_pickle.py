@@ -12,9 +12,9 @@ from . import strategies
 @given(strategies.bound_with_ported_events_queue_keys_pairs)
 def test_round_trip(
         bound_with_ported_events_queue_keys_pair: Tuple[Bound, Ported]
-        ) -> None:
+) -> None:
     bound, ported = bound_with_ported_events_queue_keys_pair
 
     assert are_bound_ported_events_queue_keys_equal(
-        pickle.loads(pickle.dumps(bound)),
-        pickle.loads(pickle.dumps(ported)))
+            pickle.loads(pickle.dumps(bound)),
+            pickle.loads(pickle.dumps(ported)))

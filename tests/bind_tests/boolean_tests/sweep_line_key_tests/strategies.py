@@ -23,5 +23,5 @@ sweep_events = strategies.recursive(acyclic_sweep_events, make_cyclic)
 sweep_line_keys = strategies.builds(SweepLineKey, sweep_events)
 nested_sweep_events = to_bound_sweep_events(sweep_events)
 nested_sweep_line_keys = strategies.builds(SweepLineKey,
-                                             nested_sweep_events)
+                                           nested_sweep_events)
 non_sweep_line_keys = strategies.builds(object)

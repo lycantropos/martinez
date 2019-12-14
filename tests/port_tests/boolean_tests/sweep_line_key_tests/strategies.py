@@ -27,5 +27,5 @@ nested_sweep_events = (scalars_strategies
                        .flatmap(partial(to_ported_sweep_events,
                                         other_events=sweep_events)))
 nested_sweep_line_keys = strategies.builds(SweepLineKey,
-                                             nested_sweep_events)
+                                           nested_sweep_events)
 non_sweep_line_keys = strategies.builds(object)
