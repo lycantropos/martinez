@@ -2,6 +2,7 @@ from functools import partial
 
 from hypothesis import strategies
 
+from martinez.boolean import EventsQueueKey
 from tests.strategies import (booleans,
                               make_cyclic,
                               ported_edges_types,
@@ -21,7 +22,7 @@ leaf_sweep_events = (scalars_strategies
 acyclic_sweep_events = (scalars_strategies
                         .flatmap(scalars_to_ported_sweep_events))
 sweep_events = strategies.recursive(acyclic_sweep_events, make_cyclic)
+events_queue_keys = strategies.builds(EventsQueueKey, sweep_events)
 nested_sweep_events = (scalars_strategies
                        .flatmap(partial(to_ported_sweep_events,
                                         other_events=sweep_events)))
-maybe_sweep_events = strategies.none() | sweep_events
