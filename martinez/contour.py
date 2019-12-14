@@ -6,7 +6,6 @@ from typing import (Iterator,
 from reprit.base import generate_repr
 
 from .bounding_box import BoundingBox
-from .hints import Scalar
 from .point import Point
 
 
