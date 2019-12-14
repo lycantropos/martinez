@@ -74,8 +74,6 @@ bool SegmentComp::operator()(const SweepEvent* le1,
   }
   // Segments are collinear
   if (le1->pol != le2->pol) return le1->pol < le2->pol;
-  // Just a consistent criterion is used
-  if (le1->point == le2->point) return le1 < le2;
   SweepEventComp comp;
   return comp(le1, le2);
 }
