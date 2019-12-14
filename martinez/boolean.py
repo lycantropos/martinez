@@ -181,30 +181,29 @@ class EventsQueueKey:
     def __lt__(self, other: 'EventsQueueKey') -> bool:
         if not isinstance(other, EventsQueueKey):
             return NotImplemented
-        if self.event.point.x != other.event.point.x:
-            # different x-coordinate
+        if self._event.point.x != other._event.point.x:
+            # different x-coordinate,
             # the event with lower x-coordinate is processed first
-            return self.event.point.x > other.event.point.x
-        if self.event.point.y != other.event.point.y:
+            return self._event.point.x > other._event.point.x
+        if self._event.point.y != other._event.point.y:
             # different points, but same x-coordinate,
             # the event with lower y-coordinate is processed first
-            return self.event.point.y > other.event.point.y
-        if self.event.is_left is not other.event.is_left:
+            return self._event.point.y > other._event.point.y
+        if self._event.is_left is not other._event.is_left:
             # same point, but one is a left endpoint
             # and the other a right endpoint,
             # the right endpoint is processed first
-            return self.event.is_left
+            return self._event.is_left
         # same point, both events are left endpoints
         # or both are right endpoints
-        if sign(self.event.point, self.event.other_event.point,
-                other.event.other_event.point):  # not collinear
-            # the event associate to the bottom segment
-            # is processed first
-            return self.event.is_above(other.event.other_event.point)
-        return self.event.polygon_type > other.event.polygon_type
+        if sign(self._event.point, self._event.other_event.point,
+                other._event.other_event.point):  # not collinear
+            # the event associate to the bottom segment is processed first
+            return self._event.is_above(other._event.other_event.point)
+        return self._event.polygon_type > other._event.polygon_type
 
     def __eq__(self, other: 'EventsQueueKey') -> bool:
-        return (self.event == other.event
+        return (self._event == other._event
                 if isinstance(other, EventsQueueKey)
                 else NotImplemented)
 
