@@ -1,4 +1,5 @@
-from _martinez import (Point,
+from _martinez import (EventsQueueKey,
+                       Point,
                        SweepEvent)
 from hypothesis import strategies
 
@@ -19,4 +20,5 @@ leaf_sweep_events = strategies.builds(SweepEvent, booleans, points,
 acyclic_sweep_events = strategies.recursive(leaf_sweep_events,
                                             to_bound_sweep_events)
 sweep_events = strategies.recursive(acyclic_sweep_events, make_cyclic)
+events_queue_keys = strategies.builds(EventsQueueKey, sweep_events)
 nested_sweep_events = to_bound_sweep_events(sweep_events)
