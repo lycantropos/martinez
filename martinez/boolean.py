@@ -178,6 +178,11 @@ class EventsQueueKey:
     def event(self) -> SweepEvent:
         return self._event
 
+    def __eq__(self, other: 'EventsQueueKey') -> bool:
+        return (self._event == other._event
+                if isinstance(other, EventsQueueKey)
+                else NotImplemented)
+
     def __lt__(self, other: 'EventsQueueKey') -> bool:
         if not isinstance(other, EventsQueueKey):
             return NotImplemented
@@ -201,11 +206,6 @@ class EventsQueueKey:
             # the event associate to the bottom segment is processed first
             return self._event.is_above(other._event.other_event.point)
         return self._event.polygon_type > other._event.polygon_type
-
-    def __eq__(self, other: 'EventsQueueKey') -> bool:
-        return (self._event == other._event
-                if isinstance(other, EventsQueueKey)
-                else NotImplemented)
 
 
 class SweepLineKey:
