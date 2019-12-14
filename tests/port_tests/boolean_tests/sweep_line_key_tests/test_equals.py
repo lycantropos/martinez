@@ -18,7 +18,8 @@ def test_symmetry(first_sweep_line_key: SweepLineKey,
                        second_sweep_line_key == first_sweep_line_key)
 
 
-@given(strategies.sweep_line_keys, strategies.sweep_line_keys,
+@given(strategies.sweep_line_keys,
+       strategies.sweep_line_keys,
        strategies.sweep_line_keys)
 def test_transitivity(first_sweep_line_key: SweepLineKey,
                       second_sweep_line_key: SweepLineKey,
