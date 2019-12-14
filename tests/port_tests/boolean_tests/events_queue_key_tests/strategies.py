@@ -26,3 +26,6 @@ events_queue_keys = strategies.builds(EventsQueueKey, sweep_events)
 nested_sweep_events = (scalars_strategies
                        .flatmap(partial(to_ported_sweep_events,
                                         other_events=sweep_events)))
+nested_events_queue_keys = strategies.builds(EventsQueueKey,
+                                             nested_sweep_events)
+non_events_queue_keys = strategies.builds(object)
