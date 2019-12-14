@@ -239,9 +239,9 @@ class SweepLineKey:
                 # same left endpoint, use the right endpoint to sort
                 return self.event.is_below(other.event.other_event.point)
             # different left endpoint, use the left endpoint to sort
-            if self.event.point.x == other.event.point.x:
+            elif self.event.point.x == other.event.point.x:
                 return self.event.point.y < other.event.point.y
-            if EventsQueueKey(self.event) < EventsQueueKey(other.event):
+            elif EventsQueueKey(self.event) < EventsQueueKey(other.event):
                 # has the line segment associated to `self` been inserted
                 # into sweep line after the line segment associated to `other`?
                 return other.event.is_above(self.event.point)
@@ -249,6 +249,6 @@ class SweepLineKey:
             # into sweep line after the line segment associated to `self`
             return self.event.is_below(other.event.point)
         # segments are collinear
-        if self.event.polygon_type is not other.event.polygon_type:
-            return self.event.polygon_type < other.event.polygon_type
-        return EventsQueueKey(self.event) < EventsQueueKey(other.event)
+        return (self.event.polygon_type < other.event.polygon_type
+                if self.event.polygon_type is not other.event.polygon_type
+                else EventsQueueKey(self.event) < EventsQueueKey(other.event))
