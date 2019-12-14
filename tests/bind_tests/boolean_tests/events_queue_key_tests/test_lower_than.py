@@ -1,4 +1,5 @@
-from typing import Any
+from typing import (Any,
+                    Tuple)
 
 import pytest
 from _martinez import EventsQueueKey
@@ -21,12 +22,12 @@ def test_asymmetry(first_key: EventsQueueKey,
     assert implication(first_key < second_key, not second_key < first_key)
 
 
-@given(strategies.nested_events_queue_keys,
-       strategies.nested_events_queue_keys,
-       strategies.nested_events_queue_keys)
-def test_transitivity(first_key: EventsQueueKey,
-                      second_key: EventsQueueKey,
-                      third_key: EventsQueueKey) -> None:
+@given(strategies.totally_ordered_nested_events_queue_keys_triplets)
+def test_transitivity(keys_triplet: Tuple[EventsQueueKey,
+                                          EventsQueueKey,
+                                          EventsQueueKey]) -> None:
+    first_key, second_key, third_key = keys_triplet
+
     assert implication(first_key < second_key < third_key,
                        first_key < third_key)
 
