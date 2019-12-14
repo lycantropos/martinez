@@ -31,6 +31,7 @@ namespace py = pybind11;
 #define POLYGON_TYPE_NAME "PolygonType"
 #define SEGMENT_NAME "Segment"
 #define SWEEP_EVENT_NAME "SweepEvent"
+#define SWEEP_LINE_KEY_NAME "SweepLineKey"
 
 template <class Value>
 static bool value_in_vector(const std::vector<Value>& container, Value value) {
@@ -260,6 +261,25 @@ class EventsQueueKey {
   };
 
   bool operator==(const EventsQueueKey& other) const {
+    return are_sweep_events_equal(*_event, *other._event);
+  };
+
+ private:
+  const cbop::SweepEvent* _event;
+};
+
+class SweepLineKey {
+ public:
+  const cbop::SweepEvent* event() const { return _event; };
+
+  SweepLineKey(const cbop::SweepEvent* event) : _event(event){};
+
+  bool operator<(const SweepLineKey& other) const {
+    static const cbop::SegmentComp cmp;
+    return cmp(_event, other._event);
+  };
+
+  bool operator==(const SweepLineKey& other) const {
     return are_sweep_events_equal(*_event, *other._event);
   };
 
@@ -519,6 +539,26 @@ PYBIND11_MODULE(MODULE_NAME, m) {
              return stream.str();
            })
       .def_property_readonly("event", &EventsQueueKey::event);
+
+  py::class_<SweepLineKey>(m, SWEEP_LINE_KEY_NAME)
+      .def(py::init<const cbop::SweepEvent*>(), py::arg("event"))
+      .def(py::pickle(
+          [](const SweepLineKey& key) {
+            return to_sweep_event_state(*key.event());
+          },
+          [](py::list state) {
+            return SweepLineKey(from_sweep_event_state(state));
+          }))
+      .def(py::self < py::self)
+      .def(py::self == py::self)
+      .def("__repr__",
+           [](const SweepLineKey& self) {
+             auto stream = make_stream();
+             stream << C_STR(MODULE_NAME) "." SWEEP_LINE_KEY_NAME "("
+                    << sweep_event_repr(*self.event()) << ")";
+             return stream.str();
+           })
+      .def_property_readonly("event", &SweepLineKey::event);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
