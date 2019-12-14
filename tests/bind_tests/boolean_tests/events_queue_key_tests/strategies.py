@@ -22,3 +22,6 @@ acyclic_sweep_events = strategies.recursive(leaf_sweep_events,
 sweep_events = strategies.recursive(acyclic_sweep_events, make_cyclic)
 events_queue_keys = strategies.builds(EventsQueueKey, sweep_events)
 nested_sweep_events = to_bound_sweep_events(sweep_events)
+nested_events_queue_keys = strategies.builds(EventsQueueKey,
+                                             nested_sweep_events)
+non_events_queue_keys = strategies.builds(object)
