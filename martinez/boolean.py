@@ -221,6 +221,6 @@ class SweepLineKey:
         return self._event
 
     def __eq__(self, other: 'SweepLineKey') -> bool:
-        return (self.event == other.event
+        return (self._event == other._event
                 if isinstance(other, SweepLineKey)
                 else NotImplemented)
