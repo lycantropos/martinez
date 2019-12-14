@@ -1,11 +1,11 @@
-import pickle
 from typing import Tuple
 
 from _martinez import EventsQueueKey as Bound
 from hypothesis import given
 
 from martinez.boolean import EventsQueueKey as Ported
-from tests.utils import are_bound_ported_events_queue_keys_equal
+from tests.utils import (are_bound_ported_events_queue_keys_equal,
+                         pickle_round_trip)
 from . import strategies
 
 
@@ -15,6 +15,5 @@ def test_round_trip(
 ) -> None:
     bound, ported = bound_with_ported_events_queue_keys_pair
 
-    assert are_bound_ported_events_queue_keys_equal(
-            pickle.loads(pickle.dumps(bound)),
-            pickle.loads(pickle.dumps(ported)))
+    assert are_bound_ported_events_queue_keys_equal(pickle_round_trip(bound),
+                                                    pickle_round_trip(ported))

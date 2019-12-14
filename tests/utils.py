@@ -1,3 +1,4 @@
+import pickle
 from typing import (Any,
                     Hashable,
                     Iterable,
@@ -25,6 +26,7 @@ from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
 
+Domain = TypeVar('Domain')
 Strategy = SearchStrategy
 BoundPointsPair = Tuple[BoundPoint, BoundPoint]
 BoundPointsTriplet = Tuple[BoundPoint, BoundPoint, BoundPoint]
@@ -67,6 +69,24 @@ def all_unique(iterable: Iterable[Hashable]) -> bool:
         else:
             return False
     return True
+
+
+def permute(sequence: Sequence[Domain],
+            permutation: Sequence[int]) -> Iterable[Domain]:
+    return map(sequence.__getitem__, permutation)
+
+
+def is_even_permutation(permutation: Sequence[int]) -> bool:
+    counter = 0
+    for index in range(len(permutation)):
+        for next_index in range(index + 1, len(permutation)):
+            if permutation[index] > permutation[next_index]:
+                counter += 1
+    return not counter % 2
+
+
+def pickle_round_trip(object_: Domain) -> Domain:
+    return pickle.loads(pickle.dumps(object_))
 
 
 def are_bound_ported_bounding_boxes_equal(bound: BoundBoundingBox,
@@ -165,20 +185,3 @@ def are_bound_ported_sweep_line_keys_equal(bound: BoundSweepLineKey,
                                            ported: PortedSweepLineKey
                                            ) -> bool:
     return are_bound_ported_sweep_events_equal(bound.event, ported.event)
-
-
-Domain = TypeVar('Domain')
-
-
-def permute(sequence: Sequence[Domain],
-            permutation: Sequence[int]) -> Iterable[Domain]:
-    return map(sequence.__getitem__, permutation)
-
-
-def is_even_permutation(permutation: Sequence[int]) -> bool:
-    counter = 0
-    for index in range(len(permutation)):
-        for next_index in range(index + 1, len(permutation)):
-            if permutation[index] > permutation[next_index]:
-                counter += 1
-    return not counter % 2
