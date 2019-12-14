@@ -25,6 +25,7 @@ namespace py = pybind11;
 #define BOUNDING_BOX_NAME "BoundingBox"
 #define CONTOUR_NAME "Contour"
 #define EDGE_TYPE_NAME "EdgeType"
+#define EVENTS_QUEUE_KEY_NAME "EventsQueueKey"
 #define POINT_NAME "Point"
 #define POLYGON_NAME "Polygon"
 #define POLYGON_TYPE_NAME "PolygonType"
@@ -499,7 +500,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def("is_above", &cbop::SweepEvent::above)
       .def("is_below", &cbop::SweepEvent::below);
 
-  py::class_<EventsQueueKey>(m, "EventsQueueKey")
+  py::class_<EventsQueueKey>(m, EVENTS_QUEUE_KEY_NAME)
       .def(py::init<const cbop::SweepEvent*>(), py::arg("event"))
       .def(py::pickle(
           [](const EventsQueueKey& key) {
@@ -510,6 +511,13 @@ PYBIND11_MODULE(MODULE_NAME, m) {
           }))
       .def(py::self < py::self)
       .def(py::self == py::self)
+      .def("__repr__",
+           [](const EventsQueueKey& self) {
+             auto stream = make_stream();
+             stream << C_STR(MODULE_NAME) "." EVENTS_QUEUE_KEY_NAME "("
+                    << sweep_event_repr(*self.event()) << ")";
+             return stream.str();
+           })
       .def_property_readonly("event", &EventsQueueKey::event);
 
 #ifdef VERSION_INFO
