@@ -113,8 +113,7 @@ void BooleanOpImp::run() {
   const double MINMAXX =
       std::min(_subjectBB.xmax(), _clippingBB.xmax());  // for optimization 2
   // trivial cases can be quickly resolved without sweeping the plane
-  if (trivial())
-    return;
+  if (trivial()) return;
   for (size_t i = 0; i < _subject.ncontours(); i++)
     for (size_t j = 0; j < _subject.contour(i).nvertices(); j++)
       processSegment(_subject.contour(i).segment(j), SUBJECT);
@@ -214,12 +213,13 @@ bool BooleanOpImp::trivial() {
       _subjectBB.ymin() > _clippingBB.ymax() ||
       _clippingBB.ymin() > _subjectBB.ymax()) {
     // the bounding boxes do not overlap
-    if (_operation == DIFFERENCE) _result = _subject;
+    if (_operation == DIFFERENCE)
+      _result = _subject;
     else if (_operation == UNION || _operation == XOR) {
       _result = _subject;
       _result.join(_clipping);
-    }
-    else _result = Polygon();
+    } else
+      _result = Polygon();
     _alreadyRun = true;
     return true;
   }
