@@ -89,6 +89,8 @@ BooleanOpImp::BooleanOpImp(const Polygon& subject, const Polygon& clipping,
       _clipping(clipping),
       _result(result),
       _operation(operation),
+      _subjectBB(subject.bbox()),
+      _clippingBB(clipping.bbox()),
       _alreadyRun(false),
       eq(),
       sl(),
@@ -108,15 +110,11 @@ BooleanOpImp::BooleanOpImp(const Polygon& subject, const Polygon& clipping,
 
 void BooleanOpImp::run() {
   if (_alreadyRun) return;
-  Bbox_2 subjectBB = _subject.bbox();    // for optimizations 1 and 2
-  Bbox_2 clippingBB = _clipping.bbox();  // for optimizations 1 and 2
   const double MINMAXX =
-      std::min(subjectBB.xmax(), clippingBB.xmax());  // for optimization 2
+      std::min(_subjectBB.xmax(), _clippingBB.xmax());  // for optimization 2
   // trivial cases can be quickly resolved without sweeping the plane
-  if (trivialOperation(subjectBB, clippingBB)) {
-    _alreadyRun = true;
+  if (trivial())
     return;
-  }
   for (size_t i = 0; i < _subject.ncontours(); i++)
     for (size_t j = 0; j < _subject.contour(i).nvertices(); j++)
       processSegment(_subject.contour(i).segment(j), SUBJECT);
@@ -130,7 +128,7 @@ void BooleanOpImp::run() {
     SweepEvent* se = eq.top();
     // optimization 2
     if ((_operation == INTERSECTION && se->point.x() > MINMAXX) ||
-        (_operation == DIFFERENCE && se->point.x() > subjectBB.xmax())) {
+        (_operation == DIFFERENCE && se->point.x() > _subjectBB.xmax())) {
       connectEdges();
       _alreadyRun = true;
       return;
@@ -200,27 +198,29 @@ void BooleanOpImp::run() {
   _alreadyRun = true;
 }
 
-bool BooleanOpImp::trivialOperation(const Bbox_2& subjectBB,
-                                    const Bbox_2& clippingBB) {
+bool BooleanOpImp::trivial() {
   // Test 1 for trivial result case
   if (_subject.ncontours() * _clipping.ncontours() ==
       0) {  // At least one of the polygons is empty
     if (_operation == DIFFERENCE) _result = _subject;
     if (_operation == UNION || _operation == XOR)
       _result = (_subject.ncontours() == 0) ? _clipping : _subject;
+    _alreadyRun = true;
     return true;
   }
   // Test 2 for trivial result case
-  if (subjectBB.xmin() > clippingBB.xmax() ||
-      clippingBB.xmin() > subjectBB.xmax() ||
-      subjectBB.ymin() > clippingBB.ymax() ||
-      clippingBB.ymin() > subjectBB.ymax()) {
+  if (_subjectBB.xmin() > _clippingBB.xmax() ||
+      _clippingBB.xmin() > _subjectBB.xmax() ||
+      _subjectBB.ymin() > _clippingBB.ymax() ||
+      _clippingBB.ymin() > _subjectBB.ymax()) {
     // the bounding boxes do not overlap
     if (_operation == DIFFERENCE) _result = _subject;
-    if (_operation == UNION || _operation == XOR) {
+    else if (_operation == UNION || _operation == XOR) {
       _result = _subject;
       _result.join(_clipping);
     }
+    else _result = Polygon();
+    _alreadyRun = true;
     return true;
   }
   return false;
@@ -454,7 +454,7 @@ void BooleanOpImp::connectEdges() {
         contour.setExternal(false);
       }
     }
-    int pos = i;
+    size_t pos = i;
     Point_2 initial = resultEvents[i]->point;
     contour.add(initial);
     while (resultEvents[pos]->otherEvent->point != initial) {
@@ -492,8 +492,9 @@ void BooleanOpImp::connectEdges() {
   }
 }
 
-int BooleanOpImp::nextPos(int pos, const std::vector<SweepEvent*>& resultEvents,
-                          const std::vector<bool>& processed) {
+size_t BooleanOpImp::nextPos(size_t pos,
+                             const std::vector<SweepEvent*>& resultEvents,
+                             const std::vector<bool>& processed) {
   size_t newPos = pos + 1;
   while (newPos < resultEvents.size() &&
          resultEvents[newPos]->point == resultEvents[pos]->point) {

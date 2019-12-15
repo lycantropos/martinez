@@ -141,6 +141,7 @@ class BooleanOpImp
   BooleanOpType operation() const { return _operation; }
 
   void run();
+  bool trivial();
 
 #ifdef __STEPBYSTEP
   typedef std::set<SweepEvent*, SegmentComp>::const_iterator const_sl_iterator;
@@ -166,6 +167,8 @@ class BooleanOpImp
   const Polygon& _clipping;
   Polygon& _result;
   BooleanOpType _operation;
+  Bbox_2 _subjectBB;   // for optimizations 1 and 2
+  Bbox_2 _clippingBB;  // for optimizations 1 and 2
   bool _alreadyRun;
   std::priority_queue<SweepEvent*, std::vector<SweepEvent*>, SweepEventComp>
       eq;  // event queue (sorted events to be processed)
@@ -176,7 +179,6 @@ class BooleanOpImp
                     // the boolean operation
   SweepEventComp sec;  // to compare events
   std::deque<SweepEvent*> sortedEvents;
-  bool trivialOperation(const Bbox_2& subjectBB, const Bbox_2& clippingBB);
   /** @brief Compute the events associated to segment s, and insert them into pq
    * and eq */
   void processSegment(const Segment_2& s, PolygonType pt);
@@ -200,8 +202,8 @@ class BooleanOpImp
                      const std::set<SweepEvent*, SegmentComp>::iterator& prev);
   // connect the solution edges to build the result polygon
   void connectEdges();
-  int nextPos(int pos, const std::vector<SweepEvent*>& resultEvents,
-              const std::vector<bool>& processed);
+  size_t nextPos(size_t pos, const std::vector<SweepEvent*>& resultEvents,
+                 const std::vector<bool>& processed);
 
 #ifdef __STEPBYSTEP
   bool trace;
