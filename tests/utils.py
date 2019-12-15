@@ -25,6 +25,7 @@ from martinez.contour import Contour as PortedContour
 from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
+from martinez.utilities import sign
 
 Domain = TypeVar('Domain')
 Strategy = SearchStrategy
@@ -87,6 +88,15 @@ def is_even_permutation(permutation: Sequence[int]) -> bool:
 
 def pickle_round_trip(object_: Domain) -> Domain:
     return pickle.loads(pickle.dumps(object_))
+
+
+def vertices_form_strict_polygon(vertices: Sequence[Union[PortedPoint,
+                                                          BoundPoint]]
+                                 ) -> bool:
+    return all(sign(vertices[index - 1],
+                    vertices[index],
+                    vertices[(index + 1) % len(vertices)])
+               for index in range(len(vertices)))
 
 
 def are_bound_ported_bounding_boxes_equal(bound: BoundBoundingBox,

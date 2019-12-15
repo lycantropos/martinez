@@ -1,20 +1,17 @@
-from _martinez import (Contour,
-                       OperationType,
-                       Point,
-                       Polygon)
 from hypothesis import strategies
 
-from tests.strategies import (booleans,
-                              floats,
+from martinez.boolean import OperationType
+from martinez.contour import Contour
+from martinez.polygon import Polygon
+from tests.strategies import (booleans, scalars_strategies,
+                              scalars_to_ported_points_triplets,
                               unsigned_integers_lists)
 from tests.utils import vertices_form_strict_polygon
 
 operations_types = strategies.sampled_from(list(OperationType.__members__
                                                 .values()))
-triangles_vertices = (strategies.lists(strategies.builds(Point,
-                                                         floats, floats),
-                                       min_size=3,
-                                       max_size=3)
+triangles_vertices = (scalars_strategies
+                      .flatmap(scalars_to_ported_points_triplets)
                       .filter(vertices_form_strict_polygon))
 contours_vertices = triangles_vertices
 contours = strategies.builds(Contour, contours_vertices,
