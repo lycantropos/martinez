@@ -1,16 +1,15 @@
 from _martinez import (Contour,
-                       OperationType,
                        Point,
                        Polygon)
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
+                              bound_operations_types,
                               floats,
                               unsigned_integers_lists)
 from tests.utils import vertices_form_strict_polygon
 
-operations_types = strategies.sampled_from(list(OperationType.__members__
-                                                .values()))
+operations_types = bound_operations_types
 triangles_vertices = (strategies.lists(strategies.builds(Point,
                                                          floats, floats),
                                        min_size=3,

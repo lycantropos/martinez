@@ -9,7 +9,7 @@ from _martinez import (Contour as BoundContour,
                        Point as BoundPoint,
                        PolygonType as BoundPolygonType,
                        Segment as BoundSegment,
-                       SweepEvent as BoundSweepEvent)
+                       SweepEvent as BoundSweepEvent, Polygon as BoundPolygon)
 from hypothesis import strategies
 
 from martinez.boolean import (EdgeType as PortedEdgeType,
@@ -18,6 +18,7 @@ from martinez.boolean import (EdgeType as PortedEdgeType,
 from martinez.contour import Contour as PortedContour
 from martinez.hints import Scalar
 from martinez.point import Point as PortedPoint
+from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
 from tests.utils import (BoundPortedPointsPair,
                          BoundPortedSweepEventsPair,
@@ -206,3 +207,11 @@ def to_bound_sweep_events(other_events: Strategy[Optional[BoundSweepEvent]]
                              strategies.builds(BoundPoint, floats, floats),
                              other_events, bound_polygons_types,
                              bound_edges_types)
+
+
+def to_bound_with_ported_polygons_pair(
+        bound_with_ported_contours_lists_pair: Tuple[List[BoundContour],
+                                                     List[PortedContour]]
+) -> Tuple[BoundPolygon, PortedPolygon]:
+    bound_contours, ported_contours = bound_with_ported_contours_lists_pair
+    return BoundPolygon(bound_contours), PortedPolygon(ported_contours)

@@ -10,6 +10,7 @@ from typing import (Any,
 from _martinez import (BoundingBox as BoundBoundingBox,
                        Contour as BoundContour,
                        EventsQueueKey as BoundEventsQueueKey,
+                       Operation as BoundOperation,
                        Point as BoundPoint,
                        Polygon as BoundPolygon,
                        Segment as BoundSegment,
@@ -18,6 +19,7 @@ from _martinez import (BoundingBox as BoundBoundingBox,
 from hypothesis.strategies import SearchStrategy
 
 from martinez.boolean import (EventsQueueKey as PortedEventsQueueKey,
+                              Operation as PortedOperation,
                               SweepEvent as PortedSweepEvent,
                               SweepLineKey as PortedSweepLineKey)
 from martinez.bounding_box import BoundingBox as PortedBoundingBox
@@ -195,3 +197,12 @@ def are_bound_ported_sweep_line_keys_equal(bound: BoundSweepLineKey,
                                            ported: PortedSweepLineKey
                                            ) -> bool:
     return are_bound_ported_sweep_events_equal(bound.event, ported.event)
+
+
+def are_bound_ported_operations_equal(bound: BoundOperation,
+                                      ported: PortedOperation) -> bool:
+    return (are_bound_ported_polygons_equal(bound.left, ported.left)
+            and are_bound_ported_polygons_equal(bound.right, ported.right)
+            and are_bound_ported_polygons_equal(bound.resultant,
+                                                ported.resultant)
+            and bound.type == ported.type)
