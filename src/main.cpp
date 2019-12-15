@@ -408,11 +408,11 @@ PYBIND11_MODULE(MODULE_NAME, m) {
   py::class_<cbop::BooleanOpImp>(m, "Operation")
       .def(py::init<const cbop::Polygon&, const cbop::Polygon&, cbop::Polygon&,
                     cbop::BooleanOpType>(),
-           py::arg("left"), py::arg("right"), py::arg("result"),
+           py::arg("left"), py::arg("right"), py::arg("resultant"),
            py::arg("type"))
       .def_property_readonly("left", &cbop::BooleanOpImp::subject)
       .def_property_readonly("right", &cbop::BooleanOpImp::clipping)
-      .def_property_readonly("result", &cbop::BooleanOpImp::result)
+      .def_property_readonly("resultant", &cbop::BooleanOpImp::result)
       .def_property_readonly("type", &cbop::BooleanOpImp::operation)
       .def("run", &cbop::BooleanOpImp::run);
 
