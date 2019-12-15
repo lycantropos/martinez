@@ -153,10 +153,10 @@ class BooleanOpImp
   const_out_iterator endOut() const { return out.end(); }
 #endif
  private:
-  const Polygon& subject;
-  const Polygon& clipping;
-  Polygon& result;
-  BooleanOpType operation;
+  const Polygon& _subject;
+  const Polygon& _clipping;
+  Polygon& _result;
+  BooleanOpType _operation;
   std::priority_queue<SweepEvent*, std::vector<SweepEvent*>, SweepEventComp>
       eq;  // event queue (sorted events to be processed)
   std::set<SweepEvent*, SegmentComp>

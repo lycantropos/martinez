@@ -78,17 +78,17 @@ bool SegmentComp::operator()(const SweepEvent* le1,
   return comp(le1, le2);
 }
 
-BooleanOpImp::BooleanOpImp(const Polygon& subj, const Polygon& clip,
-                           Polygon& res, BooleanOpType op
+BooleanOpImp::BooleanOpImp(const Polygon& subject, const Polygon& clipping,
+                           Polygon& result, BooleanOpType operation
 #ifdef __STEPBYSTEP
                            ,
                            QSemaphore* ds, QSemaphore* sd, bool t
 #endif
                            )
-    : subject(subj),
-      clipping(clip),
-      result(res),
-      operation(op),
+    : _subject(subject),
+      _clipping(clipping),
+      _result(result),
+      _operation(operation),
       eq(),
       sl(),
       eventHolder()
@@ -106,28 +106,28 @@ BooleanOpImp::BooleanOpImp(const Polygon& subj, const Polygon& clip,
 }
 
 void BooleanOpImp::run() {
-  Bbox_2 subjectBB = subject.bbox();    // for optimizations 1 and 2
-  Bbox_2 clippingBB = clipping.bbox();  // for optimizations 1 and 2
+  Bbox_2 subjectBB = _subject.bbox();    // for optimizations 1 and 2
+  Bbox_2 clippingBB = _clipping.bbox();  // for optimizations 1 and 2
   const double MINMAXX =
       std::min(subjectBB.xmax(), clippingBB.xmax());  // for optimization 2
   if (trivialOperation(subjectBB,
                        clippingBB))  // trivial cases can be quickly resolved
                                      // without sweeping the plane
     return;
-  for (unsigned int i = 0; i < subject.ncontours(); i++)
-    for (unsigned int j = 0; j < subject.contour(i).nvertices(); j++)
-      processSegment(subject.contour(i).segment(j), SUBJECT);
-  for (unsigned int i = 0; i < clipping.ncontours(); i++)
-    for (unsigned int j = 0; j < clipping.contour(i).nvertices(); j++)
-      processSegment(clipping.contour(i).segment(j), CLIPPING);
+  for (unsigned int i = 0; i < _subject.ncontours(); i++)
+    for (unsigned int j = 0; j < _subject.contour(i).nvertices(); j++)
+      processSegment(_subject.contour(i).segment(j), SUBJECT);
+  for (unsigned int i = 0; i < _clipping.ncontours(); i++)
+    for (unsigned int j = 0; j < _clipping.contour(i).nvertices(); j++)
+      processSegment(_clipping.contour(i).segment(j), CLIPPING);
 
   std::set<SweepEvent*, SegmentComp>::iterator it, prev, next;
 
   while (!eq.empty()) {
     SweepEvent* se = eq.top();
     // optimization 2
-    if ((operation == INTERSECTION && se->point.x() > MINMAXX) ||
-        (operation == DIFFERENCE && se->point.x() > subjectBB.xmax())) {
+    if ((_operation == INTERSECTION && se->point.x() > MINMAXX) ||
+        (_operation == DIFFERENCE && se->point.x() > subjectBB.xmax())) {
       connectEdges();
       return;
     }
@@ -198,11 +198,11 @@ void BooleanOpImp::run() {
 bool BooleanOpImp::trivialOperation(const Bbox_2& subjectBB,
                                     const Bbox_2& clippingBB) {
   // Test 1 for trivial result case
-  if (subject.ncontours() * clipping.ncontours() ==
+  if (_subject.ncontours() * _clipping.ncontours() ==
       0) {  // At least one of the polygons is empty
-    if (operation == DIFFERENCE) result = subject;
-    if (operation == UNION || operation == XOR)
-      result = (subject.ncontours() == 0) ? clipping : subject;
+    if (_operation == DIFFERENCE) _result = _subject;
+    if (_operation == UNION || _operation == XOR)
+      _result = (_subject.ncontours() == 0) ? _clipping : _subject;
     return true;
   }
   // Test 2 for trivial result case
@@ -211,10 +211,10 @@ bool BooleanOpImp::trivialOperation(const Bbox_2& subjectBB,
       subjectBB.ymin() > clippingBB.ymax() ||
       clippingBB.ymin() > subjectBB.ymax()) {
     // the bounding boxes do not overlap
-    if (operation == DIFFERENCE) result = subject;
-    if (operation == UNION || operation == XOR) {
-      result = subject;
-      result.join(clipping);
+    if (_operation == DIFFERENCE) _result = _subject;
+    if (_operation == UNION || _operation == XOR) {
+      _result = _subject;
+      _result.join(_clipping);
     }
     return true;
   }
@@ -267,7 +267,7 @@ void BooleanOpImp::computeFields(
 bool BooleanOpImp::inResult(SweepEvent* le) {
   switch (le->type) {
     case NORMAL:
-      switch (operation) {
+      switch (_operation) {
         case (INTERSECTION):
           return !le->otherInOut;
         case (UNION):
@@ -279,9 +279,9 @@ bool BooleanOpImp::inResult(SweepEvent* le) {
           return true;
       }
     case SAME_TRANSITION:
-      return operation == INTERSECTION || operation == UNION;
+      return _operation == INTERSECTION || _operation == UNION;
     case DIFFERENT_TRANSITION:
-      return operation == DIFFERENCE;
+      return _operation == DIFFERENCE;
     case NON_CONTRIBUTING:
       return false;
   }
@@ -430,20 +430,20 @@ void BooleanOpImp::connectEdges() {
   std::vector<int> holeOf;
   for (unsigned int i = 0; i < resultEvents.size(); i++) {
     if (processed[i]) continue;
-    result.push_back(Contour());
-    Contour& contour = result.back();
-    unsigned int contourId = result.ncontours() - 1;
+    _result.push_back(Contour());
+    Contour& contour = _result.back();
+    unsigned int contourId = _result.ncontours() - 1;
     depth.push_back(0);
     holeOf.push_back(-1);
     if (resultEvents[i]->prevInResult) {
       unsigned int lowerContourId = resultEvents[i]->prevInResult->contourId;
       if (!resultEvents[i]->prevInResult->resultInOut) {
-        result[lowerContourId].addHole(contourId);
+        _result[lowerContourId].addHole(contourId);
         holeOf[contourId] = lowerContourId;
         depth[contourId] = depth[lowerContourId] + 1;
         contour.setExternal(false);
-      } else if (!result[lowerContourId].external()) {
-        result[holeOf[lowerContourId]].addHole(contourId);
+      } else if (!_result[lowerContourId].external()) {
+        _result[holeOf[lowerContourId]].addHole(contourId);
         holeOf[contourId] = holeOf[lowerContourId];
         depth[contourId] = depth[lowerContourId];
         contour.setExternal(false);
