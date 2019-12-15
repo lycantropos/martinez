@@ -10,9 +10,11 @@ from typing import (Callable,
                     TypeVar,
                     Union)
 
+from reprit import seekers
 from reprit.base import generate_repr
 
 from .point import Point
+from .polygon import Polygon
 from .segment import Segment
 from .utilities import sign
 
@@ -252,3 +254,33 @@ class SweepLineKey:
         return (self.event.polygon_type < other.event.polygon_type
                 if self.event.polygon_type is not other.event.polygon_type
                 else EventsQueueKey(self.event) < EventsQueueKey(other.event))
+
+
+class Operation:
+    __slots__ = ('_left', '_right', '_resultant', '_type')
+
+    def __init__(self, left: Polygon, right: Polygon, resultant: Polygon,
+                 type_: OperationType):
+        self._left = left
+        self._right = right
+        self._resultant = resultant
+        self._type = type_
+
+    generate_repr(__init__,
+                  field_seeker=seekers.complex_)
+
+    @property
+    def left(self) -> Polygon:
+        return self._left
+
+    @property
+    def right(self) -> Polygon:
+        return self._right
+
+    @property
+    def resultant(self) -> Polygon:
+        return self._resultant
+
+    @property
+    def type(self) -> OperationType:
+        return self._type
