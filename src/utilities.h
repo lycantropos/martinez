@@ -35,7 +35,7 @@ inline double signedArea(const Point_2& p1, const Point_2& p2) {
 
 /** Sign of triangle (p1, p2, o) */
 inline int sign(const Point_2& p1, const Point_2& p2, const Point_2& o) {
-  float det =
+  double det =
       (p1.x() - o.x()) * (p2.y() - o.y()) - (p2.x() - o.x()) * (p1.y() - o.y());
   return (det < 0 ? -1 : (det > 0 ? +1 : 0));
 }
