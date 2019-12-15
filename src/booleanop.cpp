@@ -310,10 +310,8 @@ int BooleanOpImp::possibleIntersection(SweepEvent* le1, SweepEvent* le2) {
     return 0;  // the line segments intersect at an endpoint of both line
                // segments
 
-  if (nintersections == 2 && le1->pol == le2->pol) {
-    std::cerr << "Sorry, edges of the same polygon overlap\n";
-    exit(1);  // the line segments overlap, but they belong to the same polygon
-  }
+  if (nintersections == 2 && le1->pol == le2->pol)
+    throw std::domain_error("Edges of the same polygon should not overlap.");
 
   // The line segments associated to le1 and le2 intersect
   if (nintersections == 1) {
