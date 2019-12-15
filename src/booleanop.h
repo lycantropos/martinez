@@ -131,7 +131,6 @@ class BooleanOpImp
                QSemaphore* ds = 0, QSemaphore* sd = 0, bool trace = false
 #endif
   );
-  void run();
 
   const Polygon& subject() const { return _subject; }
 
@@ -140,6 +139,8 @@ class BooleanOpImp
   Polygon& result() const { return _result; }
 
   BooleanOpType operation() const { return _operation; }
+
+  void run();
 
 #ifdef __STEPBYSTEP
   typedef std::set<SweepEvent*, SegmentComp>::const_iterator const_sl_iterator;
@@ -165,6 +166,7 @@ class BooleanOpImp
   const Polygon& _clipping;
   Polygon& _result;
   BooleanOpType _operation;
+  bool _alreadyRun;
   std::priority_queue<SweepEvent*, std::vector<SweepEvent*>, SweepEventComp>
       eq;  // event queue (sorted events to be processed)
   std::set<SweepEvent*, SegmentComp>

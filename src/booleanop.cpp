@@ -89,6 +89,7 @@ BooleanOpImp::BooleanOpImp(const Polygon& subject, const Polygon& clipping,
       _clipping(clipping),
       _result(result),
       _operation(operation),
+      _alreadyRun(false),
       eq(),
       sl(),
       eventHolder()
@@ -106,14 +107,16 @@ BooleanOpImp::BooleanOpImp(const Polygon& subject, const Polygon& clipping,
 }
 
 void BooleanOpImp::run() {
+  if (_alreadyRun) return;
   Bbox_2 subjectBB = _subject.bbox();    // for optimizations 1 and 2
   Bbox_2 clippingBB = _clipping.bbox();  // for optimizations 1 and 2
   const double MINMAXX =
       std::min(subjectBB.xmax(), clippingBB.xmax());  // for optimization 2
-  if (trivialOperation(subjectBB,
-                       clippingBB))  // trivial cases can be quickly resolved
-                                     // without sweeping the plane
+  // trivial cases can be quickly resolved without sweeping the plane
+  if (trivialOperation(subjectBB, clippingBB)) {
+    _alreadyRun = true;
     return;
+  }
   for (unsigned int i = 0; i < _subject.ncontours(); i++)
     for (unsigned int j = 0; j < _subject.contour(i).nvertices(); j++)
       processSegment(_subject.contour(i).segment(j), SUBJECT);
@@ -129,6 +132,7 @@ void BooleanOpImp::run() {
     if ((_operation == INTERSECTION && se->point.x() > MINMAXX) ||
         (_operation == DIFFERENCE && se->point.x() > subjectBB.xmax())) {
       connectEdges();
+      _alreadyRun = true;
       return;
     }
     sortedEvents.push_back(se);
@@ -193,6 +197,7 @@ void BooleanOpImp::run() {
 #endif
   }
   connectEdges();
+  _alreadyRun = true;
 }
 
 bool BooleanOpImp::trivialOperation(const Bbox_2& subjectBB,
