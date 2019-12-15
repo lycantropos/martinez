@@ -117,11 +117,11 @@ void BooleanOpImp::run() {
     _alreadyRun = true;
     return;
   }
-  for (unsigned int i = 0; i < _subject.ncontours(); i++)
-    for (unsigned int j = 0; j < _subject.contour(i).nvertices(); j++)
+  for (size_t i = 0; i < _subject.ncontours(); i++)
+    for (size_t j = 0; j < _subject.contour(i).nvertices(); j++)
       processSegment(_subject.contour(i).segment(j), SUBJECT);
-  for (unsigned int i = 0; i < _clipping.ncontours(); i++)
-    for (unsigned int j = 0; j < _clipping.contour(i).nvertices(); j++)
+  for (size_t i = 0; i < _clipping.ncontours(); i++)
+    for (size_t j = 0; j < _clipping.contour(i).nvertices(); j++)
       processSegment(_clipping.contour(i).segment(j), CLIPPING);
 
   std::set<SweepEvent*, SegmentComp>::iterator it, prev, next;
@@ -415,7 +415,7 @@ void BooleanOpImp::connectEdges() {
   bool sorted = false;
   while (!sorted) {
     sorted = true;
-    for (unsigned int i = 0; i < resultEvents.size(); ++i) {
+    for (size_t i = 0; i < resultEvents.size(); ++i) {
       if (i + 1 < resultEvents.size() &&
           sec(resultEvents[i], resultEvents[i + 1])) {
         std::swap(resultEvents[i], resultEvents[i + 1]);
@@ -424,7 +424,7 @@ void BooleanOpImp::connectEdges() {
     }
   }
 
-  for (unsigned int i = 0; i < resultEvents.size(); ++i) {
+  for (size_t i = 0; i < resultEvents.size(); ++i) {
     resultEvents[i]->pos = i;
     if (!resultEvents[i]->left)
       std::swap(resultEvents[i]->pos, resultEvents[i]->otherEvent->pos);
@@ -433,15 +433,15 @@ void BooleanOpImp::connectEdges() {
   std::vector<bool> processed(resultEvents.size(), false);
   std::vector<int> depth;
   std::vector<int> holeOf;
-  for (unsigned int i = 0; i < resultEvents.size(); i++) {
+  for (size_t i = 0; i < resultEvents.size(); i++) {
     if (processed[i]) continue;
     _result.push_back(Contour());
     Contour& contour = _result.back();
-    unsigned int contourId = _result.ncontours() - 1;
+    size_t contourId = _result.ncontours() - 1;
     depth.push_back(0);
     holeOf.push_back(-1);
     if (resultEvents[i]->prevInResult) {
-      unsigned int lowerContourId = resultEvents[i]->prevInResult->contourId;
+      size_t lowerContourId = resultEvents[i]->prevInResult->contourId;
       if (!resultEvents[i]->prevInResult->resultInOut) {
         _result[lowerContourId].addHole(contourId);
         holeOf[contourId] = lowerContourId;
@@ -494,7 +494,7 @@ void BooleanOpImp::connectEdges() {
 
 int BooleanOpImp::nextPos(int pos, const std::vector<SweepEvent*>& resultEvents,
                           const std::vector<bool>& processed) {
-  unsigned int newPos = pos + 1;
+  size_t newPos = pos + 1;
   while (newPos < resultEvents.size() &&
          resultEvents[newPos]->point == resultEvents[pos]->point) {
     if (!processed[newPos])

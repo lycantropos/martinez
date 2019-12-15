@@ -61,9 +61,9 @@ struct SweepEvent {
   SweepEvent* prevInResult;  // previous segment in sl belonging to the result
                              // of the boolean operation
   bool inResult;
-  unsigned int pos;
+  size_t pos;
   bool resultInOut;
-  unsigned int contourId;
+  size_t contourId;
   // member functions
   /** Is the line segment (point, otherEvent->point) below point p */
   bool below(const Point_2& p) const {

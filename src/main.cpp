@@ -134,9 +134,9 @@ static std::vector<cbop::Point_2> contour_to_points(const cbop::Contour& self) {
   return std::vector<cbop::Point_2>(self.begin(), self.end());
 }
 
-static std::vector<unsigned int> contour_to_holes(const cbop::Contour& self) {
-  std::vector<unsigned int> result;
-  for (unsigned int index = 0; index < self.nholes(); ++index)
+static std::vector<size_t> contour_to_holes(const cbop::Contour& self) {
+  std::vector<size_t> result;
+  for (size_t index = 0; index < self.nholes(); ++index)
     result.push_back(self.hole(index));
   return result;
 }
@@ -369,7 +369,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
 
   py::class_<cbop::Contour>(m, CONTOUR_NAME)
       .def(py::init<const std::vector<cbop::Point_2>&,
-                    const std::vector<unsigned int>&, bool>(),
+                    const std::vector<size_t>&, bool>(),
            py::arg("points"), py::arg("holes"), py::arg("is_external"))
       .def(py::pickle(
           [](const cbop::Contour& self) {  // __getstate__
@@ -379,7 +379,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
           [](py::tuple tuple) {  // __setstate__
             if (tuple.size() != 3) throw std::runtime_error("Invalid state!");
             return cbop::Contour(tuple[0].cast<std::vector<cbop::Point_2>>(),
-                                 tuple[1].cast<std::vector<unsigned int>>(),
+                                 tuple[1].cast<std::vector<size_t>>(),
                                  tuple[2].cast<bool>());
           }))
       .def("__eq__", are_contours_equal)

@@ -32,7 +32,7 @@ static bool are_counterclockwise(const std::vector<Point_2>& points) {
 Contour::Contour() : _points(), _holes(), _external(true), _CC(true) {}
 
 Contour::Contour(const std::vector<cbop::Point_2>& points,
-                 const std::vector<unsigned int>& holes, bool external)
+                 const std::vector<size_t>& holes, bool external)
     : _points(points),
       _holes(holes),
       _external(external),
@@ -46,7 +46,7 @@ void Contour::changeOrientation() {
 Bbox_2 Contour::bbox() const {
   if (nvertices() == 0) return Bbox_2();
   Bbox_2 b = vertex(0).bbox();
-  for (unsigned int i = 1; i < nvertices(); ++i) b = b + vertex(i).bbox();
+  for (size_t i = 1; i < nvertices(); ++i) b = b + vertex(i).bbox();
   return b;
 }
 
@@ -73,37 +73,37 @@ bool Polygon::open(const std::string& filename) {
 }
 
 void Polygon::join(const Polygon& pol) {
-  unsigned int size = ncontours();
-  for (unsigned int i = 0; i < pol.ncontours(); ++i) {
+  size_t size = ncontours();
+  for (size_t i = 0; i < pol.ncontours(); ++i) {
     push_back(pol.contour(i));
     back().clearHoles();
-    for (unsigned int j = 0; j < pol.contour(i).nholes(); ++j)
+    for (size_t j = 0; j < pol.contour(i).nholes(); ++j)
       back().addHole(pol.contour(i).hole(j) + size);
   }
 }
 
-unsigned Polygon::nvertices() const {
-  unsigned int nv = 0;
-  for (unsigned int i = 0; i < ncontours(); i++) nv += _contours[i].nvertices();
+size_t Polygon::nvertices() const {
+  size_t nv = 0;
+  for (size_t i = 0; i < ncontours(); i++) nv += _contours[i].nvertices();
   return nv;
 }
 
 Bbox_2 Polygon::bbox() const {
   if (ncontours() == 0) return Bbox_2();
   Bbox_2 bb = _contours[0].bbox();
-  for (unsigned int i = 1; i < ncontours(); i++) bb = bb + _contours[i].bbox();
+  for (size_t i = 1; i < ncontours(); i++) bb = bb + _contours[i].bbox();
   return bb;
 }
 
 std::ostream& cbop::operator<<(std::ostream& o, Polygon& p) {
   o << p.ncontours() << std::endl;
-  for (unsigned int i = 0; i < p.ncontours(); i++)  // write the contours
+  for (size_t i = 0; i < p.ncontours(); i++)  // write the contours
     o << p.contour(i);
-  for (unsigned int i = 0; i < p.ncontours();
+  for (size_t i = 0; i < p.ncontours();
        i++) {  // write the holes of every contour
     if (p.contour(i).nholes() > 0) {
       o << i << ": ";
-      for (unsigned int j = 0; j < p.contour(i).nholes(); j++)
+      for (size_t j = 0; j < p.contour(i).nholes(); j++)
         o << p.contour(i).hole(j)
           << (j == p.contour(i).nholes() - 1 ? '\n' : ' ');
     }
