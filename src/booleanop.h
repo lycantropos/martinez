@@ -133,6 +133,14 @@ class BooleanOpImp
   );
   void run();
 
+  const Polygon& subject() const { return _subject; }
+
+  const Polygon& clipping() const { return _clipping; }
+
+  Polygon& result() const { return _result; }
+
+  BooleanOpType operation() const { return _operation; }
+
 #ifdef __STEPBYSTEP
   typedef std::set<SweepEvent*, SegmentComp>::const_iterator const_sl_iterator;
   typedef std::deque<SweepEvent*>::const_iterator const_sortedEvents_iterator;
