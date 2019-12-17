@@ -259,11 +259,11 @@ class SweepLineKey:
 class Operation:
     __slots__ = ('_left', '_right', '_resultant', '_type')
 
-    def __init__(self, left: Polygon, right: Polygon, resultant: Polygon,
-                 type_: OperationType):
+    def __init__(self, left: Polygon, right: Polygon,
+                 type_: OperationType) -> None:
         self._left = left
         self._right = right
-        self._resultant = resultant
+        self._resultant = Polygon([])
         self._type = type_
 
     generate_repr(__init__,
