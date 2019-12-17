@@ -266,8 +266,8 @@ class Operation:
         self._resultant = Polygon([])
         self._type = type_
 
-    generate_repr(__init__,
-                  field_seeker=seekers.complex_)
+    __repr__ = generate_repr(__init__,
+                             field_seeker=seekers.complex_)
 
     @property
     def left(self) -> Polygon:
