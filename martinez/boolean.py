@@ -269,6 +269,13 @@ class Operation:
     __repr__ = generate_repr(__init__,
                              field_seeker=seekers.complex_)
 
+    def __eq__(self, other: 'Operation') -> bool:
+        return (self._left == other._left
+                and self._right == other._right
+                and self._type is other._type
+                if isinstance(other, Operation)
+                else NotImplemented)
+
     @property
     def left(self) -> Polygon:
         return self._left
