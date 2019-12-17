@@ -1,4 +1,5 @@
 from _martinez import (Contour,
+                       Operation,
                        Point,
                        Polygon)
 from hypothesis import strategies
@@ -25,3 +26,4 @@ non_empty_contours_lists = strategies.lists(contours,
 polygons = strategies.builds(Polygon, contours_lists)
 empty_polygons = strategies.builds(Polygon, empty_contours_lists)
 non_empty_polygons = strategies.builds(Polygon, contours_lists)
+operations = strategies.builds(Operation, polygons, polygons, operations_types)
