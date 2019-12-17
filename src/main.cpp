@@ -426,6 +426,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("right", &cbop::BooleanOpImp::clipping)
       .def_property_readonly("resultant", &cbop::BooleanOpImp::result)
       .def_property_readonly("type", &cbop::BooleanOpImp::operation)
+      .def_property_readonly("is_trivial", &cbop::BooleanOpImp::trivial)
       .def("run", &cbop::BooleanOpImp::run);
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
