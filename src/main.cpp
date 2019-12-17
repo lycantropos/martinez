@@ -176,6 +176,13 @@ static bool are_sweep_events_equal(const cbop::SweepEvent& self,
   return true;
 }
 
+bool are_polygons_equal(const cbop::Polygon& self, const cbop::Polygon& other) {
+  if (self.ncontours() != other.ncontours()) return false;
+  for (size_t index = 0; index < self.ncontours(); ++index)
+    if (!are_contours_equal(self[index], other[index])) return false;
+  return true;
+}
+
 static std::string contour_repr(const cbop::Contour& self) {
   std::vector<std::string> points_reprs;
   for (auto& point : contour_to_points(self))
@@ -409,6 +416,12 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def(py::init<const cbop::Polygon&, const cbop::Polygon&,
                     cbop::BooleanOpType>(),
            py::arg("left"), py::arg("right"), py::arg("type"))
+      .def("__eq__",
+           [](const cbop::BooleanOpImp& self, const cbop::BooleanOpImp& other) {
+             return are_polygons_equal(self.subject(), other.subject()) &&
+                    are_polygons_equal(self.clipping(), other.clipping()) &&
+                    self.operation() == other.operation();
+           })
       .def_property_readonly("left", &cbop::BooleanOpImp::subject)
       .def_property_readonly("right", &cbop::BooleanOpImp::clipping)
       .def_property_readonly("resultant", &cbop::BooleanOpImp::result)
@@ -442,13 +455,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
           [](const std::vector<cbop::Contour>& contours) {  // __setstate__
             return cbop::Polygon(contours);
           }))
-      .def("__eq__",
-           [](const cbop::Polygon& self, const cbop::Polygon& other) {
-             if (self.ncontours() != other.ncontours()) return false;
-             for (size_t index = 0; index < self.ncontours(); ++index)
-               if (!are_contours_equal(self[index], other[index])) return false;
-             return true;
-           })
+      .def("__eq__", are_polygons_equal)
       .def(
           "__iter__",
           [](const cbop::Polygon& self) {
