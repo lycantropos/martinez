@@ -449,6 +449,17 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def(py::init<const cbop::Polygon&, const cbop::Polygon&,
                     cbop::BooleanOpType>(),
            py::arg("left"), py::arg("right"), py::arg("type"))
+      .def(py::pickle(
+          [](const cbop::BooleanOpImp& self) {  // __getstate__
+            return py::make_tuple(self.subject(), self.clipping(),
+                                  self.operation());
+          },
+          [](py::tuple tuple) {  // __setstate__
+            if (tuple.size() != 3) throw std::runtime_error("Invalid state!");
+            return cbop::BooleanOpImp(tuple[0].cast<cbop::Polygon>(),
+                                      tuple[1].cast<cbop::Polygon>(),
+                                      tuple[2].cast<cbop::BooleanOpType>());
+          }))
       .def("__eq__",
            [](const cbop::BooleanOpImp& self, const cbop::BooleanOpImp& other) {
              return are_polygons_equal(self.subject(), other.subject()) &&
