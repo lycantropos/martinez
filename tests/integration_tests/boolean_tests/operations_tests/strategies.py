@@ -2,10 +2,16 @@ from itertools import repeat
 from typing import (List,
                     Tuple)
 
-from _martinez import Point as BoundPoint
+from _martinez import (Operation as Bound,
+                       OperationType as BoundOperationType,
+                       Point as BoundPoint,
+                       Polygon as BoundPolygon)
 from hypothesis import strategies
 
+from martinez.boolean import (Operation as Ported,
+                              OperationType as PortedOperationType)
 from martinez.point import Point as PortedPoint
+from martinez.polygon import Polygon as PortedPolygon
 from tests.strategies import (booleans,
                               bound_with_ported_operations_types_pairs,
                               single_precision_floats as floats,
@@ -58,3 +64,25 @@ bound_with_ported_empty_polygons_pairs = strategies.builds(
 bound_with_ported_non_empty_polygons_pairs = strategies.builds(
         to_bound_with_ported_polygons_pair,
         bound_with_ported_non_empty_contours_lists_pairs)
+
+
+def to_bound_with_ported_operations_pair(
+        bound_with_ported_left_polygons_pair: Tuple[BoundPolygon,
+                                                    PortedPolygon],
+        bound_with_ported_right_polygons_pair: Tuple[BoundPolygon,
+                                                     PortedPolygon],
+        bound_with_ported_operations_types_pair: Tuple[BoundOperationType,
+                                                       PortedOperationType],
+) -> Tuple[Bound, Ported]:
+    bound_left, ported_left = bound_with_ported_left_polygons_pair
+    bound_right, ported_right = bound_with_ported_right_polygons_pair
+    (bound_operation_type,
+     ported_operation_type) = bound_with_ported_operations_types_pair
+    return (Bound(bound_left, bound_right, bound_operation_type),
+            Ported(ported_left, ported_right, ported_operation_type))
+
+
+bound_with_ported_operations_pairs = strategies.builds(
+        to_bound_with_ported_operations_pair,
+        bound_with_ported_polygons_pairs, bound_with_ported_polygons_pairs,
+        bound_with_ported_operations_types_pairs)
