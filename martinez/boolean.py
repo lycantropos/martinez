@@ -257,7 +257,7 @@ class SweepLineKey:
 
 
 class Operation:
-    __slots__ = ('_left', '_right', '_resultant', '_type')
+    __slots__ = ('_left', '_right', '_resultant', '_type', '_already_run')
 
     def __init__(self, left: Polygon, right: Polygon,
                  type_: OperationType) -> None:
@@ -265,6 +265,7 @@ class Operation:
         self._right = right
         self._resultant = Polygon([])
         self._type = type_
+        self._already_run = False
 
     __repr__ = generate_repr(__init__,
                              field_seeker=seekers.complex_)
@@ -291,3 +292,35 @@ class Operation:
     @property
     def type(self) -> OperationType:
         return self._type
+
+    @property
+    def is_trivial(self) -> bool:
+        # test 1 for trivial result case
+        if not (self._left.contours and self._right.contours):
+            # at least one of the polygons is empty
+            if self._type is OperationType.DIFFERENCE:
+                self._resultant = self._left
+            if (self._type is OperationType.UNION
+                    or self._type is OperationType.XOR):
+                self._resultant = (self._left
+                                   if self._left.contours
+                                   else self._right)
+            self._already_run = True
+            return True
+        # test 2 for trivial result case
+        left_bounding_box = self._left.bounding_box
+        right_bounding_box = self._right.bounding_box
+        if (left_bounding_box.x_min > right_bounding_box.x_max
+                or right_bounding_box.x_min > left_bounding_box.x_max
+                or left_bounding_box.y_min > right_bounding_box.y_max
+                or right_bounding_box.y_min > left_bounding_box.y_max):
+            # the bounding boxes do not overlap
+            if self._type is OperationType.DIFFERENCE:
+                self._resultant = self._left
+            elif (self._type is OperationType.UNION
+                  or self._type is OperationType.XOR):
+                self._resultant = self._left
+                self._resultant.join(self._right)
+            self._already_run = True
+            return True
+        return False
