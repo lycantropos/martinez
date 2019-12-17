@@ -135,7 +135,7 @@ class BooleanOpImp
 
   const Polygon& clipping() const { return _clipping; }
 
-  Polygon& result() const { return _result; }
+  const Polygon& result() const { return _result; }
 
   BooleanOpType operation() const { return _operation; }
 
@@ -216,7 +216,8 @@ class BooleanOpImp
 #endif
 };
 
-inline Polygon compute(const Polygon& subj, const Polygon& clip, BooleanOpType op) {
+inline Polygon compute(const Polygon& subj, const Polygon& clip,
+                       BooleanOpType op) {
   BooleanOpImp boi(subj, clip, op);
   boi.run();
   return boi.result();
