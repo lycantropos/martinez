@@ -233,28 +233,29 @@ class SweepLineKey:
             return NotImplemented
         if self is other:
             return False
-        if (sign(self.event.point, self.event.other_event.point,
-                 other.event.point)
+        if not (sign(self.event.point, self.event.other_event.point,
+                     other.event.point)
                 or sign(self.event.point, self.event.other_event.point,
                         other.event.other_event.point)):
-            # segments are not collinear
-            if self.event.point == other.event.point:
-                # same left endpoint, use the right endpoint to sort
-                return self.event.is_below(other.event.other_event.point)
-            # different left endpoint, use the left endpoint to sort
-            elif self.event.point.x == other.event.point.x:
-                return self.event.point.y < other.event.point.y
-            elif EventsQueueKey(self.event) < EventsQueueKey(other.event):
-                # has the line segment associated to `self` been inserted
-                # into sweep line after the line segment associated to `other`?
-                return other.event.is_above(self.event.point)
+            # segments are collinear
+            return (EventsQueueKey(self.event) < EventsQueueKey(other.event)
+                    if self.event.polygon_type is other.event.polygon_type
+                    else self.event.polygon_type < other.event.polygon_type)
+        # segments are not collinear
+        elif self.event.point == other.event.point:
+            # same left endpoint, use the right endpoint to sort
+            return self.event.is_below(other.event.other_event.point)
+        # different left endpoint, use the left endpoint to sort
+        elif self.event.point.x == other.event.point.x:
+            return self.event.point.y < other.event.point.y
+        elif EventsQueueKey(self.event) < EventsQueueKey(other.event):
+            # has the line segment associated to `self` been inserted
+            # into sweep line after the line segment associated to `other`?
+            return other.event.is_above(self.event.point)
+        else:
             # the line segment associated to `other` has been inserted
             # into sweep line after the line segment associated to `self`
             return self.event.is_below(other.event.point)
-        # segments are collinear
-        return (self.event.polygon_type < other.event.polygon_type
-                if self.event.polygon_type is not other.event.polygon_type
-                else EventsQueueKey(self.event) < EventsQueueKey(other.event))
 
 
 class Operation:
