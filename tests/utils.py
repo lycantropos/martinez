@@ -203,6 +203,4 @@ def are_bound_ported_operations_equal(bound: BoundOperation,
                                       ported: PortedOperation) -> bool:
     return (are_bound_ported_polygons_equal(bound.left, ported.left)
             and are_bound_ported_polygons_equal(bound.right, ported.right)
-            and are_bound_ported_polygons_equal(bound.resultant,
-                                                ported.resultant)
             and bound.type == ported.type)
