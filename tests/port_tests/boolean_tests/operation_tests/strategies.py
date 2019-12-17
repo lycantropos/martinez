@@ -1,5 +1,6 @@
 from hypothesis import strategies
 
+from martinez.boolean import Operation
 from martinez.contour import Contour
 from martinez.polygon import Polygon
 from tests.strategies import (booleans,
@@ -23,3 +24,4 @@ non_empty_contours_lists = strategies.lists(contours,
 polygons = strategies.builds(Polygon, contours_lists)
 empty_polygons = strategies.builds(Polygon, empty_contours_lists)
 non_empty_polygons = strategies.builds(Polygon, contours_lists)
+operations = strategies.builds(Operation, polygons, polygons, operations_types)
