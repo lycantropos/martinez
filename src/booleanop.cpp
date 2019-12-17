@@ -79,7 +79,7 @@ bool SegmentComp::operator()(const SweepEvent* le1,
 }
 
 BooleanOpImp::BooleanOpImp(const Polygon& subject, const Polygon& clipping,
-                           Polygon& result, BooleanOpType operation
+                           BooleanOpType operation
 #ifdef __STEPBYSTEP
                            ,
                            QSemaphore* ds, QSemaphore* sd, bool t
@@ -87,7 +87,7 @@ BooleanOpImp::BooleanOpImp(const Polygon& subject, const Polygon& clipping,
                            )
     : _subject(subject),
       _clipping(clipping),
-      _result(result),
+      _result(),
       _operation(operation),
       _subjectBB(subject.bbox()),
       _clippingBB(clipping.bbox()),

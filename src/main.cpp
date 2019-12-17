@@ -406,10 +406,9 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def("set_counterclockwise", &cbop::Contour::setCounterClockwise);
 
   py::class_<cbop::BooleanOpImp>(m, "Operation")
-      .def(py::init<const cbop::Polygon&, const cbop::Polygon&, cbop::Polygon&,
+      .def(py::init<const cbop::Polygon&, const cbop::Polygon&,
                     cbop::BooleanOpType>(),
-           py::arg("left"), py::arg("right"), py::arg("resultant"),
-           py::arg("type"))
+           py::arg("left"), py::arg("right"), py::arg("type"))
       .def_property_readonly("left", &cbop::BooleanOpImp::subject)
       .def_property_readonly("right", &cbop::BooleanOpImp::clipping)
       .def_property_readonly("resultant", &cbop::BooleanOpImp::result)
