@@ -26,6 +26,8 @@ namespace py = pybind11;
 #define CONTOUR_NAME "Contour"
 #define EDGE_TYPE_NAME "EdgeType"
 #define EVENTS_QUEUE_KEY_NAME "EventsQueueKey"
+#define OPERATION_NAME "Operation"
+#define OPERATION_TYPE_NAME "OperationType"
 #define POINT_NAME "Point"
 #define POLYGON_NAME "Polygon"
 #define POLYGON_TYPE_NAME "PolygonType"
@@ -69,24 +71,26 @@ static std::ostringstream make_stream() {
   return stream;
 }
 
+static std::vector<cbop::Point_2> contour_to_points(const cbop::Contour& self) {
+  return std::vector<cbop::Point_2>(self.begin(), self.end());
+}
+
+static std::vector<size_t> contour_to_holes(const cbop::Contour& self) {
+  std::vector<size_t> result;
+  for (size_t index = 0; index < self.nholes(); ++index)
+    result.push_back(self.hole(index));
+  return result;
+}
+
+static std::vector<cbop::Contour> polygon_to_contours(
+    const cbop::Polygon& self) {
+  return std::vector<cbop::Contour>(self.begin(), self.end());
+}
+
 static std::string point_repr(const cbop::Point_2& self) {
   auto stream = make_stream();
   stream << C_STR(MODULE_NAME) "." POINT_NAME "(" << self.x() << ", "
          << self.y() << ")";
-  return stream.str();
-}
-
-static std::string polygon_type_repr(const cbop::PolygonType& type) {
-  auto stream = make_stream();
-  stream << C_STR(MODULE_NAME) "." POLYGON_TYPE_NAME;
-  switch (type) {
-    case cbop::PolygonType::CLIPPING:
-      stream << ".CLIPPING";
-      break;
-    case cbop::PolygonType::SUBJECT:
-      stream << ".SUBJECT";
-      break;
-  }
   return stream.str();
 }
 
@@ -105,6 +109,40 @@ static std::string edge_type_repr(const cbop::EdgeType& type) {
       break;
     case cbop::EdgeType::SAME_TRANSITION:
       stream << ".SAME_TRANSITION";
+      break;
+  }
+  return stream.str();
+}
+
+static std::string operation_type_repr(const cbop::BooleanOpType& type) {
+  auto stream = make_stream();
+  stream << C_STR(MODULE_NAME) "." OPERATION_TYPE_NAME;
+  switch (type) {
+    case cbop::BooleanOpType::INTERSECTION:
+      stream << ".INTERSECTION";
+      break;
+    case cbop::BooleanOpType::UNION:
+      stream << ".UNION";
+      break;
+    case cbop::BooleanOpType::DIFFERENCE:
+      stream << ".DIFFERENCE";
+      break;
+    case cbop::BooleanOpType::XOR:
+      stream << ".XOR";
+      break;
+  }
+  return stream.str();
+}
+
+static std::string polygon_type_repr(const cbop::PolygonType& type) {
+  auto stream = make_stream();
+  stream << C_STR(MODULE_NAME) "." POLYGON_TYPE_NAME;
+  switch (type) {
+    case cbop::PolygonType::CLIPPING:
+      stream << ".CLIPPING";
+      break;
+    case cbop::PolygonType::SUBJECT:
+      stream << ".SUBJECT";
       break;
   }
   return stream.str();
@@ -130,20 +168,30 @@ static std::string sweep_event_repr(const cbop::SweepEvent& self) {
   return stream.str();
 }
 
-static std::vector<cbop::Point_2> contour_to_points(const cbop::Contour& self) {
-  return std::vector<cbop::Point_2>(self.begin(), self.end());
+static std::string contour_repr(const cbop::Contour& self) {
+  std::vector<std::string> points_reprs;
+  for (auto& point : contour_to_points(self))
+    points_reprs.push_back(point_repr(point));
+  std::vector<std::string> holes_reprs;
+  for (auto hole : contour_to_holes(self))
+    holes_reprs.push_back(std::to_string(hole));
+  auto stream = make_stream();
+  stream << C_STR(MODULE_NAME) "." CONTOUR_NAME "("
+         << "[" << join(points_reprs, ", ") << "]"
+         << ", "
+         << "[" << join(holes_reprs, ", ") << "]"
+         << ", " << bool_repr(self.external()) << ")";
+  return stream.str();
 }
 
-static std::vector<size_t> contour_to_holes(const cbop::Contour& self) {
-  std::vector<size_t> result;
-  for (size_t index = 0; index < self.nholes(); ++index)
-    result.push_back(self.hole(index));
-  return result;
-}
-
-static std::vector<cbop::Contour> polygon_to_contours(
-    const cbop::Polygon& self) {
-  return std::vector<cbop::Contour>(self.begin(), self.end());
+static std::string polygon_repr(const cbop::Polygon& self) {
+  auto stream = make_stream();
+  std::vector<std::string> contours_reprs;
+  for (auto& contour : self) contours_reprs.push_back(contour_repr(contour));
+  stream << C_STR(MODULE_NAME) "." POLYGON_NAME "("
+         << "[" << join(contours_reprs, ", ") << "]"
+         << ")";
+  return stream.str();
 }
 
 static bool are_contours_equal(const cbop::Contour& self,
@@ -176,27 +224,12 @@ static bool are_sweep_events_equal(const cbop::SweepEvent& self,
   return true;
 }
 
-bool are_polygons_equal(const cbop::Polygon& self, const cbop::Polygon& other) {
+static bool are_polygons_equal(const cbop::Polygon& self,
+                               const cbop::Polygon& other) {
   if (self.ncontours() != other.ncontours()) return false;
   for (size_t index = 0; index < self.ncontours(); ++index)
     if (!are_contours_equal(self[index], other[index])) return false;
   return true;
-}
-
-static std::string contour_repr(const cbop::Contour& self) {
-  std::vector<std::string> points_reprs;
-  for (auto& point : contour_to_points(self))
-    points_reprs.push_back(point_repr(point));
-  std::vector<std::string> holes_reprs;
-  for (auto hole : contour_to_holes(self))
-    holes_reprs.push_back(std::to_string(hole));
-  auto stream = make_stream();
-  stream << C_STR(MODULE_NAME) "." CONTOUR_NAME "("
-         << "[" << join(points_reprs, ", ") << "]"
-         << ", "
-         << "[" << join(holes_reprs, ", ") << "]"
-         << ", " << bool_repr(self.external()) << ")";
-  return stream.str();
 }
 
 static py::list to_plain_sweep_event_state(const cbop::SweepEvent* self) {
@@ -242,7 +275,7 @@ static cbop::SweepEvent* from_plain_sweep_event_state(const py::list& state) {
       state[3].cast<cbop::PolygonType>(), state[4].cast<cbop::EdgeType>());
 }
 
-cbop::SweepEvent* from_sweep_event_state(py::list state) {
+static cbop::SweepEvent* from_sweep_event_state(py::list state) {
   std::vector<py::list> chain;
   auto cycle_index = fill_sweep_events_states_chain(state, chain);
   std::vector<cbop::SweepEvent*> sweep_events;
@@ -328,7 +361,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .value("DIFFERENT_TRANSITION", cbop::EdgeType::DIFFERENT_TRANSITION)
       .export_values();
 
-  py::enum_<cbop::BooleanOpType>(m, "OperationType")
+  py::enum_<cbop::BooleanOpType>(m, OPERATION_TYPE_NAME)
       .value("INTERSECTION", cbop::BooleanOpType::INTERSECTION)
       .value("UNION", cbop::BooleanOpType::UNION)
       .value("DIFFERENCE", cbop::BooleanOpType::DIFFERENCE)
@@ -412,7 +445,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def("set_clockwise", &cbop::Contour::setClockwise)
       .def("set_counterclockwise", &cbop::Contour::setCounterClockwise);
 
-  py::class_<cbop::BooleanOpImp>(m, "Operation")
+  py::class_<cbop::BooleanOpImp>(m, OPERATION_NAME)
       .def(py::init<const cbop::Polygon&, const cbop::Polygon&,
                     cbop::BooleanOpType>(),
            py::arg("left"), py::arg("right"), py::arg("type"))
@@ -421,6 +454,15 @@ PYBIND11_MODULE(MODULE_NAME, m) {
              return are_polygons_equal(self.subject(), other.subject()) &&
                     are_polygons_equal(self.clipping(), other.clipping()) &&
                     self.operation() == other.operation();
+           })
+      .def("__repr__",
+           [](const cbop::BooleanOpImp& self) -> std::string {
+             auto stream = make_stream();
+             stream << C_STR(MODULE_NAME) "." OPERATION_NAME "("
+                    << polygon_repr(self.subject()) << ", "
+                    << polygon_repr(self.clipping()) << ", "
+                    << operation_type_repr(self.operation()) << ")";
+             return stream.str();
            })
       .def_property_readonly("left", &cbop::BooleanOpImp::subject)
       .def_property_readonly("right", &cbop::BooleanOpImp::clipping)
@@ -463,17 +505,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
             return py::make_iterator(self.begin(), self.end());
           },
           py::keep_alive<0, 1>())
-      .def("__repr__",
-           [](const cbop::Polygon& self) -> std::string {
-             auto stream = make_stream();
-             std::vector<std::string> contours_reprs;
-             for (auto& contour : self)
-               contours_reprs.push_back(contour_repr(contour));
-             stream << C_STR(MODULE_NAME) "." POLYGON_NAME "("
-                    << "[" << join(contours_reprs, ", ") << "]"
-                    << ")";
-             return stream.str();
-           })
+      .def("__repr__", polygon_repr)
       .def_property_readonly("bounding_box", &cbop::Polygon::bbox)
       .def_property_readonly("contours", polygon_to_contours)
       .def("join", &cbop::Polygon::join);
