@@ -23,4 +23,5 @@ def test_events(operation: Operation) -> None:
     assert isinstance(events_before, list)
     assert isinstance(events_after, list)
     assert not events_before
+    assert not len(events_after) % 2
     assert all(isinstance(event, SweepEvent) for event in events_after)
