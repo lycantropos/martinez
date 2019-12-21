@@ -1,5 +1,6 @@
 import math
 from typing import (Optional,
+                    Sequence,
                     Tuple)
 
 from .hints import Scalar
@@ -117,3 +118,8 @@ def find_intersections(first_segment: Segment, second_segment: Segment,
                                               * first_vector.y)
     return (intersections_count, first_intersection_point,
             second_intersection_point)
+
+
+def to_segments(vertices: Sequence[Point]) -> Sequence[Segment]:
+    return [Segment(vertices[index], vertices[(index + 1) % len(vertices)])
+            for index in range(len(vertices))]

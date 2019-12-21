@@ -10,13 +10,15 @@ from typing import (Callable,
                     TypeVar,
                     Union)
 
+from prioq.base import PriorityQueue
 from reprit import seekers
 from reprit.base import generate_repr
 
 from .point import Point
 from .polygon import Polygon
 from .segment import Segment
-from .utilities import sign
+from .utilities import (sign,
+                        to_segments)
 
 ACYCLIC_INDEX = -1
 
@@ -259,14 +261,17 @@ class SweepLineKey:
 
 
 class Operation:
-    __slots__ = ('_left', '_right', '_resultant', '_type', '_already_run')
+    __slots__ = ('_left', '_right', '_type', '_events_queue', '_resultant',
+                 '_already_run')
 
     def __init__(self, left: Polygon, right: Polygon,
                  type_: OperationType) -> None:
         self._left = left
         self._right = right
-        self._resultant = Polygon([])
         self._type = type_
+        self._events_queue = PriorityQueue(key=EventsQueueKey,
+                                           reverse=True)
+        self._resultant = Polygon([])
         self._already_run = False
 
     __repr__ = generate_repr(__init__,
@@ -326,3 +331,25 @@ class Operation:
             self._already_run = True
             return True
         return False
+
+    def process_segments(self) -> None:
+        for contour in self._left.contours:
+            for segment in to_segments(contour.points):
+                self._process_segment(segment, PolygonType.SUBJECT)
+        for contour in self._right.contours:
+            for segment in to_segments(contour.points):
+                self._process_segment(segment, PolygonType.CLIPPING)
+
+    def _process_segment(self, segment: Segment,
+                         polygon_type: PolygonType) -> None:
+        source_event = SweepEvent(True, segment.source, None, polygon_type,
+                                  EdgeType.NORMAL)
+        target_event = SweepEvent(True, segment.target, source_event,
+                                  polygon_type, EdgeType.NORMAL)
+        source_event.other_event = target_event
+        if segment.min == segment.source:
+            target_event.is_left = False
+        else:
+            source_event.is_left = False
+        self._events_queue.push(source_event)
+        self._events_queue.push(target_event)
