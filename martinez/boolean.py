@@ -1,4 +1,5 @@
 import enum
+from copy import copy
 from functools import (partial,
                        partialmethod)
 from operator import (attrgetter,
@@ -291,6 +292,11 @@ class Operation:
     @property
     def right(self) -> Polygon:
         return self._right
+
+    @property
+    def events(self) -> List[SweepEvent]:
+        events_queue = copy(self._events_queue)
+        return [events_queue.pop() for _ in range(len(events_queue))]
 
     @property
     def resultant(self) -> Polygon:
