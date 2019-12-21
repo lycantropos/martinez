@@ -4,15 +4,30 @@ from _martinez import (Contour,
                        Operation,
                        OperationType,
                        Point,
-                       Polygon)
+                       Polygon, SweepEvent)
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
+                              bound_edges_types,
                               bound_operations_types,
+                              bound_polygons_types,
                               floats,
+                              make_cyclic,
+                              to_bound_sweep_events,
                               unsigned_integers_lists)
 from tests.utils import vertices_form_strict_polygon
 
+booleans = booleans
+points = strategies.builds(Point, floats, floats)
+polygons_types = bound_polygons_types
+edges_types = bound_edges_types
+leaf_sweep_events = strategies.builds(SweepEvent, booleans, points,
+                                      strategies.none(),
+                                      bound_polygons_types, bound_edges_types)
+acyclic_sweep_events = strategies.recursive(leaf_sweep_events,
+                                            to_bound_sweep_events)
+sweep_events = strategies.recursive(acyclic_sweep_events, make_cyclic)
+nested_sweep_events = to_bound_sweep_events(sweep_events)
 operations_types = bound_operations_types
 triangles_vertices = (strategies.lists(strategies.builds(Point,
                                                          floats, floats),
