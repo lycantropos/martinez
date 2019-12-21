@@ -2,6 +2,7 @@ import pickle
 from typing import (Any,
                     Hashable,
                     Iterable,
+                    List,
                     Sequence,
                     Tuple,
                     TypeVar,
@@ -185,6 +186,13 @@ def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
         return False
     return (len(bound_chain) == len(ported_chain)
             and all(map(are_fields_equal, bound_chain[1:], ported_chain[1:])))
+
+
+def are_bound_ported_sweep_events_lists_equal(bound: List[BoundSweepEvent],
+                                              ported: List[PortedSweepEvent]
+                                              ) -> bool:
+    return (len(bound) == len(ported)
+            and all(map(are_bound_ported_sweep_events_equal, bound, ported)))
 
 
 def are_bound_ported_events_queue_keys_equal(bound: BoundEventsQueueKey,
