@@ -338,6 +338,26 @@ class Operation:
             return True
         return False
 
+    def divide_segment(self, event: SweepEvent, point: Point) -> None:
+        # "left event" of the "right line segment"
+        # resulting from dividing event.segment
+        left_event = SweepEvent(True, point, event.other_event,
+                                event.polygon_type,
+                                EdgeType.NORMAL)
+        # "right event" of the "left line segment"
+        # resulting from dividing event.segment
+        right_event = SweepEvent(False, point, event, event.polygon_type,
+                                 EdgeType.NORMAL)
+        if EventsQueueKey(left_event) < EventsQueueKey(event.other_event):
+            # avoid a rounding error,
+            # the left event would be processed after the right event
+            event.other_event.is_left = True
+            left_event.is_left = False
+        event.other_event.other_event = left_event
+        event.other_event = right_event
+        self._events_queue.push(left_event)
+        self._events_queue.push(right_event)
+
     def process_segments(self) -> None:
         for contour in self._left.contours:
             for segment in to_segments(contour.points):
