@@ -148,6 +148,10 @@ class BooleanOpImp
   void run();
   bool trivial();
 
+  /** @brief Divide the segment associated to left event le,
+   *  updating pq and (implicitly) the status line */
+  void divideSegment(SweepEvent* le, const Point_2& p);
+
 #ifdef __STEPBYSTEP
   typedef std::set<SweepEvent*, SegmentComp>::const_iterator const_sl_iterator;
   typedef std::deque<SweepEvent*>::const_iterator const_sortedEvents_iterator;
@@ -196,9 +200,6 @@ class BooleanOpImp
   /** @brief Process a posible intersection between the edges associated to the
    * left events le1 and le2 */
   int possibleIntersection(SweepEvent* le1, SweepEvent* le2);
-  /** @brief Divide the segment associated to left event le, updating pq and
-   * (implicitly) the status line */
-  void divideSegment(SweepEvent* le, const Point_2& p);
   /** @brief return if the left event le belongs to the result of the Boolean
    * operation */
   bool inResult(SweepEvent* le);
