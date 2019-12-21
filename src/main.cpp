@@ -479,6 +479,16 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("right", &cbop::BooleanOpImp::clipping)
       .def_property_readonly("resultant", &cbop::BooleanOpImp::result)
       .def_property_readonly("type", &cbop::BooleanOpImp::operation)
+      .def_property_readonly("events",
+                             [](const cbop::BooleanOpImp& self) {
+                               std::vector<cbop::SweepEvent*> result;
+                               auto queue = self.eventsQueue();
+                               while (!queue.empty()) {
+                                 result.push_back(queue.top());
+                                 queue.pop();
+                               }
+                               return result;
+                             })
       .def_property_readonly("is_trivial", &cbop::BooleanOpImp::trivial)
       .def("process_segments", &cbop::BooleanOpImp::processSegments)
       .def("run", &cbop::BooleanOpImp::run);

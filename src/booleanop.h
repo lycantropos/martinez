@@ -139,8 +139,12 @@ class BooleanOpImp
 
   BooleanOpType operation() const { return _operation; }
 
-  void processSegments();
+  std::priority_queue<SweepEvent*, std::vector<SweepEvent*>, SweepEventComp>
+  eventsQueue() const {
+    return eq;
+  }
 
+  void processSegments();
   void run();
   bool trivial();
 
