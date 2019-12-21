@@ -114,12 +114,7 @@ void BooleanOpImp::run() {
       std::min(_subjectBB.xmax(), _clippingBB.xmax());  // for optimization 2
   // trivial cases can be quickly resolved without sweeping the plane
   if (trivial()) return;
-  for (size_t i = 0; i < _subject.ncontours(); i++)
-    for (size_t j = 0; j < _subject.contour(i).nvertices(); j++)
-      processSegment(_subject.contour(i).segment(j), SUBJECT);
-  for (size_t i = 0; i < _clipping.ncontours(); i++)
-    for (size_t j = 0; j < _clipping.contour(i).nvertices(); j++)
-      processSegment(_clipping.contour(i).segment(j), CLIPPING);
+  processSegments();
 
   std::set<SweepEvent*, SegmentComp>::iterator it, prev, next;
 
@@ -224,6 +219,15 @@ bool BooleanOpImp::trivial() {
     return true;
   }
   return false;
+}
+
+void BooleanOpImp::processSegments() {
+  for (size_t i = 0; i < _subject.ncontours(); i++)
+    for (size_t j = 0; j < _subject.contour(i).nvertices(); j++)
+      processSegment(_subject.contour(i).segment(j), SUBJECT);
+  for (size_t i = 0; i < _clipping.ncontours(); i++)
+    for (size_t j = 0; j < _clipping.contour(i).nvertices(); j++)
+      processSegment(_clipping.contour(i).segment(j), CLIPPING);
 }
 
 void BooleanOpImp::processSegment(const Segment_2& s, PolygonType pt) {

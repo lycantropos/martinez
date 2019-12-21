@@ -139,6 +139,8 @@ class BooleanOpImp
 
   BooleanOpType operation() const { return _operation; }
 
+  void processSegments();
+
   void run();
   bool trivial();
 
