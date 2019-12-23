@@ -18,7 +18,8 @@ from reprit.base import generate_repr
 from .point import Point
 from .polygon import Polygon
 from .segment import Segment
-from .utilities import (sign,
+from .utilities import (find_intersections,
+                        sign,
                         to_segments)
 
 ACYCLIC_INDEX = -1
@@ -80,17 +81,19 @@ SweepEventState = List[Union[bool, Point, Optional[list],
 
 class SweepEvent:
     __slots__ = ('is_left', 'point', 'other_event', 'polygon_type',
-                 'edge_type')
+                 'edge_type', 'in_out')
     OTHER_EVENT_STATE_INDEX = 2
 
     def __init__(self, is_left: bool, point: Point,
                  other_event: Optional['SweepEvent'],
-                 polygon_type: PolygonType, edge_type: EdgeType) -> None:
+                 polygon_type: PolygonType,
+                 edge_type: EdgeType, in_out: bool = False) -> None:
         self.is_left = is_left
         self.point = point
         self.other_event = other_event
         self.polygon_type = polygon_type
         self.edge_type = edge_type
+        self.in_out = in_out
 
     def __getstate__(self) -> SweepEventState:
         chain = []  # type: List[SweepEvent]
@@ -357,6 +360,89 @@ class Operation:
         event.other_event = right_event
         self._events_queue.push(left_event)
         self._events_queue.push(right_event)
+
+    def possible_intersection(self,
+                              first_event: SweepEvent,
+                              second_event: SweepEvent) -> int:
+        intersections_count, first_point, second_point = find_intersections(
+                first_event.segment, second_event.segment)
+
+        if not intersections_count:
+            # no intersection
+            return 0
+
+        if ((intersections_count == 1) and
+                (first_event.point == second_event.point or
+                 (first_event.other_event.point
+                  == second_event.other_event.point))):
+            # the line segments intersect at an endpoint of both line segments
+            return 0
+
+        if (intersections_count == 2
+                and first_event.polygon_type is second_event.polygon_type):
+            raise ValueError("Edges of the same polygon should not overlap.")
+
+        # The line segments associated to le1 and le2 intersect
+        if intersections_count == 1:
+            if (first_event.point != first_point
+                    and first_event.other_event.point != first_point):
+                # if the intersection point is not an endpoint of le1.segment
+                self.divide_segment(first_event, first_point)
+            if (second_event.point != first_point
+                    and second_event.other_event.point != first_point):
+                # if the intersection point is not an endpoint of le2.segment
+                self.divide_segment(second_event, first_point)
+            return 1
+
+        # The line segments associated to le1 and le2 overlap
+        sorted_events = []
+        if first_event.point == second_event.point:
+            sorted_events.append(None)
+        elif EventsQueueKey(first_event) < EventsQueueKey(second_event):
+            sorted_events.append(second_event)
+            sorted_events.append(first_event)
+        else:
+            sorted_events.append(first_event)
+            sorted_events.append(second_event)
+
+        if first_event.other_event.point == second_event.other_event.point:
+            sorted_events.append(None)
+        elif (EventsQueueKey(first_event.other_event)
+              < EventsQueueKey(second_event.other_event)):
+            sorted_events.append(second_event.other_event)
+            sorted_events.append(first_event.other_event)
+        else:
+            sorted_events.append(first_event.other_event)
+            sorted_events.append(second_event.other_event)
+
+        if ((len(sorted_events) == 2) or
+                (len(sorted_events) == 3 and sorted_events[2])):
+            # both line segments are equal or share the left endpoint
+            first_event.edge_type = EdgeType.NON_CONTRIBUTING
+            second_event.edge_type = (
+                EdgeType.SAME_TRANSITION
+                if first_event.in_out is second_event.in_out
+                else EdgeType.DIFFERENT_TRANSITION)
+            if len(sorted_events) == 3:
+                self.divide_segment(sorted_events[2].other_event,
+                                    sorted_events[1].point)
+            return 2
+        if len(sorted_events) == 3:
+            # the line segments share the right endpoint
+            self.divide_segment(sorted_events[0], sorted_events[1].point)
+            return 3
+
+        if sorted_events[0] != sorted_events[3].other_event:
+            # no line segment includes totally the other one
+            self.divide_segment(sorted_events[0], sorted_events[1].point)
+            self.divide_segment(sorted_events[1], sorted_events[2].point)
+            return 3
+
+        # one line segment includes the other one
+        self.divide_segment(sorted_events[0], sorted_events[1].point)
+        self.divide_segment(sorted_events[3].other_event,
+                            sorted_events[2].point)
+        return 3
 
     def process_segments(self) -> None:
         for contour in self._left.contours:
