@@ -42,7 +42,8 @@ to_bound_with_ported_sweep_events = partial(
         polygons_types_pairs=bound_with_ported_polygons_types_pairs,
         edges_types_pairs=bound_with_ported_edges_types_pairs,
         in_outs=booleans,
-        other_in_outs=booleans)
+        other_in_outs=booleans,
+        in_results=booleans)
 leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(
         nones_pairs)
 bound_with_ported_acyclic_sweep_events_pairs = strategies.recursive(
