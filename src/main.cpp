@@ -204,7 +204,8 @@ static bool are_contours_equal(const cbop::Contour& self,
 static bool are_sweep_events_equal_flat(const cbop::SweepEvent& self,
                                         const cbop::SweepEvent& other) {
   return self.left == other.left && self.point == other.point &&
-         self.pol == other.pol && self.type == other.type;
+         self.pol == other.pol && self.type == other.type &&
+         self.inOut == other.inOut && self.otherInOut == other.otherInOut;
 }
 
 static bool are_sweep_events_equal(const cbop::SweepEvent& self,
