@@ -227,13 +227,38 @@ def scalars_to_acyclic_nested_ported_sweep_events(
     return events_factory(events_factory(strategies.none()))
 
 
-def to_bound_sweep_events(other_events: Strategy[Optional[BoundSweepEvent]],
-                          *,
-                          polygons_types: Strategy[BoundPolygonType] =
-                          bound_polygons_types) -> Strategy[BoundSweepEvent]:
+def to_plain_bound_sweep_events(
+        other_events: Strategy[Optional[BoundSweepEvent]],
+        *,
+        polygons_types: Strategy[BoundPolygonType] = bound_polygons_types
+) -> Strategy[BoundSweepEvent]:
     return strategies.builds(BoundSweepEvent, booleans,
                              strategies.builds(BoundPoint, floats, floats),
-                             other_events, polygons_types, bound_edges_types)
+                             other_events, polygons_types, bound_edges_types,
+                             booleans, booleans)
+
+
+def to_bound_sweep_events(**kwargs: Any) -> Strategy[PortedSweepEvent]:
+    acyclic_events = to_acyclic_bound_sweep_events(strategies.none(), **kwargs)
+    return strategies.recursive(acyclic_events, make_cyclic)
+
+
+def to_nested_bound_sweep_events(**kwargs: Any) -> Strategy[PortedSweepEvent]:
+    acyclic_events = to_acyclic_nested_bound_sweep_events(**kwargs)
+    return strategies.recursive(acyclic_events, make_cyclic)
+
+
+def to_acyclic_nested_bound_sweep_events(**kwargs: Any
+                                         ) -> Strategy[BoundSweepEvent]:
+    events_factory = partial(to_acyclic_bound_sweep_events, **kwargs)
+    return events_factory(events_factory(strategies.none()))
+
+
+def to_acyclic_bound_sweep_events(
+        other_events: Strategy[Optional[BoundSweepEvent]],
+        **kwargs: Any) -> Strategy[BoundSweepEvent]:
+    events_factory = partial(to_plain_bound_sweep_events, **kwargs)
+    return strategies.recursive(events_factory(other_events), events_factory)
 
 
 def to_bound_with_ported_polygons_pair(
