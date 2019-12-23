@@ -6,11 +6,13 @@ from typing import (List,
 from _martinez import (Operation as Bound,
                        OperationType as BoundOperationType,
                        Point as BoundPoint,
-                       Polygon as BoundPolygon)
+                       Polygon as BoundPolygon,
+                       SweepEvent as BoundSweepEvent)
 from hypothesis import strategies
 
 from martinez.boolean import (Operation as Ported,
-                              OperationType as PortedOperationType)
+                              OperationType as PortedOperationType,
+                              SweepEvent as PortedSweepEvent)
 from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from tests.strategies import (booleans,
@@ -24,7 +26,9 @@ from tests.strategies import (booleans,
                               to_bound_with_ported_polygons_pair,
                               to_bound_with_ported_sweep_events,
                               unsigned_integers_lists)
-from tests.utils import (transpose,
+from tests.utils import (are_non_overlapping_sweep_events_pair,
+                         are_sweep_events_pair_with_different_polygon_types,
+                         transpose,
                          vertices_form_strict_polygon)
 
 booleans = booleans
@@ -47,6 +51,36 @@ bound_with_ported_sweep_events_pairs = strategies.recursive(
         make_cyclic_bound_with_ported_sweep_events)
 bound_with_ported_nested_sweep_events_pairs = (
     to_bound_with_ported_sweep_events(bound_with_ported_sweep_events_pairs))
+bound_with_ported_nested_sweep_events_pairs_pairs = (
+    (strategies.tuples(*repeat(bound_with_ported_nested_sweep_events_pairs, 2))
+     .map(transpose)))
+
+
+def are_non_overlapping_sweep_events_pair_pair(
+        events_pair_pair: Tuple[Tuple[BoundSweepEvent, BoundSweepEvent],
+                                Tuple[PortedSweepEvent, PortedSweepEvent]]
+) -> bool:
+    bound_events_pair, ported_events_pair = events_pair_pair
+    return (are_non_overlapping_sweep_events_pair(bound_events_pair)
+            and are_non_overlapping_sweep_events_pair(ported_events_pair))
+
+
+def are_sweep_events_pair_pair_with_different_polygon_types(
+        events_pair_pair: Tuple[Tuple[BoundSweepEvent, BoundSweepEvent],
+                                Tuple[PortedSweepEvent, PortedSweepEvent]]
+) -> bool:
+    bound_events_pair, ported_events_pair = events_pair_pair
+    return (are_sweep_events_pair_with_different_polygon_types(
+            bound_events_pair)
+            and are_sweep_events_pair_with_different_polygon_types(
+                    ported_events_pair))
+
+
+bound_with_ported_nested_sweep_events_pairs_pairs = (
+        bound_with_ported_nested_sweep_events_pairs_pairs
+        .filter(are_non_overlapping_sweep_events_pair_pair)
+        | bound_with_ported_nested_sweep_events_pairs_pairs
+        .filter(are_sweep_events_pair_pair_with_different_polygon_types))
 bound_with_ported_operations_types_pairs = (
     bound_with_ported_operations_types_pairs)
 bound_with_ported_points_pairs = strategies.builds(
