@@ -144,6 +144,8 @@ class BooleanOpImp
     return eq;
   }
 
+  // connect the solution edges to build the result polygon
+  void connectEdges(const std::vector<SweepEvent*>& events);
   /** @brief return if the left event le belongs to the result of the Boolean
    * operation */
   bool inResult(SweepEvent* le);
@@ -193,7 +195,6 @@ class BooleanOpImp
       eventHolder;  // It holds the events generated during the computation of
                     // the boolean operation
   SweepEventComp sec;  // to compare events
-  std::deque<SweepEvent*> sortedEvents;
   /** @brief Compute the events associated to segment s, and insert them into pq
    * and eq */
   void processSegment(const Segment_2& s, PolygonType pt);
@@ -206,8 +207,6 @@ class BooleanOpImp
   /** @brief compute several fields of left event le */
   void computeFields(SweepEvent* le,
                      const std::set<SweepEvent*, SegmentComp>::iterator& prev);
-  // connect the solution edges to build the result polygon
-  void connectEdges();
   size_t nextPos(size_t pos, const std::vector<SweepEvent*>& resultEvents,
                  const std::vector<bool>& processed);
 

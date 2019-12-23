@@ -120,13 +120,14 @@ void BooleanOpImp::run() {
   processSegments();
 
   std::set<SweepEvent*, SegmentComp>::iterator it, prev, next;
+  std::vector<SweepEvent*> sortedEvents;
 
   while (!eq.empty()) {
     SweepEvent* se = eq.top();
     // optimization 2
     if ((_operation == INTERSECTION && se->point.x() > MINMAXX) ||
         (_operation == DIFFERENCE && se->point.x() > _subjectBB.xmax())) {
-      connectEdges();
+      connectEdges(sortedEvents);
       _alreadyRun = true;
       return;
     }
@@ -191,7 +192,7 @@ void BooleanOpImp::run() {
     if (trace) somethingDone->release();
 #endif
   }
-  connectEdges();
+  connectEdges(sortedEvents);
   _alreadyRun = true;
 }
 
@@ -401,12 +402,11 @@ void BooleanOpImp::divideSegment(SweepEvent* le, const Point_2& p) {
   eq.push(r);
 }
 
-void BooleanOpImp::connectEdges() {
+void BooleanOpImp::connectEdges(const std::vector<SweepEvent*>& events) {
   // copy the events in the result polygon to resultEvents array
   std::vector<SweepEvent*> resultEvents;
-  resultEvents.reserve(sortedEvents.size());
-  for (std::deque<SweepEvent*>::const_iterator it = sortedEvents.begin();
-       it != sortedEvents.end(); it++)
+  resultEvents.reserve(events.size());
+  for (auto it = events.begin(); it != events.end(); it++)
     if (((*it)->left && (*it)->inResult) ||
         (!(*it)->left && (*it)->otherEvent->inResult))
       resultEvents.push_back(*it);
