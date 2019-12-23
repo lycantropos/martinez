@@ -25,12 +25,15 @@ SweepEvent::SweepEvent()
       inResult(false) {}
 
 SweepEvent::SweepEvent(bool b, const Point_2& p, SweepEvent* other,
-                       PolygonType pt, EdgeType et)
+                       PolygonType pt, EdgeType et, bool _inOut,
+                       bool _otherInOut)
     : left(b),
       point(p),
       otherEvent(other),
       pol(pt),
       type(et),
+      inOut(_inOut),
+      otherInOut(_otherInOut),
       prevInResult(nullptr),
       inResult(false) {}
 

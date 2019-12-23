@@ -43,7 +43,7 @@ struct SegmentComp {
 struct SweepEvent {
   SweepEvent();
   SweepEvent(bool b, const Point_2& p, SweepEvent* other, PolygonType pt,
-             EdgeType et = NORMAL);
+             EdgeType et = NORMAL, bool inOut = false, bool otherInOut = false);
   bool left;               // is point the left endpoint of the edge (point,
                            // otherEvent->point)?
   Point_2 point;           // point associated with the event
