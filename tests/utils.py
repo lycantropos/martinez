@@ -16,7 +16,8 @@ from _martinez import (BoundingBox as BoundBoundingBox,
                        Polygon as BoundPolygon,
                        Segment as BoundSegment,
                        SweepEvent as BoundSweepEvent,
-                       SweepLineKey as BoundSweepLineKey)
+                       SweepLineKey as BoundSweepLineKey,
+                       find_intersections as bound_find_intersections)
 from hypothesis import strategies
 from hypothesis.strategies import SearchStrategy
 
@@ -29,8 +30,9 @@ from martinez.contour import Contour as PortedContour
 from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
-from martinez.utilities import (find_intersections,
-                                sign)
+from martinez.utilities import (
+    find_intersections as ported_find_intersections,
+    sign)
 
 Domain = TypeVar('Domain')
 Strategy = SearchStrategy
@@ -122,7 +124,13 @@ def are_non_overlapping_sweep_events_pair(events_pair: Tuple[AnySweepEvent,
                                           ) -> bool:
     first_event, second_event = events_pair
     first_segment, second_segment = first_event.segment, second_event.segment
-    return find_intersections(first_segment, second_segment)[0] != 2
+    if isinstance(first_event, BoundSweepEvent):
+        intersections_count = bound_find_intersections(first_segment,
+                                                       second_segment)[0]
+    else:
+        intersections_count = ported_find_intersections(first_segment,
+                                                        second_segment)[0]
+    return intersections_count != 2
 
 
 def are_sweep_events_pair_with_different_polygon_types(
