@@ -19,11 +19,25 @@ from tests.strategies import (booleans,
                               scalars_to_ported_points,
                               scalars_to_ported_points_triplets)
 from tests.utils import (Strategy,
+                         are_non_overlapping_sweep_events_pair,
+                         are_sweep_events_pair_with_different_polygon_types,
+                         is_sweep_event_non_degenerate,
+                         strategy_to_pairs,
                          vertices_form_strict_polygon)
 
 points = scalars_strategies.flatmap(scalars_to_ported_points)
 nested_sweep_events = (scalars_strategies
                        .flatmap(scalars_to_nested_ported_sweep_events))
+non_degenerate_nested_sweep_events = (nested_sweep_events
+                                      .filter(is_sweep_event_non_degenerate))
+nested_sweep_events_pairs = (scalars_strategies
+                             .map(scalars_to_nested_ported_sweep_events)
+                             .flatmap(strategy_to_pairs))
+nested_sweep_events_pairs = (
+        nested_sweep_events_pairs
+        .filter(are_non_overlapping_sweep_events_pair)
+        | nested_sweep_events_pairs
+        .filter(are_sweep_events_pair_with_different_polygon_types))
 operations_types = ported_operations_types
 
 
