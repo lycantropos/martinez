@@ -21,12 +21,14 @@ SweepEvent::SweepEvent()
       otherEvent(nullptr),
       pol(SUBJECT),
       type(NORMAL),
+      inOut(false),
+      otherInOut(false),
       prevInResult(nullptr),
       inResult(false) {}
 
 SweepEvent::SweepEvent(bool b, const Point_2& p, SweepEvent* other,
                        PolygonType pt, EdgeType et, bool _inOut,
-                       bool _otherInOut)
+                       bool _otherInOut, bool _inResult)
     : left(b),
       point(p),
       otherEvent(other),
@@ -35,7 +37,7 @@ SweepEvent::SweepEvent(bool b, const Point_2& p, SweepEvent* other,
       inOut(_inOut),
       otherInOut(_otherInOut),
       prevInResult(nullptr),
-      inResult(false) {}
+      inResult(_inResult) {}
 
 std::string SweepEvent::toString() const {
   std::ostringstream oss;
