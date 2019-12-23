@@ -144,6 +144,9 @@ class BooleanOpImp
     return eq;
   }
 
+  /** @brief return if the left event le belongs to the result of the Boolean
+   * operation */
+  bool inResult(SweepEvent* le);
   /** @brief Process a posible intersection between the edges associated to the
    * left events le1 and le2 */
   int possibleIntersection(SweepEvent* le1, SweepEvent* le2);
@@ -200,9 +203,6 @@ class BooleanOpImp
     eventHolder.push_back(e);
     return &eventHolder.back();
   }
-  /** @brief return if the left event le belongs to the result of the Boolean
-   * operation */
-  bool inResult(SweepEvent* le);
   /** @brief compute several fields of left event le */
   void computeFields(SweepEvent* le,
                      const std::set<SweepEvent*, SegmentComp>::iterator& prev);
