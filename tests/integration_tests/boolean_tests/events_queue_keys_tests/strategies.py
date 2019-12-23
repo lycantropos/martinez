@@ -22,7 +22,9 @@ to_bound_with_ported_sweep_events = partial(
         booleans,
         strategies.builds(to_bound_with_ported_points_pair, floats, floats),
         polygons_types_pairs=bound_with_ported_polygons_types_pairs,
-        edges_types_pairs=bound_with_ported_edges_types_pairs)
+        edges_types_pairs=bound_with_ported_edges_types_pairs,
+        in_outs=booleans,
+        other_in_outs=booleans)
 nones_pairs = strategies.tuples(*repeat(strategies.none(), 2))
 leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(
         nones_pairs)

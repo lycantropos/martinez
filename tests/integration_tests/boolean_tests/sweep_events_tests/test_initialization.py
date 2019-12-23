@@ -19,7 +19,8 @@ from . import strategies
        strategies.bound_with_ported_points_pairs,
        strategies.bound_with_ported_maybe_sweep_events_pairs,
        strategies.bound_with_ported_polygons_types_pairs,
-       strategies.bound_with_ported_edges_types_pairs)
+       strategies.bound_with_ported_edges_types_pairs,
+       strategies.booleans, strategies.booleans)
 def test_basic(is_left: bool,
                bound_with_ported_points_pair: Tuple[BoundPoint, PortedPoint],
                bound_with_ported_other_events_pair: Tuple[Optional[Bound],
@@ -28,7 +29,8 @@ def test_basic(is_left: bool,
                                                             PortedPolygonType],
                bound_with_ported_edges_types_pair: Tuple[BoundEdgeType,
                                                          PortedEdgeType],
-               ) -> None:
+               in_out: bool,
+               other_in_out: bool) -> None:
     bound_point, ported_point = bound_with_ported_points_pair
     bound_other_event, ported_other_event = bound_with_ported_other_events_pair
     (bound_polygon_type,
@@ -36,8 +38,9 @@ def test_basic(is_left: bool,
     bound_edge_type, ported_edge_type = bound_with_ported_edges_types_pair
 
     bound = Bound(is_left, bound_point, bound_other_event, bound_polygon_type,
-                  bound_edge_type)
+                  bound_edge_type, in_out, other_in_out)
     ported = Ported(is_left, ported_point, ported_other_event,
-                    ported_polygon_type, ported_edge_type)
+                    ported_polygon_type, ported_edge_type,
+                    in_out, other_in_out)
 
     assert are_bound_ported_sweep_events_equal(bound, ported)
