@@ -133,7 +133,9 @@ class SweepEvent:
             return (left.is_left is right.is_left
                     and left.point == right.point
                     and left.polygon_type is right.polygon_type
-                    and left.edge_type is right.edge_type)
+                    and left.edge_type is right.edge_type
+                    and left.in_out is right.in_out
+                    and left.other_in_out is right.other_in_out)
 
         chain, other_chain = [], []
         return (are_fields_equal(self, other)
