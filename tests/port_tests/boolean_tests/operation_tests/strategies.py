@@ -17,7 +17,8 @@ from tests.strategies import (booleans,
                               scalars_strategies,
                               scalars_to_nested_ported_sweep_events,
                               scalars_to_ported_points,
-                              scalars_to_ported_points_triplets)
+                              scalars_to_ported_points_triplets,
+                              scalars_to_ported_sweep_events)
 from tests.utils import (Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
@@ -26,6 +27,7 @@ from tests.utils import (Strategy,
                          vertices_form_strict_polygon)
 
 points = scalars_strategies.flatmap(scalars_to_ported_points)
+sweep_events = scalars_strategies.flatmap(scalars_to_ported_sweep_events)
 nested_sweep_events = (scalars_strategies
                        .flatmap(scalars_to_nested_ported_sweep_events))
 non_degenerate_nested_sweep_events = (nested_sweep_events
