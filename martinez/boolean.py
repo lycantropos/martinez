@@ -369,6 +369,29 @@ class Operation:
         self._events_queue.push(left_event)
         self._events_queue.push(right_event)
 
+    def in_result(self, event: SweepEvent) -> bool:
+        operation_type = self._type
+        edge_type = event.edge_type
+        if edge_type is EdgeType.NORMAL:
+            if operation_type is OperationType.INTERSECTION:
+                return not event.other_in_out
+            elif operation_type is OperationType.UNION:
+                return event.other_in_out
+            elif operation_type is OperationType.DIFFERENCE:
+                return (event.polygon_type is PolygonType.SUBJECT
+                        and event.other_in_out
+                        or event.polygon_type is PolygonType.CLIPPING
+                        and not event.other_in_out)
+            else:
+                return operation_type is OperationType.XOR
+        elif edge_type is EdgeType.SAME_TRANSITION:
+            return (operation_type is OperationType.INTERSECTION
+                    or operation_type is OperationType.UNION)
+        elif edge_type is EdgeType.DIFFERENT_TRANSITION:
+            return operation_type is OperationType.DIFFERENCE
+        else:
+            return False
+
     def possible_intersection(self,
                               first_event: SweepEvent,
                               second_event: SweepEvent) -> int:
