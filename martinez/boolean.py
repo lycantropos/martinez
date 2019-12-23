@@ -81,14 +81,15 @@ SweepEventState = List[Union[bool, Point, Optional[list],
 
 class SweepEvent:
     __slots__ = ('is_left', 'point', 'other_event', 'polygon_type',
-                 'edge_type', 'in_out', 'other_in_out')
+                 'edge_type', 'in_out', 'other_in_out', 'in_result')
     OTHER_EVENT_STATE_INDEX = 2
 
     def __init__(self, is_left: bool, point: Point,
                  other_event: Optional['SweepEvent'],
                  polygon_type: PolygonType,
                  edge_type: EdgeType,
-                 in_out: bool = False, other_in_out: bool = False) -> None:
+                 in_out: bool = False, other_in_out: bool = False,
+                 in_result: bool = False) -> None:
         self.is_left = is_left
         self.point = point
         self.other_event = other_event
@@ -96,6 +97,7 @@ class SweepEvent:
         self.edge_type = edge_type
         self.in_out = in_out
         self.other_in_out = other_in_out
+        self.in_result = in_result
 
     def __getstate__(self) -> SweepEventState:
         chain = []  # type: List[SweepEvent]
