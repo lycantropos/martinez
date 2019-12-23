@@ -48,13 +48,8 @@ def implication(antecedent: bool, consequent: bool) -> bool:
     return not antecedent or consequent
 
 
-FirstCoordinate = TypeVar('FirstCoordinate')
-SecondCoordinate = TypeVar('SecondCoordinate')
-
-
-def transpose(sequence: Sequence[Tuple[FirstCoordinate, SecondCoordinate]]
-              ) -> Tuple[Sequence[FirstCoordinate],
-                         Sequence[SecondCoordinate]]:
+def transpose(sequence: Sequence[Tuple[Domain, ...]]
+              ) -> Tuple[Sequence[Domain], ...]:
     sequence_type = type(sequence)
     if not sequence:
         return sequence_type(), sequence_type()
