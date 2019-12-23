@@ -589,6 +589,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
               from_sweep_event_state)))
       .def("__eq__", are_sweep_events_equal)
       .def("__repr__", sweep_event_repr)
+      .def_readwrite("in_out", &cbop::SweepEvent::inOut)
+      .def_readwrite("other_in_out", &cbop::SweepEvent::otherInOut)
       .def_readwrite("is_left", &cbop::SweepEvent::left)
       .def_readwrite("point", &cbop::SweepEvent::point)
       .def_readwrite("other_event", &cbop::SweepEvent::otherEvent)
