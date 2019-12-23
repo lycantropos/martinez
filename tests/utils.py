@@ -17,6 +17,7 @@ from _martinez import (BoundingBox as BoundBoundingBox,
                        Segment as BoundSegment,
                        SweepEvent as BoundSweepEvent,
                        SweepLineKey as BoundSweepLineKey)
+from hypothesis import strategies
 from hypothesis.strategies import SearchStrategy
 
 from martinez.boolean import (EventsQueueKey as PortedEventsQueueKey,
@@ -28,7 +29,8 @@ from martinez.contour import Contour as PortedContour
 from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
-from martinez.utilities import sign
+from martinez.utilities import (find_intersections,
+                                sign)
 
 Domain = TypeVar('Domain')
 Strategy = SearchStrategy
@@ -97,6 +99,38 @@ def vertices_form_strict_polygon(vertices: Sequence[Union[PortedPoint,
                for index in range(len(vertices)))
 
 
+def strategy_to_pairs(strategy: Strategy[Domain]
+                      ) -> Strategy[Tuple[Domain, Domain]]:
+    return strategies.tuples(strategy, strategy)
+
+
+def is_bounding_box_empty(bounding_box: Union[BoundBoundingBox,
+                                              PortedBoundingBox]) -> bool:
+    return not (bounding_box.x_min or bounding_box.y_min
+                or bounding_box.x_max or bounding_box.y_max)
+
+
+AnySweepEvent = TypeVar('AnySweepEvent', BoundSweepEvent, PortedSweepEvent)
+
+
+def is_sweep_event_non_degenerate(event: AnySweepEvent) -> bool:
+    return not event.segment.is_degenerate
+
+
+def are_non_overlapping_sweep_events_pair(events_pair: Tuple[AnySweepEvent,
+                                                             AnySweepEvent]
+                                          ) -> bool:
+    first_event, second_event = events_pair
+    first_segment, second_segment = first_event.segment, second_event.segment
+    return find_intersections(first_segment, second_segment)[0] != 2
+
+
+def are_sweep_events_pair_with_different_polygon_types(
+        events_pair: Tuple[AnySweepEvent, AnySweepEvent]) -> bool:
+    first_event, second_event = events_pair
+    return first_event.polygon_type != second_event.polygon_type
+
+
 def are_bound_ported_bounding_boxes_equal(bound: BoundBoundingBox,
                                           ported: PortedBoundingBox) -> bool:
     return (bound.x_min == ported.x_min and bound.y_min == ported.y_min
@@ -119,12 +153,6 @@ def are_bound_ported_segments_equal(bound: BoundSegment,
                                     ported: PortedSegment) -> bool:
     return (are_bound_ported_points_equal(bound.source, ported.source)
             and are_bound_ported_points_equal(bound.target, ported.target))
-
-
-def is_bounding_box_empty(bounding_box: Union[BoundBoundingBox,
-                                              PortedBoundingBox]) -> bool:
-    return not (bounding_box.x_min or bounding_box.y_min
-                or bounding_box.x_max or bounding_box.y_max)
 
 
 def are_bound_ported_contours_equal(bound: BoundContour,

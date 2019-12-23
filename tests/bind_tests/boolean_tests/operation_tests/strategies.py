@@ -4,7 +4,8 @@ from _martinez import (Contour,
                        Operation,
                        OperationType,
                        Point,
-                       Polygon, SweepEvent)
+                       Polygon,
+                       SweepEvent)
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
@@ -15,7 +16,10 @@ from tests.strategies import (booleans,
                               make_cyclic,
                               to_bound_sweep_events,
                               unsigned_integers_lists)
-from tests.utils import vertices_form_strict_polygon
+from tests.utils import (are_non_overlapping_sweep_events_pair,
+                         are_sweep_events_pair_with_different_polygon_types,
+                         is_sweep_event_non_degenerate,
+                         vertices_form_strict_polygon)
 
 booleans = booleans
 points = strategies.builds(Point, floats, floats)
@@ -28,6 +32,15 @@ acyclic_sweep_events = strategies.recursive(leaf_sweep_events,
                                             to_bound_sweep_events)
 sweep_events = strategies.recursive(acyclic_sweep_events, make_cyclic)
 nested_sweep_events = to_bound_sweep_events(sweep_events)
+non_degenerate_nested_sweep_events = (nested_sweep_events
+                                      .filter(is_sweep_event_non_degenerate))
+nested_sweep_events_pairs = strategies.tuples(nested_sweep_events,
+                                              nested_sweep_events)
+nested_sweep_events_pairs = (
+        nested_sweep_events_pairs
+        .filter(are_non_overlapping_sweep_events_pair)
+        | nested_sweep_events_pairs
+        .filter(are_sweep_events_pair_with_different_polygon_types))
 operations_types = bound_operations_types
 triangles_vertices = (strategies.lists(strategies.builds(Point,
                                                          floats, floats),
