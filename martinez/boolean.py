@@ -432,7 +432,7 @@ class Operation:
             self.divide_segment(sorted_events[0], sorted_events[1].point)
             return 3
 
-        if sorted_events[0] != sorted_events[3].other_event:
+        if sorted_events[0] is not sorted_events[3].other_event:
             # no line segment includes totally the other one
             self.divide_segment(sorted_events[0], sorted_events[1].point)
             self.divide_segment(sorted_events[1], sorted_events[2].point)
