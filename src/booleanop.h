@@ -152,6 +152,7 @@ class BooleanOpImp
   /** @brief Process a posible intersection between the edges associated to the
    * left events le1 and le2 */
   int possibleIntersection(SweepEvent* le1, SweepEvent* le2);
+  void processEvents(const std::vector<SweepEvent*>& events);
   void processSegments();
   void run();
   bool trivial();

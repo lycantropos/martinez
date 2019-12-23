@@ -429,20 +429,23 @@ void BooleanOpImp::connectEdges(const std::vector<SweepEvent*>& events) {
     if (!resultEvents[i]->left)
       std::swap(resultEvents[i]->pos, resultEvents[i]->otherEvent->pos);
   }
+  processEvents(resultEvents);
+}
 
-  std::vector<bool> processed(resultEvents.size(), false);
+void BooleanOpImp::processEvents(const std::vector<SweepEvent*>& events) {
+  std::vector<bool> processed(events.size(), false);
   std::vector<int> depth;
   std::vector<int> holeOf;
-  for (size_t i = 0; i < resultEvents.size(); i++) {
+  for (size_t i = 0; i < events.size(); i++) {
     if (processed[i]) continue;
     _result.push_back(Contour());
     Contour& contour = _result.back();
     size_t contourId = _result.ncontours() - 1;
     depth.push_back(0);
     holeOf.push_back(-1);
-    if (resultEvents[i]->prevInResult) {
-      size_t lowerContourId = resultEvents[i]->prevInResult->contourId;
-      if (!resultEvents[i]->prevInResult->resultInOut) {
+    if (events[i]->prevInResult) {
+      size_t lowerContourId = events[i]->prevInResult->contourId;
+      if (!events[i]->prevInResult->resultInOut) {
         _result[lowerContourId].addHole(contourId);
         holeOf[contourId] = lowerContourId;
         depth[contourId] = depth[lowerContourId] + 1;
@@ -455,39 +458,38 @@ void BooleanOpImp::connectEdges(const std::vector<SweepEvent*>& events) {
       }
     }
     size_t pos = i;
-    Point_2 initial = resultEvents[i]->point;
+    Point_2 initial = events[i]->point;
     contour.add(initial);
-    while (resultEvents[pos]->otherEvent->point != initial) {
+    while (events[pos]->otherEvent->point != initial) {
 #ifdef __STEPBYSTEP
       if (trace) {
         doSomething->acquire();
-        out.push_back(resultEvents[pos]->left ? resultEvents[pos]
-                                              : resultEvents[pos]->otherEvent);
+        out.push_back(events[pos]->left ? events[pos]
+                                        : events[pos]->otherEvent);
       }
 #endif
       processed[pos] = true;
-      if (resultEvents[pos]->left) {
-        resultEvents[pos]->resultInOut = false;
-        resultEvents[pos]->contourId = contourId;
+      if (events[pos]->left) {
+        events[pos]->resultInOut = false;
+        events[pos]->contourId = contourId;
       } else {
-        resultEvents[pos]->otherEvent->resultInOut = true;
-        resultEvents[pos]->otherEvent->contourId = contourId;
+        events[pos]->otherEvent->resultInOut = true;
+        events[pos]->otherEvent->contourId = contourId;
       }
-      processed[pos = resultEvents[pos]->pos] = true;
-      contour.add(resultEvents[pos]->point);
-      pos = nextPos(pos, resultEvents, processed);
+      processed[pos = events[pos]->pos] = true;
+      contour.add(events[pos]->point);
+      pos = nextPos(pos, events, processed);
 #ifdef __STEPBYSTEP
       if (trace) somethingDone->release();
 #endif
     }
 #ifdef __STEPBYSTEP
     if (trace)
-      out.push_back(resultEvents[pos]->left ? resultEvents[pos]
-                                            : resultEvents[pos]->otherEvent);
+      out.push_back(events[pos]->left ? events[pos] : events[pos]->otherEvent);
 #endif
-    processed[pos] = processed[resultEvents[pos]->pos] = true;
-    resultEvents[pos]->otherEvent->resultInOut = true;
-    resultEvents[pos]->otherEvent->contourId = contourId;
+    processed[pos] = processed[events[pos]->pos] = true;
+    events[pos]->otherEvent->resultInOut = true;
+    events[pos]->otherEvent->contourId = contourId;
     if (depth[contourId] & 1) contour.changeOrientation();
   }
 }
