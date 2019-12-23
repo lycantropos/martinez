@@ -104,7 +104,8 @@ class SweepEvent:
         cycle_index = self._fill_sweep_events_chain(chain)
         states = [[sweep_event.is_left, sweep_event.point, None,
                    sweep_event.polygon_type, sweep_event.edge_type,
-                   sweep_event.in_out, sweep_event.other_in_out]
+                   sweep_event.in_out, sweep_event.other_in_out,
+                   sweep_event.in_result]
                   for sweep_event in chain]
         for index in range(len(states) - 1):
             states[index][self.OTHER_EVENT_STATE_INDEX] = states[index + 1]
@@ -114,15 +115,15 @@ class SweepEvent:
 
     def __setstate__(self, state: SweepEventState) -> 'SweepEvent':
         (self.is_left, self.point, self.other_event,
-         self.polygon_type, self.edge_type,
-         self.in_out, self.other_in_out) = (state[0], state[1], None,
-                                            state[3], state[4],
-                                            state[5], state[6])
+         self.polygon_type, self.edge_type, self.in_out,
+         self.other_in_out, self.in_result) = (state[0], state[1], None,
+                                               state[3], state[4], state[5],
+                                               state[6], state[7])
         chain = []  # type: List[SweepEventState]
         cycle_index = self._fill_states_chain(state, chain)
         sweep_events = [self] + [SweepEvent(state[0], state[1], None,
-                                            state[3], state[4],
-                                            state[5], state[6])
+                                            state[3], state[4], state[5],
+                                            state[6], state[7])
                                  for state in chain[1:]]
         for index in range(len(sweep_events) - 1):
             sweep_events[index].other_event = sweep_events[index + 1]
