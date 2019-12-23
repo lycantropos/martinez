@@ -392,13 +392,8 @@ void BooleanOpImp::divideSegment(SweepEvent* le, const Point_2& p) {
       SweepEvent(true, p, le->otherEvent, le->pol /*, le->other->type*/));
   if (sec(l, le->otherEvent)) {  // avoid a rounding error. The left event would
                                  // be processed after the right event
-    std::cout << "Oops" << std::endl;
     le->otherEvent->left = true;
     l->left = false;
-  }
-  if (sec(le, r)) {  // avoid a rounding error. The left event would be
-                     // processed after the right event
-    std::cout << "Oops2" << std::endl;
   }
   le->otherEvent->otherEvent = l;
   le->otherEvent = r;
