@@ -166,7 +166,8 @@ static std::string sweep_event_repr(const cbop::SweepEvent& self) {
     stream << ", " << polygon_type_repr((*iterator)->pol) << ", "
            << edge_type_repr((*iterator)->type) << ", "
            << bool_repr((*iterator)->inOut) << ", "
-           << bool_repr((*iterator)->otherInOut) << ")";
+           << bool_repr((*iterator)->otherInOut) << ", "
+           << bool_repr((*iterator)->inResult) << ")";
   return stream.str();
 }
 
