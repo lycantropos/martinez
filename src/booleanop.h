@@ -144,6 +144,9 @@ class BooleanOpImp
     return eq;
   }
 
+  /** @brief Process a posible intersection between the edges associated to the
+   * left events le1 and le2 */
+  int possibleIntersection(SweepEvent* le1, SweepEvent* le2);
   void processSegments();
   void run();
   bool trivial();
@@ -197,9 +200,6 @@ class BooleanOpImp
     eventHolder.push_back(e);
     return &eventHolder.back();
   }
-  /** @brief Process a posible intersection between the edges associated to the
-   * left events le1 and le2 */
-  int possibleIntersection(SweepEvent* le1, SweepEvent* le2);
   /** @brief return if the left event le belongs to the result of the Boolean
    * operation */
   bool inResult(SweepEvent* le);

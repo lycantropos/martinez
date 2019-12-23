@@ -492,6 +492,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("is_trivial", &cbop::BooleanOpImp::trivial)
       .def("divide_segment", &cbop::BooleanOpImp::divideSegment,
            py::arg("event"), py::arg("point"))
+      .def("possible_intersection", &cbop::BooleanOpImp::possibleIntersection,
+           py::arg("first_event"), py::arg("second_event"))
       .def("process_segments", &cbop::BooleanOpImp::processSegments)
       .def("run", &cbop::BooleanOpImp::run);
 
