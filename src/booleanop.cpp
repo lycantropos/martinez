@@ -403,33 +403,36 @@ void BooleanOpImp::divideSegment(SweepEvent* le, const Point_2& p) {
 }
 
 void BooleanOpImp::connectEdges(const std::vector<SweepEvent*>& events) {
+  processEvents(collectEvents(events));
+}
+
+std::vector<SweepEvent*> BooleanOpImp::collectEvents(
+    const std::vector<SweepEvent*>& events) {
   // copy the events in the result polygon to resultEvents array
-  std::vector<SweepEvent*> resultEvents;
-  resultEvents.reserve(events.size());
+  std::vector<SweepEvent*> result;
+  result.reserve(events.size());
   for (auto it = events.begin(); it != events.end(); it++)
     if (((*it)->left && (*it)->inResult) ||
         (!(*it)->left && (*it)->otherEvent->inResult))
-      resultEvents.push_back(*it);
+      result.push_back(*it);
 
-  // Due to overlapping edges the resultEvents array can be not wholly sorted
+  // Due to overlapping edges the result array can be not wholly sorted
   bool sorted = false;
   while (!sorted) {
     sorted = true;
-    for (size_t i = 0; i < resultEvents.size(); ++i) {
-      if (i + 1 < resultEvents.size() &&
-          sec(resultEvents[i], resultEvents[i + 1])) {
-        std::swap(resultEvents[i], resultEvents[i + 1]);
+    for (size_t i = 0; i < result.size(); ++i) {
+      if (i + 1 < result.size() && sec(result[i], result[i + 1])) {
+        std::swap(result[i], result[i + 1]);
         sorted = false;
       }
     }
   }
 
-  for (size_t i = 0; i < resultEvents.size(); ++i) {
-    resultEvents[i]->pos = i;
-    if (!resultEvents[i]->left)
-      std::swap(resultEvents[i]->pos, resultEvents[i]->otherEvent->pos);
+  for (size_t i = 0; i < result.size(); ++i) {
+    result[i]->pos = i;
+    if (!result[i]->left) std::swap(result[i]->pos, result[i]->otherEvent->pos);
   }
-  processEvents(resultEvents);
+  return result;
 }
 
 void BooleanOpImp::processEvents(const std::vector<SweepEvent*>& events) {
