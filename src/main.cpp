@@ -505,6 +505,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def("in_result", &cbop::BooleanOpImp::inResult, py::arg("event"))
       .def("possible_intersection", &cbop::BooleanOpImp::possibleIntersection,
            py::arg("first_event"), py::arg("second_event"))
+      .def("process_events", &cbop::BooleanOpImp::processEvents,
+           py::arg("events"))
       .def("process_segments", &cbop::BooleanOpImp::processSegments)
       .def("run", &cbop::BooleanOpImp::run);
 
