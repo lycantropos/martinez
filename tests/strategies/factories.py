@@ -1,5 +1,6 @@
 from functools import partial
-from typing import (List,
+from typing import (Any,
+                    List,
                     Optional,
                     Tuple,
                     TypeVar)
@@ -7,9 +8,10 @@ from typing import (List,
 from _martinez import (Contour as BoundContour,
                        EdgeType as BoundEdgeType,
                        Point as BoundPoint,
+                       Polygon as BoundPolygon,
                        PolygonType as BoundPolygonType,
                        Segment as BoundSegment,
-                       SweepEvent as BoundSweepEvent, Polygon as BoundPolygon)
+                       SweepEvent as BoundSweepEvent)
 from hypothesis import strategies
 
 from martinez.boolean import (EdgeType as PortedEdgeType,
@@ -178,35 +180,56 @@ def make_cyclic_bound_with_ported_sweep_events(
                              strategies.integers())
 
 
-def to_ported_sweep_events(scalars: Strategy[Scalar],
-                           other_events: Strategy[Optional[PortedSweepEvent]]
-                           ) -> Strategy[PortedSweepEvent]:
-    points = strategies.builds(PortedPoint, scalars, scalars)
-    return strategies.builds(PortedSweepEvent, booleans, points, other_events,
-                             ported_polygons_types, ported_edges_types)
-
-
-def scalars_to_ported_leaf_sweep_events(scalars: Strategy[Scalar]
-                                        ) -> Strategy[PortedSweepEvent]:
+def scalars_to_plain_ported_sweep_events(
+        scalars: Strategy[Scalar],
+        other_events: Strategy[Optional[PortedSweepEvent]],
+        *,
+        polygons_types: Strategy[PortedPolygonType] = ported_polygons_types
+) -> Strategy[PortedSweepEvent]:
     return strategies.builds(PortedSweepEvent, booleans,
-                             strategies.builds(PortedPoint, scalars, scalars),
-                             strategies.none(), ported_polygons_types,
-                             ported_edges_types)
+                             scalars_to_ported_points(scalars), other_events,
+                             polygons_types, ported_edges_types)
 
 
-def scalars_to_ported_sweep_events(scalars: Strategy[Scalar]
+def scalars_to_acyclic_ported_sweep_events(
+        scalars: Strategy[Scalar],
+        other_events: Strategy[Optional[PortedSweepEvent]] = strategies.none(),
+        **kwargs: Any
+) -> Strategy[PortedSweepEvent]:
+    events_factory = partial(scalars_to_plain_ported_sweep_events, scalars,
+                             **kwargs)
+    return strategies.recursive(events_factory(other_events), events_factory)
+
+
+def scalars_to_nested_ported_sweep_events(scalars: Strategy[Scalar],
+                                          **kwargs: Any
+                                          ) -> Strategy[PortedSweepEvent]:
+    acyclic_events = scalars_to_acyclic_nested_ported_sweep_events(scalars,
+                                                                   **kwargs)
+    return strategies.recursive(acyclic_events, make_cyclic)
+
+
+def scalars_to_ported_sweep_events(scalars: Strategy[Scalar], **kwargs: Any
                                    ) -> Strategy[PortedSweepEvent]:
-    return strategies.recursive(to_ported_sweep_events(scalars,
-                                                       strategies.none()),
-                                partial(to_ported_sweep_events, scalars))
+    acyclic_events = scalars_to_acyclic_ported_sweep_events(scalars, **kwargs)
+    return strategies.recursive(acyclic_events, make_cyclic)
 
 
-def to_bound_sweep_events(other_events: Strategy[Optional[BoundSweepEvent]]
-                          ) -> Strategy[BoundSweepEvent]:
+def scalars_to_acyclic_nested_ported_sweep_events(
+        scalars: Strategy[Scalar],
+        **kwargs: Any) -> Strategy[PortedSweepEvent]:
+    events_factory = partial(scalars_to_acyclic_ported_sweep_events,
+                             scalars, **kwargs)
+    return events_factory(events_factory(strategies.none()))
+
+
+def to_bound_sweep_events(other_events: Strategy[Optional[BoundSweepEvent]],
+                          *,
+                          polygons_types: Strategy[BoundPolygonType] =
+                          bound_polygons_types) -> Strategy[BoundSweepEvent]:
     return strategies.builds(BoundSweepEvent, booleans,
                              strategies.builds(BoundPoint, floats, floats),
-                             other_events, bound_polygons_types,
-                             bound_edges_types)
+                             other_events, polygons_types, bound_edges_types)
 
 
 def to_bound_with_ported_polygons_pair(

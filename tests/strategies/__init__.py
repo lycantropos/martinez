@@ -1,5 +1,8 @@
 from .factories import (make_cyclic,
                         make_cyclic_bound_with_ported_sweep_events,
+                        scalars_to_acyclic_ported_sweep_events,
+                        scalars_to_nested_ported_sweep_events,
+                        scalars_to_plain_ported_sweep_events,
                         scalars_to_ported_points,
                         scalars_to_ported_points_lists,
                         scalars_to_ported_points_pairs,
@@ -12,8 +15,7 @@ from .factories import (make_cyclic,
                         to_bound_with_ported_polygons_pair,
                         to_bound_with_ported_segments_pair,
                         to_bound_with_ported_sweep_events,
-                        to_cyclic_sweep_event,
-                        to_ported_sweep_events)
+                        to_cyclic_sweep_event)
 from .literals import (booleans,
                        bound_edges_types,
                        bound_operations_types,
