@@ -208,7 +208,8 @@ def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
                 and bound.polygon_type == ported.polygon_type
                 and bound.edge_type == ported.edge_type
                 and bound.in_out is ported.in_out
-                and bound.other_in_out is ported.other_in_out)
+                and bound.other_in_out is ported.other_in_out
+                and bound.in_result is ported.in_result)
 
     if not are_fields_equal(bound, ported):
         return False
