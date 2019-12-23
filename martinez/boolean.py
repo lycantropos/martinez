@@ -415,8 +415,8 @@ class Operation:
             sorted_events.append(first_event.other_event)
             sorted_events.append(second_event.other_event)
 
-        if ((len(sorted_events) == 2) or
-                (len(sorted_events) == 3 and sorted_events[2])):
+        if (len(sorted_events) == 2
+                or len(sorted_events) == 3 and sorted_events[2]):
             # both line segments are equal or share the left endpoint
             first_event.edge_type = EdgeType.NON_CONTRIBUTING
             second_event.edge_type = (
