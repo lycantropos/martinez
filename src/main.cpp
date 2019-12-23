@@ -496,6 +496,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                                return result;
                              })
       .def_property_readonly("is_trivial", &cbop::BooleanOpImp::trivial)
+      .def("connect_edges", &cbop::BooleanOpImp::connectEdges,
+           py::arg("events"))
       .def("divide_segment", &cbop::BooleanOpImp::divideSegment,
            py::arg("event"), py::arg("point"))
       .def("in_result", &cbop::BooleanOpImp::inResult, py::arg("event"))
