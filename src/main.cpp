@@ -248,6 +248,7 @@ static py::list to_plain_sweep_event_state(const cbop::SweepEvent* self) {
   result.append(self->inOut);
   result.append(self->otherInOut);
   result.append(self->inResult);
+  result.append(self->pos);
   return result;
 }
 
@@ -278,11 +279,12 @@ static int fill_sweep_events_states_chain(py::list& state,
 }
 
 static cbop::SweepEvent* from_plain_sweep_event_state(const py::list& state) {
-  if (state.size() != 8) throw std::runtime_error("Invalid state!");
+  if (state.size() != 9) throw std::runtime_error("Invalid state!");
   return new cbop::SweepEvent(
       state[0].cast<bool>(), state[1].cast<cbop::Point_2>(), nullptr,
       state[3].cast<cbop::PolygonType>(), state[4].cast<cbop::EdgeType>(),
-      state[5].cast<bool>(), state[6].cast<bool>(), state[7].cast<bool>());
+      state[5].cast<bool>(), state[6].cast<bool>(), state[7].cast<bool>(),
+      state[8].cast<size_t>());
 }
 
 static cbop::SweepEvent* from_sweep_event_state(py::list state) {
