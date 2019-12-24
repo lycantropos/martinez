@@ -31,10 +31,13 @@ from tests.utils import (BoundPortedPointsPair,
 from .literals import (booleans,
                        bound_edges_types,
                        bound_polygons_types,
+                       bound_with_ported_edges_types_pairs,
+                       bound_with_ported_polygons_types_pairs,
                        floats,
                        non_negative_integers,
                        ported_edges_types,
                        ported_polygons_types,
+                       single_precision_floats,
                        unsigned_integers)
 
 
@@ -129,17 +132,22 @@ def loop_sweep_event(sweep_event: AnySweepEvent,
 
 
 def to_bound_with_ported_sweep_events(
-        are_left: Strategy[bool],
-        points_pairs: BoundPortedPointsPair,
         other_events: Strategy[Tuple[Optional[BoundSweepEvent],
                                      Optional[PortedSweepEvent]]],
+        are_left: Strategy[bool] = booleans,
+        points_pairs: BoundPortedPointsPair = strategies.builds(
+                to_bound_with_ported_points_pair, single_precision_floats,
+                single_precision_floats),
         polygons_types_pairs: Strategy[Tuple[BoundPolygonType,
-                                             PortedPolygonType]],
-        edges_types_pairs: Strategy[Tuple[BoundEdgeType, PortedEdgeType]],
-        in_outs: Strategy[bool],
-        other_in_outs: Strategy[bool],
-        in_results: Strategy[bool],
-        positions: Strategy[int]) -> Strategy[BoundPortedSweepEventsPair]:
+                                             PortedPolygonType]]
+        = bound_with_ported_polygons_types_pairs,
+        edges_types_pairs: Strategy[Tuple[BoundEdgeType, PortedEdgeType]]
+        = bound_with_ported_edges_types_pairs,
+        in_outs: Strategy[bool] = booleans,
+        other_in_outs: Strategy[bool] = booleans,
+        in_results: Strategy[bool] = booleans,
+        positions: Strategy[int] = unsigned_integers
+) -> Strategy[BoundPortedSweepEventsPair]:
     def to_sweep_events(
             is_left: bool,
             points_pair: BoundPortedPointsPair,

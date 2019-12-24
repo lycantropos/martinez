@@ -13,17 +13,15 @@ from tests.utils import (are_bound_ported_operations_equal,
 from . import strategies
 
 
-@given(strategies.bound_with_ported_operations_pairs,
-       strategies.bound_with_ported_nested_sweep_events_pairs,
-       strategies.bound_with_ported_points_pairs)
-def test_basic(bound_with_ported_operations_pair: Tuple[Bound, Ported],
-               bound_with_ported_sweep_events_pair: Tuple[BoundSweepEvent,
-                                                          PortedSweepEvent],
-               bound_with_ported_points_pair: Tuple[BoundPoint, PortedPoint],
-               ) -> None:
-    bound, ported = bound_with_ported_operations_pair
-    bound_event, ported_event = bound_with_ported_sweep_events_pair
-    bound_point, ported_point = bound_with_ported_points_pair
+@given(strategies.operations_pairs,
+       strategies.nested_sweep_events_pairs,
+       strategies.points_pairs)
+def test_basic(operations_pair: Tuple[Bound, Ported],
+               sweep_events_pair: Tuple[BoundSweepEvent, PortedSweepEvent],
+               points_pair: Tuple[BoundPoint, PortedPoint]) -> None:
+    bound, ported = operations_pair
+    bound_event, ported_event = sweep_events_pair
+    bound_point, ported_point = points_pair
 
     bound.divide_segment(bound_event, bound_point)
     ported.divide_segment(ported_event, ported_point)

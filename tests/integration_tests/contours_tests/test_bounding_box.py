@@ -8,9 +8,9 @@ from tests.utils import are_bound_ported_bounding_boxes_equal
 from . import strategies
 
 
-@given(strategies.bound_with_ported_contours_pairs)
-def test_basic(bound_with_ported_contours_pair: Tuple[Bound, Ported]) -> None:
-    bound, ported = bound_with_ported_contours_pair
+@given(strategies.contours_pairs)
+def test_basic(contours_pair: Tuple[Bound, Ported]) -> None:
+    bound, ported = contours_pair
 
     assert are_bound_ported_bounding_boxes_equal(bound.bounding_box,
                                                  ported.bounding_box)

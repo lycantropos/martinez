@@ -8,9 +8,9 @@ from tests.utils import are_bound_ported_bounding_boxes_equal
 from . import strategies
 
 
-@given(strategies.bound_with_ported_points_pairs)
-def test_basic(bound_with_ported_points_pair: Tuple[Bound, Ported]) -> None:
-    bound, ported = bound_with_ported_points_pair
+@given(strategies.points_pairs)
+def test_basic(points_pair: Tuple[Bound, Ported]) -> None:
+    bound, ported = points_pair
 
     assert are_bound_ported_bounding_boxes_equal(bound.bounding_box,
                                                  ported.bounding_box)

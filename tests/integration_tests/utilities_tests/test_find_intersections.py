@@ -10,14 +10,11 @@ from tests.utils import are_bound_ported_points_sequences_equal
 from . import strategies
 
 
-@given(strategies.bound_with_ported_segments_pairs_pairs)
-def test_basic(
-        bound_with_ported_segments_pair_pair: Tuple[Tuple[PortedSegment,
-                                                          PortedSegment],
-                                                    Tuple[BoundSegment,
-                                                          BoundSegment]]
-) -> None:
-    bound_segments, ported_segments = bound_with_ported_segments_pair_pair
+@given(strategies.segments_pairs_pairs)
+def test_basic(segments_pair_pair: Tuple[Tuple[PortedSegment, PortedSegment],
+                                         Tuple[BoundSegment, BoundSegment]]
+               ) -> None:
+    bound_segments, ported_segments = segments_pair_pair
 
     bound_result = bound_find_intersections(*bound_segments)
     ported_result = ported_find_intersections(*ported_segments)

@@ -10,13 +10,11 @@ from tests.utils import are_bound_ported_contours_equal
 from . import strategies
 
 
-@given(strategies.bound_with_ported_contours_pairs,
-       strategies.bound_with_ported_points_pairs)
-def test_basic(bound_with_ported_contours_pair: Tuple[Bound, Ported],
-               bound_with_ported_points_pair: Tuple[BoundPoint, PortedPoint]
-               ) -> None:
-    bound, ported = bound_with_ported_contours_pair
-    bound_point, ported_point = bound_with_ported_points_pair
+@given(strategies.contours_pairs, strategies.points_pairs)
+def test_basic(contours_pair: Tuple[Bound, Ported],
+               points_pair: Tuple[BoundPoint, PortedPoint]) -> None:
+    bound, ported = contours_pair
+    bound_point, ported_point = points_pair
 
     bound.add(bound_point)
     ported.add(ported_point)

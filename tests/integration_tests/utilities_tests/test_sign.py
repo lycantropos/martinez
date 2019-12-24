@@ -9,11 +9,9 @@ from tests.utils import (BoundPointsTriplet,
 from . import strategies
 
 
-@given(strategies.bound_with_ported_points_triplets_pairs)
-def test_basic(
-        bound_with_ported_points_triplets_pair: Tuple[PortedPointsTriplet,
-                                                      BoundPointsTriplet]
-) -> None:
-    bound_points, ported_points = bound_with_ported_points_triplets_pair
+@given(strategies.points_triplets_pairs)
+def test_basic(points_triplets_pair: Tuple[PortedPointsTriplet,
+                                           BoundPointsTriplet]) -> None:
+    bound_points, ported_points = points_triplets_pair
 
     assert bound_sign(*bound_points) == ported_sign(*ported_points)

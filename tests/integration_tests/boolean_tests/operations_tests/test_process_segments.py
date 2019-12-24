@@ -9,10 +9,9 @@ from tests.utils import (are_bound_ported_operations_equal,
 from . import strategies
 
 
-@given(strategies.bound_with_ported_operations_pairs)
-def test_basic(bound_with_ported_operations_pair: Tuple[Bound, Ported]
-               ) -> None:
-    bound, ported = bound_with_ported_operations_pair
+@given(strategies.operations_pairs)
+def test_basic(operations_pair: Tuple[Bound, Ported]) -> None:
+    bound, ported = operations_pair
 
     bound.process_segments()
     ported.process_segments()

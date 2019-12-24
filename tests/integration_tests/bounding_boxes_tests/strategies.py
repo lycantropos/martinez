@@ -14,5 +14,5 @@ def to_bound_with_ported_bounding_boxes(x_min: float, y_min: float,
             Ported(x_min, y_min, x_max, y_max))
 
 
-bound_with_ported_bounding_boxes_pairs = strategies.builds(
-        to_bound_with_ported_bounding_boxes, floats, floats, floats, floats)
+bounding_boxes_pairs = strategies.builds(to_bound_with_ported_bounding_boxes,
+                                         floats, floats, floats, floats)

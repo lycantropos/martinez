@@ -9,10 +9,9 @@ from tests.utils import (are_bound_ported_contours_equal,
 from . import strategies
 
 
-@given(strategies.bound_with_ported_contours_pairs)
-def test_round_trip(bound_with_ported_contours_pair: Tuple[Bound, Ported]
-                    ) -> None:
-    bound, ported = bound_with_ported_contours_pair
+@given(strategies.contours_pairs)
+def test_round_trip(contours_pair: Tuple[Bound, Ported]) -> None:
+    bound, ported = contours_pair
 
     assert are_bound_ported_contours_equal(pickle_round_trip(bound),
                                            pickle_round_trip(ported))
