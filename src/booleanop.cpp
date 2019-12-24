@@ -15,26 +15,15 @@
 
 using namespace cbop;
 
-SweepEvent::SweepEvent()
-    : left(false),
-      point(Point_2()),
-      otherEvent(nullptr),
-      pol(SUBJECT),
-      type(NORMAL),
-      inOut(false),
-      otherInOut(false),
-      prevInResult(nullptr),
-      inResult(false),
-      pos(0) {}
-
-SweepEvent::SweepEvent(bool b, const Point_2& p, SweepEvent* other,
-                       PolygonType pt, EdgeType et, bool _inOut,
-                       bool _otherInOut, bool _inResult, size_t position)
-    : left(b),
-      point(p),
-      otherEvent(other),
-      pol(pt),
-      type(et),
+SweepEvent::SweepEvent(bool _left, const Point_2& _point,
+                       SweepEvent* _otherEvent, PolygonType _polygonType,
+                       EdgeType _edgeType, bool _inOut, bool _otherInOut,
+                       bool _inResult, size_t position)
+    : left(_left),
+      point(_point),
+      otherEvent(_otherEvent),
+      pol(_polygonType),
+      type(_edgeType),
       inOut(_inOut),
       otherInOut(_otherInOut),
       prevInResult(nullptr),
