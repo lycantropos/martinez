@@ -613,6 +613,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_readwrite("in_out", &cbop::SweepEvent::inOut)
       .def_readwrite("other_in_out", &cbop::SweepEvent::otherInOut)
       .def_readwrite("in_result", &cbop::SweepEvent::inResult)
+      .def_readwrite("position", &cbop::SweepEvent::pos)
       .def_property_readonly("is_vertical", &cbop::SweepEvent::vertical)
       .def_property_readonly("segment", &cbop::SweepEvent::segment)
       .def("is_above", &cbop::SweepEvent::above)
