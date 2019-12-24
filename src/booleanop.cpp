@@ -420,10 +420,11 @@ std::vector<SweepEvent*> BooleanOpImp::collectEvents(
 
   // Due to overlapping edges the result array can be not wholly sorted
   bool sorted = false;
+  static const SweepEventComp cmp;  // to compare events
   while (!sorted) {
     sorted = true;
     for (size_t i = 0; i < result.size(); ++i) {
-      if (i + 1 < result.size() && sec(result[i], result[i + 1])) {
+      if (i + 1 < result.size() && cmp(result[i], result[i + 1])) {
         std::swap(result[i], result[i + 1]);
         sorted = false;
       }
