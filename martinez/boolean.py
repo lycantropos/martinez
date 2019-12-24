@@ -358,6 +358,28 @@ class Operation:
             return True
         return False
 
+    @staticmethod
+    def collect_events(events: List[SweepEvent]) -> List[SweepEvent]:
+        result = [event
+                  for event in events
+                  if event.is_left and event.in_result
+                  or not event.is_left and event.other_event.in_result]
+        is_sorted = False
+        while not is_sorted:
+            is_sorted = True
+            for index in range(len(result) - 1):
+                if (EventsQueueKey(result[index])
+                        < EventsQueueKey(result[index + 1])):
+                    result[index], result[index + 1] = (result[index + 1],
+                                                        result[index])
+                    is_sorted = False
+        for index, event in enumerate(result):
+            event.position = index
+            if not event.is_left:
+                event.position, event.other_event.position = (
+                    event.other_event.position, event.position)
+        return result
+
     def divide_segment(self, event: SweepEvent, point: Point) -> None:
         # "left event" of the "right line segment"
         # resulting from dividing event.segment
