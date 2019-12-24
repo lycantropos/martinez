@@ -14,7 +14,8 @@ from tests.strategies import (booleans,
                               make_cyclic_bound_with_ported_sweep_events,
                               single_precision_floats as floats,
                               to_bound_with_ported_points_pair,
-                              to_bound_with_ported_sweep_events)
+                              to_bound_with_ported_sweep_events,
+                              unsigned_integers)
 
 booleans = booleans
 to_bound_with_ported_sweep_events = partial(
@@ -25,7 +26,8 @@ to_bound_with_ported_sweep_events = partial(
         edges_types_pairs=bound_with_ported_edges_types_pairs,
         in_outs=booleans,
         other_in_outs=booleans,
-        in_results=booleans)
+        in_results=booleans,
+        positions=unsigned_integers)
 nones_pairs = strategies.tuples(*repeat(strategies.none(), 2))
 leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(
         nones_pairs)

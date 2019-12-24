@@ -25,6 +25,7 @@ from tests.strategies import (booleans,
                               to_bound_with_ported_points_pair,
                               to_bound_with_ported_polygons_pair,
                               to_bound_with_ported_sweep_events,
+                              unsigned_integers,
                               unsigned_integers_lists)
 from tests.utils import (are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
@@ -43,7 +44,8 @@ to_bound_with_ported_sweep_events = partial(
         edges_types_pairs=bound_with_ported_edges_types_pairs,
         in_outs=booleans,
         other_in_outs=booleans,
-        in_results=booleans)
+        in_results=booleans,
+        positions=unsigned_integers)
 leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(
         nones_pairs)
 bound_with_ported_acyclic_sweep_events_pairs = strategies.recursive(
