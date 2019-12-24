@@ -21,6 +21,7 @@ from tests.utils import (are_non_overlapping_sweep_events_pair,
 points = strategies.builds(Point, floats, floats)
 sweep_events = to_bound_sweep_events()
 nested_sweep_events = to_nested_bound_sweep_events()
+nested_sweep_events_lists = strategies.lists(nested_sweep_events)
 non_degenerate_nested_sweep_events = (nested_sweep_events
                                       .filter(is_sweep_event_non_degenerate))
 nested_sweep_events_pairs = strategies.tuples(nested_sweep_events,
