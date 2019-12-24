@@ -3,6 +3,7 @@ from functools import partial
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
+                              non_negative_integers,
                               ported_edges_types,
                               ported_polygons_types,
                               scalars_strategies,
@@ -13,6 +14,7 @@ from tests.strategies import (booleans,
                               scalars_to_ported_sweep_events)
 
 booleans = booleans
+non_negative_integers = non_negative_integers
 polygons_types = ported_polygons_types
 edges_types = ported_edges_types
 points = scalars_strategies.flatmap(scalars_to_ported_points)
