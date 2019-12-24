@@ -209,7 +209,7 @@ static bool are_sweep_events_equal_flat(const cbop::SweepEvent& self,
   return self.left == other.left && self.point == other.point &&
          self.pol == other.pol && self.type == other.type &&
          self.inOut == other.inOut && self.otherInOut == other.otherInOut &&
-         self.inResult == other.inResult;
+         self.inResult == other.inResult && self.pos == other.pos;
 }
 
 static bool are_sweep_events_equal(const cbop::SweepEvent& self,
