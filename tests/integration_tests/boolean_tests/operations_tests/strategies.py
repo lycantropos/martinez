@@ -39,6 +39,8 @@ sweep_events_pairs = strategies.recursive(
         acyclic_sweep_events_pairs, make_cyclic_bound_with_ported_sweep_events)
 nested_sweep_events_pairs = to_bound_with_ported_sweep_events(
         sweep_events_pairs)
+nested_sweep_events_lists_pairs = (strategies.lists(nested_sweep_events_pairs)
+                                   .map(transpose))
 nested_sweep_events_pairs_pairs = (
     strategies.tuples(*repeat(nested_sweep_events_pairs, 2)).map(transpose))
 
