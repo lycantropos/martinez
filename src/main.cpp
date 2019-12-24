@@ -499,8 +499,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                                return result;
                              })
       .def_property_readonly("is_trivial", &cbop::BooleanOpImp::trivial)
-      .def("collect_events", &cbop::BooleanOpImp::collectEvents,
-           py::arg("events"))
+      .def_static("collect_events", &cbop::BooleanOpImp::collectEvents,
+                  py::arg("events"))
       .def("connect_edges", &cbop::BooleanOpImp::connectEdges,
            py::arg("events"))
       .def("divide_segment", &cbop::BooleanOpImp::divideSegment,
