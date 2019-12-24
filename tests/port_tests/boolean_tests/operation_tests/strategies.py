@@ -30,6 +30,7 @@ points = scalars_strategies.flatmap(scalars_to_ported_points)
 sweep_events = scalars_strategies.flatmap(scalars_to_ported_sweep_events)
 nested_sweep_events = (scalars_strategies
                        .flatmap(scalars_to_nested_ported_sweep_events))
+nested_sweep_events_lists = strategies.lists(nested_sweep_events)
 non_degenerate_nested_sweep_events = (nested_sweep_events
                                       .filter(is_sweep_event_non_degenerate))
 nested_sweep_events_pairs = (scalars_strategies
