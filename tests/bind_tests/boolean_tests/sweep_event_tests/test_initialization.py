@@ -11,12 +11,13 @@ from . import strategies
 
 @given(strategies.booleans, strategies.points, strategies.maybe_sweep_events,
        strategies.polygons_types, strategies.edges_types,
-       strategies.booleans, strategies.booleans, strategies.booleans)
+       strategies.booleans, strategies.booleans, strategies.booleans,
+       strategies.unsigned_integers)
 def test_basic(is_left: bool, point: Point, other_event: Optional[SweepEvent],
                polygon_type: PolygonType, edge_type: EdgeType, in_out: bool,
-               other_in_out: bool, in_result: bool) -> None:
+               other_in_out: bool, in_result: bool, position: int) -> None:
     result = SweepEvent(is_left, point, other_event, polygon_type, edge_type,
-                        in_out, other_in_out, in_result)
+                        in_out, other_in_out, in_result, position)
 
     assert result.is_left is is_left
     assert result.point == point
@@ -26,3 +27,4 @@ def test_basic(is_left: bool, point: Point, other_event: Optional[SweepEvent],
     assert result.in_out is in_out
     assert result.other_in_out is other_in_out
     assert result.in_result is in_result
+    assert result.position == position

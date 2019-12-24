@@ -8,9 +8,11 @@ from tests.strategies import (booleans,
                               to_acyclic_bound_sweep_events,
                               to_bound_sweep_events,
                               to_nested_bound_sweep_events,
-                              to_plain_bound_sweep_events)
+                              to_plain_bound_sweep_events,
+                              unsigned_integers)
 
 booleans = booleans
+unsigned_integers = unsigned_integers
 points = strategies.builds(Point, floats, floats)
 polygons_types = bound_polygons_types
 edges_types = bound_edges_types
