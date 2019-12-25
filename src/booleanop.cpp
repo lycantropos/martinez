@@ -18,7 +18,8 @@ using namespace cbop;
 SweepEvent::SweepEvent(bool _left, const Point_2& _point,
                        SweepEvent* _otherEvent, PolygonType _polygonType,
                        EdgeType _edgeType, bool _inOut, bool _otherInOut,
-                       bool _inResult, size_t position)
+                       bool _inResult, size_t position,
+                       SweepEvent* prevInResult)
     : left(_left),
       point(_point),
       otherEvent(_otherEvent),
@@ -26,7 +27,7 @@ SweepEvent::SweepEvent(bool _left, const Point_2& _point,
       type(_edgeType),
       inOut(_inOut),
       otherInOut(_otherInOut),
-      prevInResult(nullptr),
+      prevInResult(prevInResult),
       inResult(_inResult),
       pos(position) {}
 
