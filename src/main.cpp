@@ -594,12 +594,13 @@ PYBIND11_MODULE(MODULE_NAME, m) {
   py::class_<cbop::SweepEvent, std::unique_ptr<cbop::SweepEvent, py::nodelete>>(
       m, SWEEP_EVENT_NAME)
       .def(py::init<bool, const cbop::Point_2&, cbop::SweepEvent*,
-                    cbop::PolygonType, cbop::EdgeType, bool, bool, bool,
-                    size_t>(),
+                    cbop::PolygonType, cbop::EdgeType, bool, bool, bool, size_t,
+                    cbop::SweepEvent*>(),
            py::arg("left"), py::arg("point"), py::arg("other_event").none(true),
            py::arg("polygon_type"), py::arg("edge_type"),
            py::arg("in_out") = false, py::arg("other_in_out") = false,
            py::arg("in_result") = false, py::arg("position") = 0,
+           py::arg("prev_in_result_event").none(true),
            py::return_value_policy::reference)
       .def(py::pickle(
           static_cast<std::function<py::list(const cbop::SweepEvent& self)>>(
