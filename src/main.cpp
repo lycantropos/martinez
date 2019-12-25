@@ -51,6 +51,76 @@ static std::string join(const std::vector<std::string>& elements,
       });
 };
 
+enum class Direction { NONE, LEFT, RIGHT };
+
+struct CycleRef {
+  CycleRef() = delete;
+  CycleRef(Direction _direction, size_t _index)
+      : direction(_direction), index(_index){};
+
+  const Direction direction;
+  const size_t index;
+};
+
+template <class Value>
+struct Step {
+  Step() = delete;
+  Step(Direction _direction, const Value* _value)
+      : direction(_direction), value(_value){};
+  const Direction direction;
+  const Value* value;
+};
+
+template <class Value>
+struct Chain {
+  Chain() = delete;
+  Chain(const std::vector<Step<Value>>& _path, const CycleRef& _cycle_ref)
+      : path(_path), cycle_ref(_cycle_ref){};
+
+  const std::vector<Step<Value>> path;
+  const CycleRef cycle_ref;
+};
+
+template <class Value>
+static void fill_chains(std::vector<Chain<Value>>& chains,
+                        const std::vector<Step<Value>>& path,
+                        std::function<const Value*(const Value*)> to_left,
+                        std::function<const Value*(const Value*)> to_right) {
+  const auto* end = path.back().value;
+  {
+    const auto* left = to_left(end);
+    size_t index;
+    for (index = 0; index < path.size(); ++index)
+      if (path[index].value == left) break;
+    if (index == path.size()) {
+      if (!left)
+        chains.push_back(Chain<Value>(path, CycleRef(Direction::NONE, 0)));
+      else {
+        auto next_path = path;
+        next_path.push_back(Step<Value>(Direction::LEFT, left));
+        fill_chains(chains, next_path, to_left, to_right);
+      }
+    } else
+      chains.push_back(Chain<Value>(path, CycleRef(Direction::LEFT, index)));
+  }
+  {
+    const auto* right = to_right(end);
+    size_t index;
+    for (index = 0; index < path.size(); ++index)
+      if (path[index].value == right) break;
+    if (index == path.size()) {
+      if (!right)
+        chains.push_back(Chain<Value>(path, CycleRef(Direction::NONE, 0)));
+      else {
+        auto next_path = path;
+        next_path.push_back(Step<Value>(Direction::RIGHT, right));
+        fill_chains(chains, next_path, to_left, to_right);
+      }
+    } else
+      chains.push_back(Chain<Value>(path, CycleRef(Direction::RIGHT, index)));
+  }
+}
+
 const int ACYCLIC_INDEX = -1;
 
 static int fill_sweep_events_chain(
@@ -215,18 +285,36 @@ static bool are_sweep_events_equal_flat(const cbop::SweepEvent& self,
 
 static bool are_sweep_events_equal(const cbop::SweepEvent& self,
                                    const cbop::SweepEvent& other) {
-  const auto* self_ptr = std::addressof(self);
+  const auto* ptr = std::addressof(self);
   const auto* other_ptr = std::addressof(other);
-  if (self_ptr == other_ptr) return true;
-  if (!are_sweep_events_equal_flat(self, other)) return false;
-  std::vector<const cbop::SweepEvent*> self_chain, other_chain;
-  auto self_cycle_index = fill_sweep_events_chain(self_ptr, self_chain);
-  auto other_cycle_index = fill_sweep_events_chain(other_ptr, other_chain);
-  if (self_cycle_index != other_cycle_index) return false;
-  if (self_chain.size() != other_chain.size()) return false;
-  for (size_t index = 1; index < self_chain.size(); ++index)
-    if (!are_sweep_events_equal_flat(*self_chain[index], *other_chain[index]))
+  if (ptr == other_ptr) return true;
+  std::vector<Chain<cbop::SweepEvent>> chains, other_chains;
+  fill_chains<cbop::SweepEvent>(
+      chains, {Step<cbop::SweepEvent>(Direction::NONE, ptr)},
+      &cbop::SweepEvent::otherEvent, &cbop::SweepEvent::prevInResult);
+  fill_chains<cbop::SweepEvent>(
+      other_chains, {Step<cbop::SweepEvent>(Direction::NONE, other_ptr)},
+      &cbop::SweepEvent::otherEvent, &cbop::SweepEvent::prevInResult);
+  if (chains.size() != other_chains.size()) {
+    return false;
+  }
+  for (size_t chain_index = 0; chain_index < chains.size(); ++chain_index) {
+    const auto& chain = chains[chain_index];
+    const auto& other_chain = other_chains[chain_index];
+    if (!(chain.cycle_ref.direction == other_chain.cycle_ref.direction &&
+          chain.cycle_ref.index == other_chain.cycle_ref.index))
       return false;
+    const auto& path = chain.path;
+    const auto& other_path = other_chain.path;
+    if (path.size() != other_path.size()) return false;
+    for (size_t step_index = 0; step_index < path.size(); ++step_index) {
+      const auto& step = path[step_index];
+      const auto& other_step = other_path[step_index];
+      if (!(step.direction == other_step.direction &&
+            are_sweep_events_equal_flat(*step.value, *other_step.value)))
+        return false;
+    }
+  }
   return true;
 }
 
