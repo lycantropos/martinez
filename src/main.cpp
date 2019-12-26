@@ -9,6 +9,7 @@
 #include <memory>
 #include <numeric>
 #include <sstream>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "bbox_2.h"
@@ -81,6 +82,53 @@ struct Chain {
   const std::vector<Step<Value>> path;
   const CycleRef cycle_ref;
 };
+
+template <class Value>
+static std::vector<const Value*> traverse(
+    const Value* value, std::unordered_map<size_t, size_t>& left_links,
+    std::unordered_map<size_t, size_t>& right_links,
+    std::function<const Value*(const Value*)> to_left,
+    std::function<const Value*(const Value*)> to_right) {
+  std::vector<const Value*> result;
+  std::unordered_map<const Value*, size_t> registry;
+  std::vector<const Value*> queue{value};
+  while (!queue.empty()) {
+    const auto* cursor = queue.back();
+    queue.pop_back();
+    registry[cursor] = result.size();
+    result.push_back(cursor);
+    const auto* left = to_left(cursor);
+    if (left != nullptr && registry.find(left) == registry.end())
+      queue.push_back(left);
+    const auto* right = to_right(cursor);
+    if (right != nullptr && registry.find(right) == registry.end())
+      queue.push_back(right);
+  }
+  queue.push_back(value);
+  std::unordered_set<const Value*> visited{value};
+  while (!queue.empty()) {
+    value = queue.back();
+    queue.pop_back();
+    const auto index = registry[value];
+    const auto* left = to_left(value);
+    if (left != nullptr) {
+      left_links[index] = registry[left];
+      if (visited.find(left) == visited.end()) {
+        visited.insert(left);
+        queue.push_back(left);
+      }
+    }
+    const auto* right = to_right(value);
+    if (right != nullptr) {
+      right_links[index] = registry[right];
+      if (visited.find(right) == visited.end()) {
+        visited.insert(right);
+        queue.push_back(right);
+      }
+    }
+  }
+  return result;
+}
 
 template <class Value>
 static void fill_chains(std::vector<Chain<Value>>& chains,
@@ -341,31 +389,19 @@ static bool are_polygons_equal(const cbop::Polygon& self,
   return true;
 }
 
-static py::list to_plain_sweep_event_state(const cbop::SweepEvent* self) {
-  auto result = py::list();
-  result.append(self->left);
-  result.append(self->point);
-  result.append(py::none());
-  result.append(self->pol);
-  result.append(self->type);
-  result.append(self->inOut);
-  result.append(self->otherInOut);
-  result.append(self->inResult);
-  result.append(self->pos);
-  return result;
-}
-
-static py::list to_sweep_event_state(const cbop::SweepEvent& self) {
-  std::vector<const cbop::SweepEvent*> chain;
-  auto cycle_index = fill_sweep_events_chain(std::addressof(self), chain);
-  std::vector<py::list> states;
-  for (const auto* sweep_event : chain)
-    states.push_back(to_plain_sweep_event_state(sweep_event));
-  for (size_t index = 0; index < states.size() - 1; ++index)
-    states[index][2] = states[index + 1];
-  if (cycle_index != ACYCLIC_INDEX)
-    states[states.size() - 1][2] = states[cycle_index];
-  return states[0];
+static py::tuple to_sweep_event_state(const cbop::SweepEvent& self) {
+  const auto* ptr = std::addressof(self);
+  std::unordered_map<size_t, size_t> left_links, right_links;
+  const auto events = traverse<cbop::SweepEvent>(
+      ptr, left_links, right_links, &cbop::SweepEvent::otherEvent,
+      &cbop::SweepEvent::prevInResult);
+  py::list plain_states;
+  for (const auto* event : events) {
+    plain_states.append(py::make_tuple(
+        event->left, event->point, event->pol, event->type, event->inOut,
+        event->otherInOut, event->inResult, event->pos));
+  }
+  return py::make_tuple(plain_states, left_links, right_links);
 };
 
 static int fill_sweep_events_states_chain(py::list& state,
@@ -381,27 +417,28 @@ static int fill_sweep_events_states_chain(py::list& state,
   return ACYCLIC_INDEX;
 }
 
-static cbop::SweepEvent* from_plain_sweep_event_state(const py::list& state) {
-  if (state.size() != 9) throw std::runtime_error("Invalid state!");
+static cbop::SweepEvent* from_plain_sweep_event_state(const py::tuple& state) {
+  if (state.size() != 8) throw std::runtime_error("Invalid state!");
   return new cbop::SweepEvent(
       state[0].cast<bool>(), state[1].cast<cbop::Point_2>(), nullptr,
-      state[3].cast<cbop::PolygonType>(), state[4].cast<cbop::EdgeType>(),
-      state[5].cast<bool>(), state[6].cast<bool>(), state[7].cast<bool>(),
-      state[8].cast<size_t>());
+      state[2].cast<cbop::PolygonType>(), state[3].cast<cbop::EdgeType>(),
+      state[4].cast<bool>(), state[5].cast<bool>(), state[6].cast<bool>(),
+      state[7].cast<size_t>(), nullptr);
 }
 
-static cbop::SweepEvent* from_sweep_event_state(py::list state) {
-  std::vector<py::list> chain;
-  auto cycle_index = fill_sweep_events_states_chain(state, chain);
-  std::vector<cbop::SweepEvent*> sweep_events;
-  for (const auto& state : chain)
-    sweep_events.push_back(from_plain_sweep_event_state(state));
-  for (size_t index = 0; index < sweep_events.size() - 1; ++index)
-    sweep_events[index]->otherEvent = sweep_events[index + 1];
-  if (cycle_index != ACYCLIC_INDEX)
-    sweep_events[sweep_events.size() - 1]->otherEvent =
-        sweep_events[cycle_index];
-  return sweep_events[0];
+static cbop::SweepEvent* from_sweep_event_state(py::tuple state) {
+  std::vector<cbop::SweepEvent*> events;
+  for (const auto& event_state : state[0].cast<py::list>())
+    events.push_back(
+        from_plain_sweep_event_state(event_state.cast<py::tuple>()));
+  std::unordered_map<size_t, size_t> left_links, right_links;
+  left_links = state[1].cast<std::unordered_map<size_t, size_t>>();
+  for (const auto item : left_links)
+    events[item.first]->otherEvent = events[item.second];
+  right_links = state[2].cast<std::unordered_map<size_t, size_t>>();
+  for (const auto item : right_links)
+    events[item.first]->prevInResult = events[item.second];
+  return events[0];
 }
 
 class EventsQueueKey {
@@ -706,9 +743,9 @@ PYBIND11_MODULE(MODULE_NAME, m) {
            py::arg("prev_in_result_event").none(true),
            py::return_value_policy::reference)
       .def(py::pickle(
-          static_cast<std::function<py::list(const cbop::SweepEvent& self)>>(
+          static_cast<std::function<py::tuple(const cbop::SweepEvent& self)>>(
               to_sweep_event_state),
-          static_cast<std::function<cbop::SweepEvent*(py::list)>>(
+          static_cast<std::function<cbop::SweepEvent*(py::tuple)>>(
               from_sweep_event_state)))
       .def("__eq__", are_sweep_events_equal)
       .def("__repr__", sweep_event_repr)
@@ -733,7 +770,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
           [](const EventsQueueKey& key) {
             return to_sweep_event_state(*key.event());
           },
-          [](py::list state) {
+          [](py::tuple state) {
             return EventsQueueKey(from_sweep_event_state(state));
           }))
       .def(py::self < py::self)
@@ -753,7 +790,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
           [](const SweepLineKey& key) {
             return to_sweep_event_state(*key.event());
           },
-          [](py::list state) {
+          [](py::tuple state) {
             return SweepLineKey(from_sweep_event_state(state));
           }))
       .def(py::self < py::self)
