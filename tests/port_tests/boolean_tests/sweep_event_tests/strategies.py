@@ -20,7 +20,7 @@ edges_types = ported_edges_types
 points = scalars_strategies.flatmap(scalars_to_ported_points)
 leaf_sweep_events = (scalars_strategies
                      .flatmap(partial(scalars_to_plain_ported_sweep_events,
-                                      other_events=strategies.none())))
+                                      children=strategies.none())))
 acyclic_sweep_events = (scalars_strategies
                         .flatmap(scalars_to_acyclic_ported_sweep_events))
 sweep_events = scalars_strategies.flatmap(scalars_to_ported_sweep_events)

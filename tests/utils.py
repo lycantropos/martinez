@@ -177,30 +177,11 @@ def are_bound_ported_polygons_equal(bound: BoundPolygon,
                    bound.contours, ported.contours))
 
 
-def to_sweep_event_children_count(sweep_event: Union[BoundSweepEvent,
-                                                     PortedSweepEvent]) -> int:
-    children_ids = set()
-    cursor = sweep_event
-    while (cursor.other_event is not None
-           and cursor.other_event is not sweep_event):
-        sweep_event = cursor.other_event
-        sweep_event_id = id(cursor)
-        if sweep_event_id in children_ids:
-            break
-        children_ids.add(sweep_event_id)
-    return len(children_ids)
-
-
 traverse_sweep_event = PortedSweepEvent._traverse
 
 
 def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
                                         ported: PortedSweepEvent) -> bool:
-    bound_children_count = to_sweep_event_children_count(bound)
-    ported_children_count = to_sweep_event_children_count(ported)
-    if bound_children_count != ported_children_count:
-        return False
-
     def are_fields_equal(bound: BoundSweepEvent,
                          ported: PortedSweepEvent) -> bool:
         return (bound.is_left is ported.is_left

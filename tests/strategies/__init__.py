@@ -15,7 +15,6 @@ from .factories import (make_cyclic_bound_with_ported_sweep_events,
                         to_bound_with_ported_polygons_pair,
                         to_bound_with_ported_segments_pair,
                         to_bound_with_ported_sweep_events,
-                        to_cyclic_sweep_event,
                         to_nested_bound_sweep_events,
                         to_plain_bound_sweep_events)
 from .literals import (booleans,

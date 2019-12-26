@@ -1,5 +1,6 @@
 from functools import partial
 from typing import (Any,
+                    Dict,
                     List,
                     Optional,
                     Tuple,
@@ -27,7 +28,7 @@ from tests.utils import (BoundPortedPointsPair,
                          PortedPointsPair,
                          PortedPointsTriplet,
                          Strategy,
-                         to_sweep_event_children_count)
+                         traverse_sweep_event)
 from .literals import (booleans,
                        bound_edges_types,
                        bound_polygons_types,
@@ -105,35 +106,41 @@ AnySweepEvent = TypeVar('AnySweepEvent', PortedSweepEvent, BoundSweepEvent)
 
 def make_cyclic(sweep_events: Strategy[AnySweepEvent]
                 ) -> Strategy[AnySweepEvent]:
-    return strategies.builds(to_cyclic_sweep_event,
-                             sweep_events,
-                             strategies.integers(),
-                             strategies.integers())
+    def to_cyclic_sweep_events(sweep_event: AnySweepEvent
+                               ) -> Strategy[AnySweepEvent]:
+        events = traverse_sweep_event(sweep_event, {}, {})
+        links = to_links(len(events))
+        return (strategies.builds(to_left_relinked_sweep_event,
+                                  strategies.just(events), links)
+                | strategies.builds(to_right_relinked_sweep_event,
+                                    strategies.just(events), links))
+
+    return sweep_events.flatmap(to_cyclic_sweep_events)
 
 
-def to_cyclic_sweep_event(sweep_event: AnySweepEvent,
-                          source_index_seed: int,
-                          destination_index_seed: int) -> AnySweepEvent:
-    children_count = to_sweep_event_children_count(sweep_event) or 1
-    loop_sweep_event(sweep_event,
-                     source_index_seed % children_count,
-                     destination_index_seed % children_count)
-    return sweep_event
+def to_links(events_count: int) -> Strategy[Dict[int, int]]:
+    return strategies.dictionaries(strategies.integers(0, events_count - 1),
+                                   strategies.integers(0, events_count - 1),
+                                   min_size=events_count // 2)
 
 
-def loop_sweep_event(sweep_event: AnySweepEvent,
-                     source_index: int, destination_index: int) -> None:
-    source = destination = sweep_event
-    for _ in range(source_index - 1):
-        source = source.other_event
-    for _ in range(destination_index):
-        destination = destination.other_event
-    source.other_event = destination
+def to_left_relinked_sweep_event(events: List[AnySweepEvent],
+                                 links: Dict[int, int]) -> AnySweepEvent:
+    for source, destination in links.items():
+        events[source].other_event = events[destination]
+    return events[0]
+
+
+def to_right_relinked_sweep_event(events: List[AnySweepEvent],
+                                  links: Dict[int, int]) -> AnySweepEvent:
+    for source, destination in links.items():
+        events[source].prev_in_result_event = events[destination]
+    return events[0]
 
 
 def to_bound_with_ported_sweep_events(
-        other_events: Strategy[Tuple[Optional[BoundSweepEvent],
-                                     Optional[PortedSweepEvent]]],
+        children: Strategy[Tuple[Optional[BoundSweepEvent],
+                                 Optional[PortedSweepEvent]]],
         are_left: Strategy[bool] = booleans,
         points_pairs: BoundPortedPointsPair = strategies.builds(
                 to_bound_with_ported_points_pair, single_precision_floats,
@@ -149,76 +156,99 @@ def to_bound_with_ported_sweep_events(
         positions: Strategy[int] = unsigned_integers
 ) -> Strategy[BoundPortedSweepEventsPair]:
     def to_sweep_events(
-            is_left: bool,
-            points_pair: BoundPortedPointsPair,
+            is_left: bool, points_pair: BoundPortedPointsPair,
             other_events_pair: Tuple[Optional[BoundSweepEvent],
                                      Optional[PortedSweepEvent]],
             polygons_types_pair: Tuple[BoundPolygonType, PortedPolygonType],
             edges_types_pair: Tuple[BoundEdgeType, PortedEdgeType],
-            in_out: bool,
-            other_in_out: bool,
-            in_result: bool,
-            position: int) -> BoundPortedSweepEventsPair:
+            in_out: bool, other_in_out: bool, in_result: bool, position: int,
+            prev_in_result_events_pair: Tuple[Optional[BoundSweepEvent],
+                                              Optional[PortedSweepEvent]]
+    ) -> BoundPortedSweepEventsPair:
         bound_point, ported_point = points_pair
-        (bound_other_event,
-         ported_other_event) = other_events_pair
-        (bound_polygon_type,
-         ported_polygon_type) = polygons_types_pair
+        bound_other_event, ported_other_event = other_events_pair
+        bound_polygon_type, ported_polygon_type = polygons_types_pair
         bound_edge_type, ported_edge_type = edges_types_pair
+        (bound_prev_in_result_event,
+         ported_prev_in_result_event) = prev_in_result_events_pair
         bound = BoundSweepEvent(is_left, bound_point, bound_other_event,
                                 bound_polygon_type, bound_edge_type,
-                                in_out, other_in_out, in_result, position)
+                                in_out, other_in_out, in_result, position,
+                                bound_prev_in_result_event)
         ported = PortedSweepEvent(is_left, ported_point, ported_other_event,
                                   ported_polygon_type, ported_edge_type,
-                                  in_out, other_in_out, in_result, position)
+                                  in_out, other_in_out, in_result, position,
+                                  ported_prev_in_result_event)
         return bound, ported
 
     return strategies.builds(to_sweep_events,
-                             are_left, points_pairs, other_events,
+                             are_left, points_pairs, children,
                              polygons_types_pairs, edges_types_pairs,
-                             in_outs, other_in_outs, in_results, positions)
+                             in_outs, other_in_outs, in_results, positions,
+                             children)
 
 
 def make_cyclic_bound_with_ported_sweep_events(
         sweep_events_pairs: Strategy[BoundPortedSweepEventsPair]
 ) -> Strategy[BoundPortedSweepEventsPair]:
-    def to_cyclic_sweep_events(sweep_events_pair: BoundPortedSweepEventsPair,
-                               source_index_seed: int,
-                               destination_index_seed: int
-                               ) -> BoundPortedSweepEventsPair:
+    def to_cyclic_sweep_events_pair(
+            sweep_events_pair: BoundPortedSweepEventsPair
+    ) -> Strategy[BoundPortedSweepEventsPair]:
         bound, ported = sweep_events_pair
-        return (to_cyclic_sweep_event(bound, source_index_seed,
-                                      destination_index_seed),
-                to_cyclic_sweep_event(ported, source_index_seed,
-                                      destination_index_seed))
+        bound_left_links, ported_left_links = {}, {}
+        bound_right_links, ported_right_links = {}, {}
+        bound_events = traverse_sweep_event(bound, bound_left_links,
+                                            bound_right_links)
+        ported_events = traverse_sweep_event(ported, ported_left_links,
+                                             ported_right_links)
+        links = to_links(len(bound_events))
+        return (strategies.builds(to_left_relinked_sweep_events_pair,
+                                  strategies.just(bound_events),
+                                  strategies.just(ported_events),
+                                  links)
+                | strategies.builds(to_right_relinked_sweep_events_pair,
+                                    strategies.just(bound_events),
+                                    strategies.just(ported_events),
+                                    links))
 
-    return strategies.builds(to_cyclic_sweep_events,
-                             sweep_events_pairs,
-                             strategies.integers(),
-                             strategies.integers())
+    def to_left_relinked_sweep_events_pair(
+            bound_events: List[BoundSweepEvent],
+            ported_events: List[PortedSweepEvent],
+            links: Dict[int, int]) -> Tuple[BoundSweepEvent, PortedSweepEvent]:
+        return (to_left_relinked_sweep_event(bound_events, links),
+                to_left_relinked_sweep_event(ported_events, links))
+
+    def to_right_relinked_sweep_events_pair(
+            bound_events: List[BoundSweepEvent],
+            ported_events: List[PortedSweepEvent],
+            links: Dict[int, int]) -> Tuple[BoundSweepEvent, PortedSweepEvent]:
+        return (to_right_relinked_sweep_event(bound_events, links),
+                to_right_relinked_sweep_event(ported_events, links))
+
+    return sweep_events_pairs.flatmap(to_cyclic_sweep_events_pair)
 
 
 def scalars_to_plain_ported_sweep_events(
         scalars: Strategy[Scalar],
-        other_events: Strategy[Optional[PortedSweepEvent]],
+        children: Strategy[Optional[PortedSweepEvent]],
         *,
         polygons_types: Strategy[PortedPolygonType] = ported_polygons_types
 ) -> Strategy[PortedSweepEvent]:
     return strategies.builds(PortedSweepEvent, booleans,
-                             scalars_to_ported_points(scalars), other_events,
+                             scalars_to_ported_points(scalars), children,
                              polygons_types, ported_edges_types,
                              booleans, booleans, booleans,
-                             non_negative_integers)
+                             non_negative_integers, children)
 
 
 def scalars_to_acyclic_ported_sweep_events(
         scalars: Strategy[Scalar],
-        other_events: Strategy[Optional[PortedSweepEvent]] = strategies.none(),
+        children: Strategy[Optional[PortedSweepEvent]] = strategies.none(),
         **kwargs: Any
 ) -> Strategy[PortedSweepEvent]:
     events_factory = partial(scalars_to_plain_ported_sweep_events, scalars,
                              **kwargs)
-    return strategies.recursive(events_factory(other_events), events_factory)
+    return strategies.recursive(events_factory(children), events_factory)
 
 
 def scalars_to_nested_ported_sweep_events(scalars: Strategy[Scalar],
@@ -240,18 +270,19 @@ def scalars_to_acyclic_nested_ported_sweep_events(
         **kwargs: Any) -> Strategy[PortedSweepEvent]:
     events_factory = partial(scalars_to_acyclic_ported_sweep_events,
                              scalars, **kwargs)
-    return events_factory(events_factory(strategies.none()))
+    return events_factory(events_factory())
 
 
 def to_plain_bound_sweep_events(
-        other_events: Strategy[Optional[BoundSweepEvent]],
+        children: Strategy[Optional[BoundSweepEvent]],
         *,
         polygons_types: Strategy[BoundPolygonType] = bound_polygons_types
 ) -> Strategy[BoundSweepEvent]:
     return strategies.builds(BoundSweepEvent, booleans,
                              strategies.builds(BoundPoint, floats, floats),
-                             other_events, polygons_types, bound_edges_types,
-                             booleans, booleans, booleans, unsigned_integers)
+                             children, polygons_types, bound_edges_types,
+                             booleans, booleans, booleans, unsigned_integers,
+                             children)
 
 
 def to_bound_sweep_events(**kwargs: Any) -> Strategy[PortedSweepEvent]:
@@ -271,10 +302,10 @@ def to_acyclic_nested_bound_sweep_events(**kwargs: Any
 
 
 def to_acyclic_bound_sweep_events(
-        other_events: Strategy[Optional[BoundSweepEvent]],
+        children: Strategy[Optional[BoundSweepEvent]],
         **kwargs: Any) -> Strategy[BoundSweepEvent]:
     events_factory = partial(to_plain_bound_sweep_events, **kwargs)
-    return strategies.recursive(events_factory(other_events), events_factory)
+    return strategies.recursive(events_factory(children), events_factory)
 
 
 def to_bound_with_ported_polygons_pair(
