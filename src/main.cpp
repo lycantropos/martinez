@@ -624,7 +624,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
            py::arg("polygon_type"), py::arg("edge_type"),
            py::arg("in_out") = false, py::arg("other_in_out") = false,
            py::arg("in_result") = false, py::arg("position") = 0,
-           py::arg("prev_in_result_event").none(true),
+           py::arg("prev_in_result_event").none(true) = nullptr,
            py::return_value_policy::reference)
       .def(py::pickle(
           static_cast<std::function<py::tuple(const cbop::SweepEvent& self)>>(
