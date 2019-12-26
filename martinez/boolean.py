@@ -1,15 +1,14 @@
 import enum
 from copy import copy
-from functools import (partial,
-                       partialmethod)
-from operator import (attrgetter,
-                      itemgetter)
+from functools import partial
+from operator import attrgetter
 from reprlib import recursive_repr
 from typing import (Callable,
+                    Dict,
                     List,
                     Optional,
-                    TypeVar,
-                    Union)
+                    Tuple,
+                    TypeVar)
 
 from prioq.base import PriorityQueue
 from reprit import seekers
@@ -22,7 +21,7 @@ from .utilities import (find_intersections,
                         sign,
                         to_segments)
 
-ACYCLIC_INDEX = -1
+Domain = TypeVar('Domain')
 
 
 class _EnumBase(enum.IntEnum):
@@ -52,38 +51,54 @@ class PolygonType(_EnumBase):
     CLIPPING = 1
 
 
-Domain = TypeVar('Domain')
+def traverse(object_: Domain,
+             left_links: Dict[int, int],
+             right_links: Dict[int, int],
+             to_left: Callable[[Domain], Optional[Domain]],
+             to_right: Callable[[Domain], Optional[Domain]]) -> List[Domain]:
+    registry = {}
+    result = []
+    queue = [object_]
+    while queue:
+        cursor = queue.pop()
+        registry[id(cursor)] = len(result)
+        result.append(cursor)
+        left = to_left(cursor)
+        if left is not None and id(left) not in registry:
+            queue.append(left)
+        right = to_right(cursor)
+        if right is not None and id(right) not in registry:
+            queue.append(right)
+    queue = [object_]
+    visited = {id(object_)}
+    while queue:
+        cursor = queue.pop()
+        index = registry[id(cursor)]
+        left = to_left(cursor)
+        if left is not None:
+            left_links[index] = registry[id(left)]
+            if id(left) not in visited:
+                visited.add(id(left))
+                queue.append(left)
+        right = to_right(cursor)
+        if right is not None:
+            right_links[index] = registry[id(right)]
+            if id(right) not in visited:
+                visited.add(id(right))
+                queue.append(right)
+    return result
 
 
-def _fill_chain(start: Domain, chain: List[Domain],
-                to_next: Callable[[Domain], Optional[Domain]]) -> int:
-    chain.append(start)
-    cursor = to_next(start)
-    while cursor is not None:
-        try:
-            cycle_index = next(index
-                               for index, element in enumerate(chain)
-                               if element is cursor)
-        except StopIteration:
-            chain.append(cursor)
-            cursor = to_next(cursor)
-        else:
-            # last element points to already visited one
-            # with this index
-            return cycle_index
-    # has no cycles
-    return ACYCLIC_INDEX
-
-
-SweepEventState = List[Union[bool, Point, Optional[list],
-                             PolygonType, EdgeType]]
+PlainSweepEventState = Tuple[bool, Point, PolygonType, EdgeType,
+                             bool, bool, bool, int]
+SweepEventState = Tuple[List[PlainSweepEventState],
+                        Dict[int, int], Dict[int, int]]
 
 
 class SweepEvent:
     __slots__ = ('is_left', 'point', 'other_event', 'polygon_type',
                  'edge_type', 'in_out', 'other_in_out', 'in_result',
                  'position', 'prev_in_result_event')
-    OTHER_EVENT_STATE_INDEX = 2
 
     def __init__(self, is_left: bool, point: Point,
                  other_event: Optional['SweepEvent'],
@@ -105,42 +120,47 @@ class SweepEvent:
         self.prev_in_result_event = prev_in_result_event
 
     def __getstate__(self) -> SweepEventState:
-        chain = []  # type: List[SweepEvent]
-        cycle_index = self._fill_sweep_events_chain(chain)
-        states = [[sweep_event.is_left, sweep_event.point, None,
-                   sweep_event.polygon_type, sweep_event.edge_type,
-                   sweep_event.in_out, sweep_event.other_in_out,
-                   sweep_event.in_result, sweep_event.position]
-                  for sweep_event in chain]
-        for index in range(len(states) - 1):
-            states[index][self.OTHER_EVENT_STATE_INDEX] = states[index + 1]
-        if cycle_index != ACYCLIC_INDEX:
-            states[-1][self.OTHER_EVENT_STATE_INDEX] = states[cycle_index]
-        return states[0]
+        left_links, right_links = {}, {}
+        events = self._traverse(self, left_links, right_links)
+        return ([(event.is_left, event.point, event.polygon_type,
+                  event.edge_type, event.in_out, event.other_in_out,
+                  event.in_result, event.position)
+                 for event in events],
+                left_links, right_links)
 
-    def __setstate__(self, state: SweepEventState) -> 'SweepEvent':
-        (self.is_left, self.point, self.other_event,
-         self.polygon_type, self.edge_type, self.in_out,
-         self.other_in_out, self.in_result,
-         self.position) = (state[0], state[1], None,
-                           state[3], state[4], state[5],
-                           state[6], state[7], state[8])
-        chain = []  # type: List[SweepEventState]
-        cycle_index = self._fill_states_chain(state, chain)
-        sweep_events = [self] + [SweepEvent(state[0], state[1], None,
-                                            state[3], state[4], state[5],
-                                            state[6], state[7], state[8])
-                                 for state in chain[1:]]
-        for index in range(len(sweep_events) - 1):
-            sweep_events[index].other_event = sweep_events[index + 1]
-        if cycle_index != ACYCLIC_INDEX:
-            sweep_events[-1].other_event = sweep_events[cycle_index]
+    def __setstate__(self, state: SweepEventState) -> None:
+        events_states, left_links, right_links = state
+        (self.is_left, self.point, self.polygon_type, self.edge_type,
+         self.in_out, self.other_in_out, self.in_result,
+         self.position) = events_states[0]
+        self.other_event, self.prev_in_result_event = None, None
+        events = [self] + [SweepEvent(event_state[0], event_state[1], None,
+                                      event_state[2], event_state[3],
+                                      event_state[4], event_state[5],
+                                      event_state[6], event_state[7], None)
+                           for event_state in events_states[1:]]
+        for source, destination in left_links.items():
+            events[source].other_event = events[destination]
+        for source, destination in right_links.items():
+            events[source].prev_in_result_event = events[destination]
 
     __repr__ = recursive_repr()(generate_repr(__init__))
 
     def __eq__(self, other: 'SweepEvent') -> bool:
         if self is other:
             return True
+
+        def are_equal(left: SweepEvent, right: SweepEvent) -> bool:
+            left_left_links, left_right_links = {}, {}
+            right_left_links, right_right_links = {}, {}
+            left_events = self._traverse(left, left_left_links,
+                                         left_right_links)
+            right_events = self._traverse(right, right_left_links,
+                                          right_right_links)
+            return (left_left_links == right_left_links
+                    and left_right_links == right_right_links
+                    and len(left_events) == len(right_events)
+                    and all(map(are_fields_equal, left_events, right_events)))
 
         def are_fields_equal(left: SweepEvent, right: SweepEvent) -> bool:
             return (left.is_left is right.is_left
@@ -152,22 +172,14 @@ class SweepEvent:
                     and left.in_result is right.in_result
                     and left.position == right.position)
 
-        chain, other_chain = [], []
-        return (are_fields_equal(self, other)
-                and (self._fill_sweep_events_chain(chain)
-                     == other._fill_sweep_events_chain(other_chain))
-                and len(chain) == len(other_chain)
-                and all(are_fields_equal(child, other_child)
-                        for child, other_child in zip(chain[1:],
-                                                      other_chain[1:]))
+        return (are_equal(self, other)
                 if isinstance(other, SweepEvent)
                 else NotImplemented)
 
-    _fill_sweep_events_chain = partialmethod(_fill_chain,
-                                             to_next=attrgetter('other_event'))
-    _fill_states_chain = staticmethod(
-            partial(_fill_chain,
-                    to_next=itemgetter(OTHER_EVENT_STATE_INDEX)))
+    _traverse = staticmethod(
+            partial(traverse,
+                    to_left=attrgetter('other_event'),
+                    to_right=attrgetter('prev_in_result_event')))
 
     @property
     def is_vertical(self) -> bool:
