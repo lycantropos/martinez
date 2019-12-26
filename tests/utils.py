@@ -191,7 +191,7 @@ def to_sweep_event_children_count(sweep_event: Union[BoundSweepEvent,
     return len(children_ids)
 
 
-fill_sweep_events_chain = PortedSweepEvent._fill_sweep_events_chain
+traverse_sweep_event = PortedSweepEvent._traverse
 
 
 def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
@@ -212,15 +212,16 @@ def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
                 and bound.in_result is ported.in_result
                 and bound.position == ported.position)
 
-    if not are_fields_equal(bound, ported):
-        return False
-    bound_chain, ported_chain = [], []
-    bound_cycle_index = fill_sweep_events_chain(bound, bound_chain)
-    ported_cycle_index = fill_sweep_events_chain(ported, ported_chain)
-    if bound_cycle_index != ported_cycle_index:
-        return False
-    return (len(bound_chain) == len(ported_chain)
-            and all(map(are_fields_equal, bound_chain[1:], ported_chain[1:])))
+    bound_left_links, ported_left_links = {}, {}
+    bound_right_links, ported_right_links = {}, {}
+    bound_events = traverse_sweep_event(bound, bound_left_links,
+                                        bound_right_links)
+    ported_events = traverse_sweep_event(ported, ported_left_links,
+                                         ported_right_links)
+    return (bound_left_links == ported_left_links
+            and bound_right_links == ported_right_links
+            and len(bound_events) == len(ported_events)
+            and all(map(are_fields_equal, bound_events, ported_events)))
 
 
 def are_bound_ported_sweep_events_lists_equal(bound: List[BoundSweepEvent],
