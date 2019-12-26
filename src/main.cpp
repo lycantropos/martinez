@@ -9,6 +9,7 @@
 #include <memory>
 #include <numeric>
 #include <sstream>
+#include <unordered_set>
 
 #include "bbox_2.h"
 #include "booleanop.h"
@@ -220,25 +221,39 @@ static std::string polygon_type_repr(const cbop::PolygonType& type) {
 
 static std::string bool_repr(bool value) { return py::str(py::bool_(value)); }
 
-static std::string sweep_event_repr(const cbop::SweepEvent& self) {
-  std::vector<const cbop::SweepEvent*> chain;
-  auto cycle_index = fill_sweep_events_chain(std::addressof(self), chain);
-  auto stream = make_stream();
-  for (const auto* sweep_event : chain)
-    stream << C_STR(MODULE_NAME) "." SWEEP_EVENT_NAME "("
-           << bool_repr(sweep_event->left) << ", "
-           << point_repr(sweep_event->point) << ", ";
-  if (cycle_index == ACYCLIC_INDEX)
+static void sweep_event_repr_impl(
+    std::ostringstream& stream, const cbop::SweepEvent* sweep_event,
+    std::unordered_set<const cbop::SweepEvent*> visited) {
+  visited.insert(sweep_event);
+  stream << C_STR(MODULE_NAME) "." SWEEP_EVENT_NAME "("
+         << bool_repr(sweep_event->left) << ", "
+         << point_repr(sweep_event->point) << ", ";
+  const auto* left = sweep_event->otherEvent;
+  if (left == nullptr)
     stream << std::string(py::str(py::none()));
-  else
+  else if (visited.find(left) != visited.end())
     stream << "...";
-  for (auto iterator = chain.rbegin(); iterator != chain.rend(); ++iterator)
-    stream << ", " << polygon_type_repr((*iterator)->pol) << ", "
-           << edge_type_repr((*iterator)->type) << ", "
-           << bool_repr((*iterator)->inOut) << ", "
-           << bool_repr((*iterator)->otherInOut) << ", "
-           << bool_repr((*iterator)->inResult) << ", " << (*iterator)->pos
-           << ")";
+  else
+    sweep_event_repr_impl(stream, left, visited);
+  stream << ", " << polygon_type_repr(sweep_event->pol) << ", "
+         << edge_type_repr(sweep_event->type) << ", "
+         << bool_repr(sweep_event->inOut) << ", "
+         << bool_repr(sweep_event->otherInOut) << ", "
+         << bool_repr(sweep_event->inResult) << ", " << sweep_event->pos
+         << ", ";
+  const auto* right = sweep_event->prevInResult;
+  if (right == nullptr)
+    stream << std::string(py::str(py::none()));
+  else if (visited.find(right) != visited.end())
+    stream << "...";
+  else
+    sweep_event_repr_impl(stream, right, visited);
+  stream << ")";
+}
+
+static std::string sweep_event_repr(const cbop::SweepEvent& self) {
+  auto stream = make_stream();
+  sweep_event_repr_impl(stream, std::addressof(self), {});
   return stream.str();
 }
 
