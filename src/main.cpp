@@ -71,7 +71,7 @@ static std::vector<const Value*> traverse(
   queue.push_back(value);
   std::unordered_set<const Value*> visited{value};
   while (!queue.empty()) {
-    cursor = queue.back();
+    const auto* cursor = queue.back();
     queue.pop_back();
     const auto index = registry[cursor];
     const auto* left = to_left(cursor);
