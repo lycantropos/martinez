@@ -351,33 +351,20 @@ static bool are_sweep_events_equal(const cbop::SweepEvent& self,
   const auto* ptr = std::addressof(self);
   const auto* other_ptr = std::addressof(other);
   if (ptr == other_ptr) return true;
-  std::vector<Chain<cbop::SweepEvent>> chains, other_chains;
-  fill_chains<cbop::SweepEvent>(
-      chains, {Step<cbop::SweepEvent>(Direction::NONE, ptr)},
+  std::unordered_map<size_t, size_t> left_links, other_left_links;
+  std::unordered_map<size_t, size_t> right_links, other_right_links;
+  const auto events = traverse<cbop::SweepEvent>(
+      ptr, left_links, right_links, &cbop::SweepEvent::otherEvent,
+      &cbop::SweepEvent::prevInResult);
+  const auto other_events = traverse<cbop::SweepEvent>(
+      other_ptr, other_left_links, other_right_links,
       &cbop::SweepEvent::otherEvent, &cbop::SweepEvent::prevInResult);
-  fill_chains<cbop::SweepEvent>(
-      other_chains, {Step<cbop::SweepEvent>(Direction::NONE, other_ptr)},
-      &cbop::SweepEvent::otherEvent, &cbop::SweepEvent::prevInResult);
-  if (chains.size() != other_chains.size()) {
+  if (!(left_links == other_left_links && right_links == other_right_links))
     return false;
-  }
-  for (size_t chain_index = 0; chain_index < chains.size(); ++chain_index) {
-    const auto& chain = chains[chain_index];
-    const auto& other_chain = other_chains[chain_index];
-    if (!(chain.cycle_ref.direction == other_chain.cycle_ref.direction &&
-          chain.cycle_ref.index == other_chain.cycle_ref.index))
+  if (events.size() != other_events.size()) return false;
+  for (size_t index = 0; index < events.size(); ++index)
+    if (!are_sweep_events_equal_flat(events[index], other_events[index]))
       return false;
-    const auto& path = chain.path;
-    const auto& other_path = other_chain.path;
-    if (path.size() != other_path.size()) return false;
-    for (size_t step_index = 0; step_index < path.size(); ++step_index) {
-      const auto& step = path[step_index];
-      const auto& other_step = other_path[step_index];
-      if (!(step.direction == other_step.direction &&
-            are_sweep_events_equal_flat(*step.value, *other_step.value)))
-        return false;
-    }
-  }
   return true;
 }
 
