@@ -37,12 +37,6 @@ namespace py = pybind11;
 #define SWEEP_EVENT_NAME "SweepEvent"
 #define SWEEP_LINE_KEY_NAME "SweepLineKey"
 
-template <class Value>
-static bool value_in_vector(const std::vector<Value>& container, Value value) {
-  return std::find(container.begin(), container.end(), value) !=
-         container.end();
-}
-
 static std::string join(const std::vector<std::string>& elements,
                         const std::string& separator) {
   if (elements.empty()) return std::string();
@@ -51,36 +45,6 @@ static std::string join(const std::vector<std::string>& elements,
       [&separator](const std::string& result, const std::string& value) {
         return result + separator + value;
       });
-};
-
-enum class Direction { NONE, LEFT, RIGHT };
-
-struct CycleRef {
-  CycleRef() = delete;
-  CycleRef(Direction _direction, size_t _index)
-      : direction(_direction), index(_index){};
-
-  const Direction direction;
-  const size_t index;
-};
-
-template <class Value>
-struct Step {
-  Step() = delete;
-  Step(Direction _direction, const Value* _value)
-      : direction(_direction), value(_value){};
-  const Direction direction;
-  const Value* value;
-};
-
-template <class Value>
-struct Chain {
-  Chain() = delete;
-  Chain(const std::vector<Step<Value>>& _path, const CycleRef& _cycle_ref)
-      : path(_path), cycle_ref(_cycle_ref){};
-
-  const std::vector<Step<Value>> path;
-  const CycleRef cycle_ref;
 };
 
 template <class Value>
@@ -128,60 +92,6 @@ static std::vector<const Value*> traverse(
     }
   }
   return result;
-}
-
-template <class Value>
-static void fill_chains(std::vector<Chain<Value>>& chains,
-                        const std::vector<Step<Value>>& path,
-                        std::function<const Value*(const Value*)> to_left,
-                        std::function<const Value*(const Value*)> to_right) {
-  const auto* end = path.back().value;
-  {
-    const auto* left = to_left(end);
-    size_t index;
-    for (index = 0; index < path.size(); ++index)
-      if (path[index].value == left) break;
-    if (index == path.size()) {
-      if (!left)
-        chains.push_back(Chain<Value>(path, CycleRef(Direction::NONE, 0)));
-      else {
-        auto next_path = path;
-        next_path.push_back(Step<Value>(Direction::LEFT, left));
-        fill_chains(chains, next_path, to_left, to_right);
-      }
-    } else
-      chains.push_back(Chain<Value>(path, CycleRef(Direction::LEFT, index)));
-  }
-  {
-    const auto* right = to_right(end);
-    size_t index;
-    for (index = 0; index < path.size(); ++index)
-      if (path[index].value == right) break;
-    if (index == path.size()) {
-      if (!right)
-        chains.push_back(Chain<Value>(path, CycleRef(Direction::NONE, 0)));
-      else {
-        auto next_path = path;
-        next_path.push_back(Step<Value>(Direction::RIGHT, right));
-        fill_chains(chains, next_path, to_left, to_right);
-      }
-    } else
-      chains.push_back(Chain<Value>(path, CycleRef(Direction::RIGHT, index)));
-  }
-}
-
-const int ACYCLIC_INDEX = -1;
-
-static int fill_sweep_events_chain(
-    const cbop::SweepEvent* self, std::vector<const cbop::SweepEvent*>& chain) {
-  chain.push_back(self);
-  const auto* cursor = self;
-  while (!!(cursor = cursor->otherEvent)) {
-    auto iterator = std::find(chain.begin(), chain.end(), cursor);
-    if (iterator != chain.end()) return std::distance(chain.begin(), iterator);
-    chain.push_back(cursor);
-  }
-  return ACYCLIC_INDEX;
 }
 
 static std::ostringstream make_stream() {
@@ -390,19 +300,6 @@ static py::tuple to_sweep_event_state(const cbop::SweepEvent& self) {
   }
   return py::make_tuple(plain_states, left_links, right_links);
 };
-
-static int fill_sweep_events_states_chain(py::list& state,
-                                          std::vector<py::list>& chain) {
-  chain.push_back(state);
-  auto cursor = state;
-  while (!cursor[2].is_none()) {
-    cursor = cursor[2].cast<py::list>();
-    auto iterator = std::find(chain.begin(), chain.end(), cursor);
-    if (iterator != chain.end()) return std::distance(chain.begin(), iterator);
-    chain.push_back(cursor);
-  }
-  return ACYCLIC_INDEX;
-}
 
 static cbop::SweepEvent* from_plain_sweep_event_state(const py::tuple& state) {
   if (state.size() != 8) throw std::runtime_error("Invalid state!");
