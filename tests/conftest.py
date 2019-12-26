@@ -10,5 +10,6 @@ settings.register_profile('default',
                                         if on_azure_pipelines or on_travis_ci
                                         else settings.default.max_examples),
                           deadline=None,
-                          suppress_health_check=[HealthCheck.filter_too_much,
+                          suppress_health_check=[HealthCheck.data_too_large,
+                                                 HealthCheck.filter_too_much,
                                                  HealthCheck.too_slow])
