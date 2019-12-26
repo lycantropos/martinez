@@ -273,7 +273,7 @@ static bool are_sweep_events_equal(const cbop::SweepEvent& self,
     return false;
   if (events.size() != other_events.size()) return false;
   for (size_t index = 0; index < events.size(); ++index)
-    if (!are_sweep_events_equal_flat(events[index], other_events[index]))
+    if (!are_sweep_events_equal_flat(*events[index], *other_events[index]))
       return false;
   return true;
 }
