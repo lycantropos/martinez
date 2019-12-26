@@ -71,10 +71,10 @@ static std::vector<const Value*> traverse(
   queue.push_back(value);
   std::unordered_set<const Value*> visited{value};
   while (!queue.empty()) {
-    value = queue.back();
+    cursor = queue.back();
     queue.pop_back();
-    const auto index = registry[value];
-    const auto* left = to_left(value);
+    const auto index = registry[cursor];
+    const auto* left = to_left(cursor);
     if (left != nullptr) {
       left_links[index] = registry[left];
       if (visited.find(left) == visited.end()) {
@@ -82,7 +82,7 @@ static std::vector<const Value*> traverse(
         queue.push_back(left);
       }
     }
-    const auto* right = to_right(value);
+    const auto* right = to_right(cursor);
     if (right != nullptr) {
       right_links[index] = registry[right];
       if (visited.find(right) == visited.end()) {
