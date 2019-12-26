@@ -1,10 +1,12 @@
-from typing import Tuple
+from typing import (List,
+                    Tuple)
 
 from _martinez import (Contour,
                        Operation,
                        OperationType,
                        Point,
-                       Polygon)
+                       Polygon,
+                       SweepEvent)
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
@@ -43,7 +45,8 @@ contours = strategies.builds(Contour, contours_vertices,
 contours_lists = strategies.lists(contours)
 empty_contours_lists = strategies.builds(list)
 non_empty_contours_lists = strategies.lists(contours,
-                                            min_size=1)
+                                            min_size=1,
+                                            max_size=1)
 polygons = strategies.builds(Polygon, contours_lists)
 empty_polygons = strategies.builds(Polygon, empty_contours_lists)
 non_empty_polygons = strategies.builds(Polygon, non_empty_contours_lists)
@@ -82,5 +85,17 @@ trivial_operations = (
                                               non_empty_polygons,
                                               non_empty_polygons),
                             operations_types))
-operations = strategies.builds(Operation, polygons, polygons, operations_types)
+operations = strategies.builds(Operation, non_empty_polygons,
+                               non_empty_polygons, operations_types)
 operations |= trivial_operations
+
+
+def to_operation_with_events_list(operation: Operation
+                                  ) -> Tuple[Operation, List[SweepEvent]]:
+    operation.process_segments()
+    return operation, Operation.collect_events(operation.events)
+
+
+operations_with_events_lists = (
+        strategies.tuples(operations, strategies.builds(list))
+        | operations.map(to_operation_with_events_list))
