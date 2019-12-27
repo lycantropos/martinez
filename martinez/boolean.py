@@ -648,12 +648,14 @@ class Operation:
                 try:
                     next_event = sweep_line.next(event)
                 except ValueError:
-                    continue
+                    next_event = None
                 try:
                     previous_event = sweep_line.prev(event)
                 except ValueError:
-                    continue
-                self.possible_intersection(previous_event, next_event)
+                    previous_event = None
+                sweep_line.remove(event)
+                if next_event is not None and previous_event is not None:
+                    self.possible_intersection(previous_event, next_event)
         return result
 
     def compute_fields(self, event: SweepEvent,
