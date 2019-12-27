@@ -643,6 +643,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_readwrite("in_out", &cbop::SweepEvent::inOut)
       .def_readwrite("other_in_out", &cbop::SweepEvent::otherInOut)
       .def_readwrite("in_result", &cbop::SweepEvent::inResult)
+      .def_readwrite("result_in_out", &cbop::SweepEvent::resultInOut)
       .def_readwrite("position", &cbop::SweepEvent::pos)
       .def_readwrite("contour_id", &cbop::SweepEvent::contourId)
       .def_readwrite("prev_in_result_event", &cbop::SweepEvent::prevInResult)
