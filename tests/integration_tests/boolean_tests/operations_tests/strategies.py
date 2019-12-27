@@ -28,8 +28,7 @@ from tests.utils import (Strategy,
                          to_bound_rectangle,
                          to_ported_rectangle,
                          to_valid_coordinates,
-                         transpose,
-                         vertices_form_strict_polygon)
+                         transpose)
 
 booleans = booleans
 points_pairs = strategies.builds(to_bound_with_ported_points_pair,
@@ -95,16 +94,6 @@ nested_sweep_events_pairs_pairs = (
         | nested_sweep_events_pairs_pairs
         .filter(are_sweep_events_pair_pair_with_different_polygon_types))
 operations_types_pairs = bound_with_ported_operations_types_pairs
-
-
-def vertices_pair_form_strict_polygons(vertices_pair: Tuple[List[BoundPoint],
-                                                            List[PortedPoint]]
-                                       ) -> bool:
-    bound_vertices, ported_vertices = vertices_pair
-    return (vertices_form_strict_polygon(bound_vertices)
-            and vertices_form_strict_polygon(ported_vertices))
-
-
 coordinates = (strategies.lists(floats,
                                 min_size=2,
                                 unique=True)

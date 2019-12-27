@@ -32,8 +32,7 @@ from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
 from martinez.utilities import (
-    find_intersections as ported_find_intersections,
-    sign)
+    find_intersections as ported_find_intersections)
 
 Domain = TypeVar('Domain')
 Strategy = SearchStrategy
@@ -100,15 +99,6 @@ def to_valid_coordinates(pair: List[Scalar]) -> Tuple[Scalar, Scalar]:
 
 def pickle_round_trip(object_: Domain) -> Domain:
     return pickle.loads(pickle.dumps(object_))
-
-
-def vertices_form_strict_polygon(vertices: Sequence[Union[PortedPoint,
-                                                          BoundPoint]]
-                                 ) -> bool:
-    return all(sign(vertices[index - 1],
-                    vertices[index],
-                    vertices[(index + 1) % len(vertices)])
-               for index in range(len(vertices)))
 
 
 def strategy_to_pairs(strategy: Strategy[Domain]
