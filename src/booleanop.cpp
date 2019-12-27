@@ -193,6 +193,8 @@ void BooleanOpImp::run() {
 }
 
 std::vector<SweepEvent*> BooleanOpImp::sweep() {
+  const double MINMAXX =
+      std::min(_subjectBB.xmax(), _clippingBB.xmax());  // for optimization 2
   std::set<SweepEvent*, SegmentComp>::iterator it, prev, next;
   std::vector<SweepEvent*> result;
 
