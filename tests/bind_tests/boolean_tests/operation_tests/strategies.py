@@ -17,7 +17,8 @@ from tests.strategies import (booleans,
 from tests.utils import (Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
-                         is_sweep_event_non_degenerate)
+                         is_sweep_event_non_degenerate,
+                         to_valid_coordinates)
 
 points = strategies.builds(Point, floats, floats)
 sweep_events = to_bound_sweep_events()
@@ -51,17 +52,6 @@ nested_sweep_events_pairs = (
         | nested_sweep_events_pairs
         .filter(are_sweep_events_pair_with_different_polygon_types))
 operations_types = bound_operations_types
-
-
-def to_valid_coordinates(pair: Tuple[float, float]) -> Tuple[float, float]:
-    start, end = pair
-    if end - start < 1:
-        start = end - 10
-    elif end - start > 100:
-        end = start + 10
-    return start, end
-
-
 coordinates = (strategies.lists(floats,
                                 min_size=2,
                                 max_size=2,

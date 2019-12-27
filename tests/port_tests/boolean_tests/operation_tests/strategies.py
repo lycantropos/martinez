@@ -18,14 +18,13 @@ from tests.strategies import (booleans,
                               scalars_strategies,
                               scalars_to_nested_ported_sweep_events,
                               scalars_to_ported_points,
-                              scalars_to_ported_points_triplets,
                               scalars_to_ported_sweep_events)
 from tests.utils import (Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
                          strategy_to_pairs,
-                         vertices_form_strict_polygon)
+                         to_valid_coordinates)
 
 points = scalars_strategies.flatmap(scalars_to_ported_points)
 sweep_events = scalars_strategies.flatmap(scalars_to_ported_sweep_events)
@@ -124,6 +123,9 @@ def scalars_to_polygons(scalars: Strategy[Scalar],
 
 
 polygons = scalars_strategies.flatmap(scalars_to_polygons)
+non_empty_polygons = scalars_strategies.flatmap(partial(scalars_to_polygons,
+                                                        min_size=1,
+                                                        max_size=1))
 
 
 def scalars_to_contours_lists(scalars: Strategy[Scalar],
@@ -143,26 +145,48 @@ def scalars_to_contours(scalars: Strategy[Scalar]) -> Strategy[Contour]:
 
 
 def scalars_to_contours_vertices(scalars: Strategy[Scalar]) -> List:
-    return (scalars_to_ported_points_triplets(scalars)
-            .filter(vertices_form_strict_polygon)
-            .map(list))
+    coordinates = (strategies.lists(scalars,
+                                    min_size=2,
+                                    max_size=2,
+                                    unique=True)
+                   .map(sorted)
+                   .map(tuple)
+                   .map(to_valid_coordinates))
+
+    def to_rectangle(xs: Tuple[float, float],
+                     ys: Tuple[float, float]) -> List[Point]:
+        min_x, max_x = xs
+        min_y, max_y = ys
+        return [Point(min_x, min_y), Point(max_x, min_y),
+                Point(max_x, max_y), Point(min_x, max_y)]
+
+    return strategies.builds(to_rectangle, coordinates, coordinates)
 
 
 trivial_operations = (scalars_strategies
                       .flatmap(partial(scalars_to_trivial_operations,
                                        operations_types=operations_types)))
-operations = (scalars_strategies
-              .flatmap(partial(scalars_to_operations,
-                               operations_types=operations_types))
-              | trivial_operations)
+non_trivial_operations = strategies.builds(Operation, non_empty_polygons,
+                                           non_empty_polygons,
+                                           operations_types)
+operations = trivial_operations | non_trivial_operations
+
+
+def pre_process_operation(operation: Operation) -> Operation:
+    operation.process_segments()
+    return operation
+
+
+pre_processed_operations = operations.map(pre_process_operation)
+pre_processed_non_trivial_operations = (non_trivial_operations
+                                        .map(pre_process_operation))
 
 
 def to_operation_with_events_list(operation: Operation
                                   ) -> Tuple[Operation, List[SweepEvent]]:
-    operation.process_segments()
-    return operation, Operation.collect_events(operation.events)
+    return operation, Operation.collect_events(operation.sweep())
 
 
 operations_with_events_lists = (
         strategies.tuples(operations, strategies.builds(list))
-        | operations.map(to_operation_with_events_list))
+        | pre_processed_operations.map(to_operation_with_events_list))

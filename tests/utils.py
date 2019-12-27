@@ -27,6 +27,7 @@ from martinez.boolean import (EventsQueueKey as PortedEventsQueueKey,
                               SweepLineKey as PortedSweepLineKey)
 from martinez.bounding_box import BoundingBox as PortedBoundingBox
 from martinez.contour import Contour as PortedContour
+from martinez.hints import Scalar
 from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
@@ -86,6 +87,15 @@ def is_even_permutation(permutation: Sequence[int]) -> bool:
             if permutation[index] > permutation[next_index]:
                 counter += 1
     return not counter % 2
+
+
+def to_valid_coordinates(pair: Tuple[Scalar, Scalar]) -> Tuple[Scalar, Scalar]:
+    start, end = pair
+    if end - start < 1:
+        start = end - 10
+    elif end - start > 100:
+        end = start + 10
+    return start, end
 
 
 def pickle_round_trip(object_: Domain) -> Domain:
