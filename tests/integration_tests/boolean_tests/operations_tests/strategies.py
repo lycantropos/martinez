@@ -140,3 +140,21 @@ def to_bound_with_ported_operations_pair(
 operations_pairs = strategies.builds(to_bound_with_ported_operations_pair,
                                      polygons_pairs, polygons_pairs,
                                      operations_types_pairs)
+
+
+def to_operations_with_events_lists_pair(
+        operations: Tuple[Bound, Ported]
+) -> Tuple[Tuple[Bound, Ported],
+           Tuple[List[BoundSweepEvent], List[PortedSweepEvent]]]:
+    bound, ported = operations
+    bound.process_segments()
+    ported.process_segments()
+    return operations, (Bound.collect_events(bound.events),
+                        Ported.collect_events(ported.events))
+
+
+operations_with_events_lists_pairs = (
+        strategies.tuples(operations_pairs,
+                          strategies.tuples(*repeat(strategies.builds(list),
+                                                    2)))
+        | operations_pairs.map(to_operations_with_events_lists_pair))
