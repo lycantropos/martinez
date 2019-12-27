@@ -214,7 +214,7 @@ std::vector<SweepEvent*> BooleanOpImp::sweep() {
 #endif
     eq.pop();
     if (se->left) {  // the line segment must be inserted into sl
-      next = prev = se->posSL = it = sl.insert(se).first;
+      next = prev = it = sl.insert(se).first;
       (prev != sl.begin()) ? --prev : prev = sl.end();
       ++next;
 #ifdef __STEPBYSTEP
@@ -243,10 +243,12 @@ std::vector<SweepEvent*> BooleanOpImp::sweep() {
           computeFields(se, prev);
         }
       }
-    } else {                // the line segment must be removed from sl
+    } else {
+      // the line segment must be removed from sl
       se = se->otherEvent;  // we work with the left event
-      next = prev = it =
-          se->posSL;  // se->posSL; is equal than sl.find (se); but faster
+      it = sl.find(se);
+      if (it == sl.end()) continue;
+      next = prev = it;
       (prev != sl.begin()) ? --prev : prev = sl.end();
       ++next;
 #ifdef __STEPBYSTEP
