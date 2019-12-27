@@ -505,7 +505,11 @@ size_t BooleanOpImp::nextPos(size_t pos,
     else
       ++newPos;
   }
+  if (!pos) return 0;
   newPos = pos - 1;
-  while (processed[newPos]) --newPos;
+  while (processed[newPos]) {
+    if (!newPos) break;
+    --newPos;
+  }
   return newPos;
 }
