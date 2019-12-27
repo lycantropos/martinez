@@ -15,7 +15,8 @@ from tests.strategies import (booleans,
                               to_bound_sweep_events,
                               to_nested_bound_sweep_events,
                               unsigned_integers_lists)
-from tests.utils import (are_non_overlapping_sweep_events_pair,
+from tests.utils import (Strategy,
+                         are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
                          vertices_form_strict_polygon)
@@ -23,6 +24,23 @@ from tests.utils import (are_non_overlapping_sweep_events_pair,
 points = strategies.builds(Point, floats, floats)
 sweep_events = to_bound_sweep_events()
 nested_sweep_events = to_nested_bound_sweep_events()
+non_empty_sweep_events_lists = strategies.lists(sweep_events,
+                                                min_size=1)
+
+
+def to_sweep_events_lists_with_indices_and_booleans_lists(
+        events: List[SweepEvent]
+) -> Strategy[Tuple[List[SweepEvent], List[bool]]]:
+    return strategies.tuples(strategies.just(events),
+                             strategies.integers(0, len(events) - 1),
+                             strategies.lists(booleans,
+                                              min_size=len(events),
+                                              max_size=len(events)))
+
+
+non_empty_sweep_events_lists_with_indices_and_booleans_lists = (
+    non_empty_sweep_events_lists.flatmap(
+            to_sweep_events_lists_with_indices_and_booleans_lists))
 nested_sweep_events_lists = strategies.lists(nested_sweep_events)
 non_degenerate_nested_sweep_events = (nested_sweep_events
                                       .filter(is_sweep_event_non_degenerate))
