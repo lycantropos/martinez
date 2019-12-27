@@ -177,7 +177,9 @@ class SweepEvent:
                     and left.in_out is right.in_out
                     and left.other_in_out is right.other_in_out
                     and left.in_result is right.in_result
-                    and left.position == right.position)
+                    and left.result_in_out is right.result_in_out
+                    and left.position == right.position
+                    and left.contour_id == right.contour_id)
 
         return (are_equal(self, other)
                 if isinstance(other, SweepEvent)
