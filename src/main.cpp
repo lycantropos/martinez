@@ -543,7 +543,9 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def("process_events", &cbop::BooleanOpImp::processEvents,
            py::arg("events"))
       .def("process_segments", &cbop::BooleanOpImp::processSegments)
-      .def("run", &cbop::BooleanOpImp::run);
+      .def("run", &cbop::BooleanOpImp::run)
+      .def_static("to_next_position", &cbop::BooleanOpImp::nextPos,
+                  py::arg("position"), py::arg("events"), py::arg("processed"));
 
   py::class_<cbop::Point_2>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
