@@ -5,7 +5,6 @@ from functools import partial
 from typing import (Optional,
                     SupportsFloat)
 
-import math
 from _martinez import (EdgeType as BoundEdgeType,
                        OperationType as BoundOperationType,
                        PolygonType as BoundPolygonType)
@@ -15,25 +14,18 @@ from martinez.boolean import (EdgeType as PortedEdgeType,
                               OperationType as PortedOperationType,
                               PolygonType as PortedPolygonType)
 from martinez.hints import Scalar
-from tests.utils import (Strategy,
-                         implication)
+from tests.utils import (MAX_VALUE,
+                         MIN_VALUE,
+                         Strategy)
 
 MAX_DIGITS_COUNT = sys.float_info.dig
 
 booleans = strategies.booleans()
 
 
-def is_non_zero_number_far_from_zero(number: float) -> bool:
-    return implication(bool(number), bool(number ** 3))
-
-
-def is_number_far_from_infinity(number: float) -> bool:
-    return not math.isinf(number ** 3)
-
-
 def to_decimals(*,
-                min_value: Optional[Scalar] = None,
-                max_value: Optional[Scalar] = None,
+                min_value: Optional[Scalar] = MIN_VALUE,
+                max_value: Optional[Scalar] = MAX_VALUE,
                 allow_nan: bool = False,
                 allow_infinity: bool = False,
                 max_digits_count: int = MAX_DIGITS_COUNT) -> Strategy[Decimal]:
@@ -46,8 +38,8 @@ def to_decimals(*,
 
 
 def to_floats(*,
-              min_value: Optional[Scalar] = None,
-              max_value: Optional[Scalar] = None,
+              min_value: Optional[Scalar] = MIN_VALUE,
+              max_value: Optional[Scalar] = MAX_VALUE,
               allow_nan: bool = False,
               allow_infinity: bool = False,
               max_digits_count: int = MAX_DIGITS_COUNT) -> Strategy[float]:
@@ -60,8 +52,8 @@ def to_floats(*,
 
 
 def to_fractions(*,
-                 min_value: Optional[Scalar] = None,
-                 max_value: Optional[Scalar] = None,
+                 min_value: Optional[Scalar] = MIN_VALUE,
+                 max_value: Optional[Scalar] = MAX_VALUE,
                  max_denominator: Optional[Scalar] = None,
                  max_digits_count: int = MAX_DIGITS_COUNT
                  ) -> Strategy[Fraction]:
@@ -73,8 +65,8 @@ def to_fractions(*,
 
 
 def to_integers(*,
-                min_value: Optional[Scalar] = None,
-                max_value: Optional[Scalar] = None,
+                min_value: Optional[Scalar] = MIN_VALUE,
+                max_value: Optional[Scalar] = MAX_VALUE,
                 max_digits_count: int = MAX_DIGITS_COUNT) -> Strategy[int]:
     return (strategies.integers(min_value=min_value,
                                 max_value=max_value)
