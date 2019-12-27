@@ -90,7 +90,7 @@ def traverse(object_: Domain,
 
 
 PlainSweepEventState = Tuple[bool, Point, PolygonType, EdgeType,
-                             bool, bool, bool, int]
+                             bool, bool, bool, int, int]
 SweepEventState = Tuple[List[PlainSweepEventState],
                         Dict[int, int], Dict[int, int]]
 
@@ -126,7 +126,7 @@ class SweepEvent:
         events = self._traverse(self, left_links, right_links)
         return ([(event.is_left, event.point, event.polygon_type,
                   event.edge_type, event.in_out, event.other_in_out,
-                  event.in_result, event.position)
+                  event.in_result, event.position, event.contour_id)
                  for event in events],
                 left_links, right_links)
 
@@ -134,12 +134,13 @@ class SweepEvent:
         events_states, left_links, right_links = state
         (self.is_left, self.point, self.polygon_type, self.edge_type,
          self.in_out, self.other_in_out, self.in_result,
-         self.position) = events_states[0]
+         self.position, self.contour_id) = events_states[0]
         self.other_event, self.prev_in_result_event = None, None
         events = [self] + [SweepEvent(event_state[0], event_state[1], None,
                                       event_state[2], event_state[3],
                                       event_state[4], event_state[5],
-                                      event_state[6], event_state[7], None)
+                                      event_state[6], event_state[7],
+                                      event_state[8], None)
                            for event_state in events_states[1:]]
         for source, destination in left_links.items():
             events[source].other_event = events[destination]
