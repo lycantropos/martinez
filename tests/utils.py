@@ -88,12 +88,16 @@ def is_even_permutation(permutation: Sequence[int]) -> bool:
     return not counter % 2
 
 
-def to_valid_coordinates(pair: List[Scalar]) -> Tuple[Scalar, Scalar]:
-    start, *_, end = pair
-    if end - start < 1:
-        start = end - 10
-    elif end - start > 100:
-        end = start + 10
+def to_valid_coordinates(candidates: List[Scalar],
+                         *,
+                         lower_bound: int = 1,
+                         upper_bound: int = 100) -> Tuple[Scalar, Scalar]:
+    start, *rest, end = candidates
+    if not (lower_bound <= end - start <= upper_bound):
+        start = next((candidate
+                      for candidate in rest
+                      if lower_bound <= end - candidate <= upper_bound),
+                     end - (upper_bound - lower_bound))
     return start, end
 
 
