@@ -404,6 +404,9 @@ class Operation:
                     event.other_event.position, event.position)
         return result
 
+    def connect_edges(self, events: List[SweepEvent]) -> None:
+        self.process_events(self.collect_events(events))
+
     def divide_segment(self, event: SweepEvent, point: Point) -> None:
         # "left event" of the "right line segment"
         # resulting from dividing event.segment
