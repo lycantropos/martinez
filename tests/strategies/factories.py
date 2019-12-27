@@ -153,17 +153,23 @@ def to_bound_with_ported_sweep_events(
         in_outs: Strategy[bool] = booleans,
         other_in_outs: Strategy[bool] = booleans,
         in_results: Strategy[bool] = booleans,
+        results_in_outs: Strategy[bool] = booleans,
         positions: Strategy[int] = unsigned_integers,
         contours_ids: Strategy[int] = unsigned_integers
 ) -> Strategy[BoundPortedSweepEventsPair]:
     def to_sweep_events(
-            is_left: bool, points_pair: BoundPortedPointsPair,
+            is_left: bool,
+            points_pair: BoundPortedPointsPair,
             other_events_pair: Tuple[Optional[BoundSweepEvent],
                                      Optional[PortedSweepEvent]],
             polygons_types_pair: Tuple[BoundPolygonType, PortedPolygonType],
             edges_types_pair: Tuple[BoundEdgeType, PortedEdgeType],
-            in_out: bool, other_in_out: bool, in_result: bool,
-            position: int, contour_id: int,
+            in_out: bool,
+            other_in_out: bool,
+            in_result: bool,
+            result_in_out: bool,
+            position: int,
+            contour_id: int,
             prev_in_result_events_pair: Tuple[Optional[BoundSweepEvent],
                                               Optional[PortedSweepEvent]]
     ) -> BoundPortedSweepEventsPair:
@@ -174,20 +180,23 @@ def to_bound_with_ported_sweep_events(
         (bound_prev_in_result_event,
          ported_prev_in_result_event) = prev_in_result_events_pair
         bound = BoundSweepEvent(is_left, bound_point, bound_other_event,
-                                bound_polygon_type, bound_edge_type,
-                                in_out, other_in_out, in_result, position,
-                                contour_id, bound_prev_in_result_event)
+                                bound_polygon_type, bound_edge_type, in_out,
+                                other_in_out, in_result, result_in_out,
+                                position, contour_id,
+                                bound_prev_in_result_event)
         ported = PortedSweepEvent(is_left, ported_point, ported_other_event,
                                   ported_polygon_type, ported_edge_type,
-                                  in_out, other_in_out, in_result, position,
-                                  contour_id, ported_prev_in_result_event)
+                                  in_out, other_in_out, in_result,
+                                  result_in_out, position, contour_id,
+                                  ported_prev_in_result_event)
         return bound, ported
 
     return strategies.builds(to_sweep_events,
                              are_left, points_pairs, children,
                              polygons_types_pairs, edges_types_pairs,
-                             in_outs, other_in_outs, in_results, positions,
-                             contours_ids, children)
+                             in_outs, other_in_outs, in_results,
+                             results_in_outs, positions, contours_ids,
+                             children)
 
 
 def make_cyclic_bound_with_ported_sweep_events(

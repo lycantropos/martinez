@@ -191,6 +191,7 @@ def are_bound_ported_sweep_events_equal(bound: BoundSweepEvent,
                 and bound.in_out is ported.in_out
                 and bound.other_in_out is ported.other_in_out
                 and bound.in_result is ported.in_result
+                and bound.result_in_out is ported.result_in_out
                 and bound.position == ported.position
                 and bound.contour_id == ported.contour_id)
 
