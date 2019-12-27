@@ -601,6 +601,27 @@ class Operation:
         self._events_queue.push(source_event)
         self._events_queue.push(target_event)
 
+    def compute_fields(self, event: SweepEvent,
+                       previous_event: Optional[SweepEvent]) -> None:
+        if previous_event is None:
+            event.in_out = False
+            event.other_in_out = True
+        else:
+            if event.polygon_type is previous_event.polygon_type:
+                event.in_out = not previous_event.in_out
+                event.other_in_out = previous_event.other_in_out
+            else:
+                event.in_out = not previous_event.other_in_out
+                event.other_in_out = (not previous_event.in_out
+                                      if previous_event.is_vertical
+                                      else previous_event.in_out)
+            event.prev_in_result_event = (
+                previous_event.prev_in_result_event
+                if (not self.in_result(previous_event)
+                    or previous_event.is_vertical)
+                else previous_event)
+        event.in_result = self.in_result(event)
+
     @staticmethod
     def to_next_position(position: int, events: List[SweepEvent],
                          processed: List[bool]) -> int:
