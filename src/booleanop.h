@@ -154,6 +154,9 @@ class BooleanOpImp
   /** @brief return if the left event le belongs to the result of the Boolean
    * operation */
   bool inResult(SweepEvent* le);
+  static size_t nextPos(size_t pos,
+                        const std::vector<SweepEvent*>& resultEvents,
+                        const std::vector<bool>& processed);
   /** @brief Process a posible intersection between the edges associated to the
    * left events le1 and le2 */
   int possibleIntersection(SweepEvent* le1, SweepEvent* le2);
@@ -213,8 +216,6 @@ class BooleanOpImp
   /** @brief compute several fields of left event le */
   void computeFields(SweepEvent* le,
                      const std::set<SweepEvent*, SegmentComp>::iterator& prev);
-  size_t nextPos(size_t pos, const std::vector<SweepEvent*>& resultEvents,
-                 const std::vector<bool>& processed);
 
 #ifdef __STEPBYSTEP
   bool trace;
