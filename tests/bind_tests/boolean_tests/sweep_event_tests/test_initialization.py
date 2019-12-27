@@ -20,8 +20,8 @@ def test_basic(is_left: bool, point: Point, other_event: Optional[SweepEvent],
                position: int, contour_id: int,
                prev_in_result_event: Optional[SweepEvent]) -> None:
     result = SweepEvent(is_left, point, other_event, polygon_type, edge_type,
-                        in_out, other_in_out, in_result, position, contour_id,
-                        prev_in_result_event)
+                        in_out, other_in_out, in_result, result_in_out,
+                        position, contour_id, prev_in_result_event)
 
     assert result.is_left is is_left
     assert result.point == point
