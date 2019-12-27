@@ -550,3 +550,22 @@ class Operation:
             source_event.is_left = False
         self._events_queue.push(source_event)
         self._events_queue.push(target_event)
+
+    @staticmethod
+    def to_next_position(position: int, events: List[SweepEvent],
+                         processed: List[bool]) -> int:
+        result = position + 1
+        while (result < len(events)
+               and events[result].point == events[position].point):
+            if not processed[result]:
+                return result
+            else:
+                result += 1
+        if not position:
+            return 0
+        result = position - 1
+        while processed[result]:
+            if not result:
+                break
+            result -= 1
+        return result
