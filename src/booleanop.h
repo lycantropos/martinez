@@ -163,6 +163,7 @@ class BooleanOpImp
   void processEvents(const std::vector<SweepEvent*>& events);
   void processSegments();
   void run();
+  std::vector<SweepEvent*> sweep();
   bool trivial();
 
   /** @brief Divide the segment associated to left event le,

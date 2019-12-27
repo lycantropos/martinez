@@ -192,6 +192,81 @@ void BooleanOpImp::run() {
   _alreadyRun = true;
 }
 
+std::vector<SweepEvent*> BooleanOpImp::sweep() {
+  std::set<SweepEvent*, SegmentComp>::iterator it, prev, next;
+  std::vector<SweepEvent*> result;
+
+  while (!eq.empty()) {
+    SweepEvent* se = eq.top();
+    // optimization 2
+    if ((_operation == INTERSECTION && se->point.x() > MINMAXX) ||
+        (_operation == DIFFERENCE && se->point.x() > _subjectBB.xmax())) {
+      break;
+    }
+    result.push_back(se);
+#ifdef __STEPBYSTEP
+    if (trace) {
+      doSomething->acquire();
+      _currentPoint = se->point;
+    }
+#endif
+    eq.pop();
+    if (se->left) {  // the line segment must be inserted into sl
+      next = prev = se->posSL = it = sl.insert(se).first;
+      (prev != sl.begin()) ? --prev : prev = sl.end();
+      ++next;
+#ifdef __STEPBYSTEP
+      if (trace) {
+        _currentEvent = *it;
+        _previousEvent = prev != sl.end() ? *prev : 0;
+        _nextEvent = next != sl.end() ? *next : 0;
+      }
+#endif
+      computeFields(se, prev);
+      // Process a possible intersection between "se" and its next neighbor in
+      // sl
+      if (next != sl.end()) {
+        if (possibleIntersection(se, *next) == 2) {
+          computeFields(se, prev);
+          computeFields(*next, it);
+        }
+      }
+      // Process a possible intersection between "se" and its previous neighbor
+      // in sl
+      if (prev != sl.end()) {
+        if (possibleIntersection(*prev, se) == 2) {
+          std::set<SweepEvent*, SegmentComp>::iterator prevprev = prev;
+          (prevprev != sl.begin()) ? --prevprev : prevprev = sl.end();
+          computeFields(*prev, prevprev);
+          computeFields(se, prev);
+        }
+      }
+    } else {                // the line segment must be removed from sl
+      se = se->otherEvent;  // we work with the left event
+      next = prev = it =
+          se->posSL;  // se->posSL; is equal than sl.find (se); but faster
+      (prev != sl.begin()) ? --prev : prev = sl.end();
+      ++next;
+#ifdef __STEPBYSTEP
+      if (trace) {
+        _currentEvent = *it;
+        _previousEvent = prev != sl.end() ? *prev : 0;
+        _nextEvent = next != sl.end() ? *next : 0;
+      }
+#endif
+      // delete line segment associated to "se" from sl and check for
+      // intersection between the neighbors of "se" in sl
+      sl.erase(it);
+      if (next != sl.end() && prev != sl.end())
+        possibleIntersection(*prev, *next);
+    }
+#ifdef __STEPBYSTEP
+    if (trace) somethingDone->release();
+#endif
+  }
+  return result;
+}
+
 bool BooleanOpImp::trivial() {
   // Test 1 for trivial result case
   if (_subject.ncontours() * _clipping.ncontours() ==
