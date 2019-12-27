@@ -239,7 +239,7 @@ def scalars_to_plain_ported_sweep_events(
     return strategies.builds(PortedSweepEvent, booleans,
                              scalars_to_ported_points(scalars), children,
                              polygons_types, ported_edges_types,
-                             booleans, booleans, booleans,
+                             booleans, booleans, booleans, booleans,
                              non_negative_integers, non_negative_integers,
                              children)
 
