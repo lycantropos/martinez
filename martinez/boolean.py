@@ -572,7 +572,7 @@ class Operation:
                     cursor.other_event.contour_id = contour_id
                 position = cursor.position
                 processed[position] = True
-                contour.add(cursor.point)
+                contour.add(events[position].point)
                 position = self.to_next_position(position, events, processed)
             processed[position] = processed[events[position].position] = True
             events[position].other_event.result_in_out = True
