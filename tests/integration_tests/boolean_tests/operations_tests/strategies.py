@@ -169,8 +169,6 @@ def to_operations_with_events_lists_pair(
 ) -> Tuple[Tuple[Bound, Ported],
            Tuple[List[BoundSweepEvent], List[PortedSweepEvent]]]:
     bound, ported = operations
-    bound.process_segments()
-    ported.process_segments()
     return operations, (Bound.collect_events(bound.sweep()),
                         Ported.collect_events(ported.sweep()))
 
