@@ -23,7 +23,8 @@ from tests.strategies import (booleans,
                               to_bound_with_ported_polygons_pair,
                               to_bound_with_ported_sweep_events,
                               unsigned_integers_lists)
-from tests.utils import (are_non_overlapping_sweep_events_pair,
+from tests.utils import (Strategy,
+                         are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          transpose,
                          vertices_form_strict_polygon)
@@ -39,6 +40,26 @@ sweep_events_pairs = strategies.recursive(
         acyclic_sweep_events_pairs, make_cyclic_bound_with_ported_sweep_events)
 nested_sweep_events_pairs = to_bound_with_ported_sweep_events(
         sweep_events_pairs)
+non_empty_sweep_events_lists_pairs = (strategies.lists(sweep_events_pairs,
+                                                       min_size=1)
+                                      .map(transpose))
+
+
+def to_sweep_events_lists_pairs_with_indices_and_booleans_lists(
+        events_pairs: Tuple[List[BoundSweepEvent], List[PortedSweepEvent]]
+) -> Strategy[Tuple[List[BoundSweepEvent], List[PortedSweepEvent],
+                    int, List[bool]]]:
+    events_count = len(events_pairs[0])
+    return strategies.tuples(strategies.just(events_pairs),
+                             strategies.integers(0, events_count - 1),
+                             strategies.lists(booleans,
+                                              min_size=events_count,
+                                              max_size=events_count))
+
+
+non_empty_sweep_events_lists_pairs_with_indices_and_booleans_lists = (
+    non_empty_sweep_events_lists_pairs.flatmap(
+            to_sweep_events_lists_pairs_with_indices_and_booleans_lists))
 nested_sweep_events_lists_pairs = (strategies.lists(nested_sweep_events_pairs)
                                    .map(transpose))
 nested_sweep_events_pairs_pairs = (
