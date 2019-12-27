@@ -1,4 +1,3 @@
-from itertools import repeat
 from typing import Tuple
 
 from _martinez import (SweepEvent as BoundSweepEvent,
@@ -10,9 +9,10 @@ from martinez.boolean import (SweepEvent as PortedSweepEvent,
 from tests.strategies import (booleans,
                               make_cyclic_bound_with_ported_sweep_events,
                               to_bound_with_ported_sweep_events)
+from tests.utils import strategy_to_pairs
 
 booleans = booleans
-nones_pairs = strategies.tuples(*repeat(strategies.none(), 2))
+nones_pairs = strategy_to_pairs(strategies.none())
 leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(nones_pairs)
 acyclic_sweep_events_pairs = strategies.recursive(
         leaf_sweep_events_pairs, to_bound_with_ported_sweep_events)

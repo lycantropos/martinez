@@ -116,6 +116,14 @@ def strategy_to_pairs(strategy: Strategy[Domain]
     return strategies.tuples(strategy, strategy)
 
 
+def to_bound_rectangle(xs: Tuple[float, float],
+                       ys: Tuple[float, float]) -> List[BoundPoint]:
+    min_x, max_x = xs
+    min_y, max_y = ys
+    return [BoundPoint(min_x, min_y), BoundPoint(max_x, min_y),
+            BoundPoint(max_x, max_y), BoundPoint(min_x, max_y)]
+
+
 def is_bounding_box_empty(bounding_box: Union[BoundBoundingBox,
                                               PortedBoundingBox]) -> bool:
     return not (bounding_box.x_min or bounding_box.y_min

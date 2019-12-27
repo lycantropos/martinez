@@ -1,4 +1,3 @@
-from itertools import repeat
 from typing import (List,
                     Tuple)
 
@@ -26,13 +25,14 @@ from tests.strategies import (booleans,
 from tests.utils import (Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
+                         strategy_to_pairs,
                          transpose,
                          vertices_form_strict_polygon)
 
 booleans = booleans
 points_pairs = strategies.builds(to_bound_with_ported_points_pair,
                                  floats, floats)
-nones_pairs = strategies.tuples(*repeat(strategies.none(), 2))
+nones_pairs = strategy_to_pairs(strategies.none())
 leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(nones_pairs)
 acyclic_sweep_events_pairs = strategies.recursive(
         leaf_sweep_events_pairs, to_bound_with_ported_sweep_events)
@@ -63,8 +63,8 @@ non_empty_sweep_events_lists_pairs_with_indices_and_booleans_lists = (
             to_sweep_events_lists_pairs_with_indices_and_booleans_lists))
 nested_sweep_events_lists_pairs = (strategies.lists(nested_sweep_events_pairs)
                                    .map(transpose))
-nested_sweep_events_pairs_pairs = (
-    strategies.tuples(*repeat(nested_sweep_events_pairs, 2)).map(transpose))
+nested_sweep_events_pairs_pairs = (strategy_to_pairs(nested_sweep_events_pairs)
+                                   .map(transpose))
 
 
 def are_non_overlapping_sweep_events_pair_pair(
@@ -112,8 +112,7 @@ contours_pairs = strategies.builds(to_bound_with_ported_contours_pair,
                                    vertices_pairs, unsigned_integers_lists,
                                    booleans)
 contours_lists_pairs = strategies.lists(contours_pairs).map(transpose)
-empty_contours_lists_pairs = strategies.tuples(*repeat(strategies.builds(list),
-                                                       2))
+empty_contours_lists_pairs = strategy_to_pairs(strategies.builds(list))
 non_empty_contours_lists_pairs = strategies.lists(contours_pairs,
                                                   min_size=1).map(transpose)
 polygons_pairs = strategies.builds(to_bound_with_ported_polygons_pair,
@@ -156,6 +155,5 @@ def to_operations_with_events_lists_pair(
 
 operations_with_events_lists_pairs = (
         strategies.tuples(operations_pairs,
-                          strategies.tuples(*repeat(strategies.builds(list),
-                                                    2)))
+                          strategy_to_pairs(strategies.builds(list)))
         | operations_pairs.map(to_operations_with_events_lists_pair))

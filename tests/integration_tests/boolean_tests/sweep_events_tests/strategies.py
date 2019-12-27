@@ -1,5 +1,3 @@
-from itertools import repeat
-
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
@@ -10,6 +8,7 @@ from tests.strategies import (booleans,
                               to_bound_with_ported_points_pair,
                               to_bound_with_ported_sweep_events,
                               unsigned_integers)
+from tests.utils import strategy_to_pairs
 
 booleans = booleans
 polygons_types_pairs = bound_with_ported_polygons_types_pairs
@@ -17,7 +16,7 @@ edges_types_pairs = bound_with_ported_edges_types_pairs
 unsigned_integers = unsigned_integers
 points_pairs = strategies.builds(to_bound_with_ported_points_pair,
                                  floats, floats)
-nones_pairs = strategies.tuples(*repeat(strategies.none(), 2))
+nones_pairs = strategy_to_pairs(strategies.none())
 leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(nones_pairs)
 acyclic_sweep_events_pairs = strategies.recursive(
         leaf_sweep_events_pairs, to_bound_with_ported_sweep_events)

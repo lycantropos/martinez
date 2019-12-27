@@ -18,6 +18,7 @@ from tests.utils import (Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
+                         to_bound_rectangle,
                          to_valid_coordinates)
 
 points = strategies.builds(Point, floats, floats)
@@ -59,17 +60,8 @@ coordinates = (strategies.lists(floats,
                .map(sorted)
                .map(tuple)
                .map(to_valid_coordinates))
-
-
-def to_rectangle(xs: Tuple[float, float],
-                 ys: Tuple[float, float]) -> List[Point]:
-    min_x, max_x = xs
-    min_y, max_y = ys
-    return [Point(min_x, min_y), Point(max_x, min_y),
-            Point(max_x, max_y), Point(min_x, max_y)]
-
-
-rectangles_vertices = strategies.builds(to_rectangle, coordinates, coordinates)
+rectangles_vertices = strategies.builds(to_bound_rectangle,
+                                        coordinates, coordinates)
 contours_vertices = rectangles_vertices
 contours = strategies.builds(Contour, contours_vertices,
                              strategies.builds(list), strategies.just(True))
