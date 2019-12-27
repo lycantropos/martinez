@@ -679,6 +679,15 @@ class Operation:
                 else previous_event)
         event.in_result = self.in_result(event)
 
+    def run(self) -> None:
+        if self._already_run:
+            return
+        if self.is_trivial:
+            return
+        self.process_segments()
+        self.connect_edges(self.sweep())
+        self._already_run = True
+
     @staticmethod
     def to_next_position(position: int, events: List[SweepEvent],
                          processed: List[bool]) -> int:
