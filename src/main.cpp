@@ -197,8 +197,9 @@ static void sweep_event_repr_impl(
          << edge_type_repr(sweep_event->type) << ", "
          << bool_repr(sweep_event->inOut) << ", "
          << bool_repr(sweep_event->otherInOut) << ", "
-         << bool_repr(sweep_event->inResult) << ", " << sweep_event->pos << ", "
-         << sweep_event->contourId << ", ";
+         << bool_repr(sweep_event->inResult) << ", "
+         << bool_repr(sweep_event->resultInOut) << ", " << sweep_event->pos
+         << ", " << sweep_event->contourId << ", ";
   const auto* right = sweep_event->prevInResult;
   if (right == nullptr)
     stream << std::string(py::str(py::none()));
