@@ -14,6 +14,7 @@ from prioq.base import PriorityQueue
 from reprit import seekers
 from reprit.base import generate_repr
 
+from .contour import Contour
 from .point import Point
 from .polygon import Polygon
 from .segment import Segment
@@ -528,6 +529,52 @@ class Operation:
         self.divide_segment(sorted_events[3].other_event,
                             sorted_events[2].point)
         return 3
+
+    def process_events(self, events: List[SweepEvent]) -> None:
+        depth, hole_of = [], []
+        processed = [False] * len(events)
+        contours = self._resultant.contours
+        for index, event in enumerate(events):
+            if processed[index]:
+                continue
+            contour = Contour([], [], True)
+            contour_id = len(contours)
+            contours.append(contour)
+            depth.append(0)
+            hole_of.append(-1)
+            if event.prev_in_result_event is not None:
+                lower_contour_id = event.prev_in_result_event.contour_id
+                if not event.prev_in_result_event.result_in_out:
+                    contours[lower_contour_id].add_hole(contour_id)
+                    hole_of[contour_id] = lower_contour_id
+                    depth[contour_id] = depth[lower_contour_id] + 1
+                    contour.is_external = False
+                elif not contours[lower_contour_id].is_external:
+                    contours[hole_of[lower_contour_id]].add_hole(contour_id)
+                    hole_of[contour_id] = hole_of[lower_contour_id]
+                    depth[contour_id] = depth[lower_contour_id]
+                    contour.is_external = False
+            position = index
+            initial = event.point
+            contour.add(initial)
+            while events[position].other_event.point != initial:
+                processed[position] = True
+                cursor = events[position]
+                if cursor.is_left:
+                    cursor.result_in_out = False
+                    cursor.contour_id = contour_id
+                else:
+                    cursor.other_event.result_in_out = True
+                    cursor.other_event.contour_id = contour_id
+                position = cursor.position
+                processed[position] = True
+                contour.add(cursor.point)
+                position = self.to_next_position(position, events, processed)
+            processed[position] = processed[events[position].position] = True
+            events[position].other_event.result_in_out = True
+            events[position].other_event.contour_id = contour_id
+            if depth[contour_id] & 1:
+                contour.reverse()
 
     def process_segments(self) -> None:
         for contour in self._left.contours:
