@@ -89,8 +89,8 @@ def is_even_permutation(permutation: Sequence[int]) -> bool:
     return not counter % 2
 
 
-def to_valid_coordinates(pair: Tuple[Scalar, Scalar]) -> Tuple[Scalar, Scalar]:
-    start, end = pair
+def to_valid_coordinates(pair: List[Scalar]) -> Tuple[Scalar, Scalar]:
+    start, *_, end = pair
     if end - start < 1:
         start = end - 10
     elif end - start > 100:
@@ -122,6 +122,14 @@ def to_bound_rectangle(xs: Tuple[float, float],
     min_y, max_y = ys
     return [BoundPoint(min_x, min_y), BoundPoint(max_x, min_y),
             BoundPoint(max_x, max_y), BoundPoint(min_x, max_y)]
+
+
+def to_ported_rectangle(xs: Tuple[Scalar, Scalar],
+                        ys: Tuple[Scalar, Scalar]) -> List[PortedPoint]:
+    min_x, max_x = xs
+    min_y, max_y = ys
+    return [PortedPoint(min_x, min_y), PortedPoint(max_x, min_y),
+            PortedPoint(max_x, max_y), PortedPoint(min_x, max_y)]
 
 
 def is_bounding_box_empty(bounding_box: Union[BoundBoundingBox,

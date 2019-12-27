@@ -24,6 +24,7 @@ from tests.utils import (Strategy,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
                          strategy_to_pairs,
+                         to_ported_rectangle,
                          to_valid_coordinates)
 
 points = scalars_strategies.flatmap(scalars_to_ported_points)
@@ -147,20 +148,10 @@ def scalars_to_contours(scalars: Strategy[Scalar]) -> Strategy[Contour]:
 def scalars_to_contours_vertices(scalars: Strategy[Scalar]) -> List:
     coordinates = (strategies.lists(scalars,
                                     min_size=2,
-                                    max_size=2,
                                     unique=True)
                    .map(sorted)
-                   .map(tuple)
                    .map(to_valid_coordinates))
-
-    def to_rectangle(xs: Tuple[float, float],
-                     ys: Tuple[float, float]) -> List[Point]:
-        min_x, max_x = xs
-        min_y, max_y = ys
-        return [Point(min_x, min_y), Point(max_x, min_y),
-                Point(max_x, max_y), Point(min_x, max_y)]
-
-    return strategies.builds(to_rectangle, coordinates, coordinates)
+    return strategies.builds(to_ported_rectangle, coordinates, coordinates)
 
 
 trivial_operations = (scalars_strategies

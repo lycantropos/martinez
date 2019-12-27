@@ -55,10 +55,8 @@ nested_sweep_events_pairs = (
 operations_types = bound_operations_types
 coordinates = (strategies.lists(floats,
                                 min_size=2,
-                                max_size=2,
                                 unique=True)
                .map(sorted)
-               .map(tuple)
                .map(to_valid_coordinates))
 rectangles_vertices = strategies.builds(to_bound_rectangle,
                                         coordinates, coordinates)
