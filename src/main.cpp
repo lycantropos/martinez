@@ -544,6 +544,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
            py::arg("events"))
       .def("process_segments", &cbop::BooleanOpImp::processSegments)
       .def("run", &cbop::BooleanOpImp::run)
+      .def("sweep", &cbop::BooleanOpImp::sweep)
       .def_static("to_next_position", &cbop::BooleanOpImp::nextPos,
                   py::arg("position"), py::arg("events"), py::arg("processed"));
 
