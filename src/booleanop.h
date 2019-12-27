@@ -154,7 +154,7 @@ class BooleanOpImp
   void connectEdges(const std::vector<SweepEvent*>& events);
   /** @brief return if the left event le belongs to the result of the Boolean
    * operation */
-  bool inResult(SweepEvent* le);
+  bool inResult(SweepEvent* le) const;
   static size_t nextPos(size_t pos,
                         const std::vector<SweepEvent*>& resultEvents,
                         const std::vector<bool>& processed);

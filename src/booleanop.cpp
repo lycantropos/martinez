@@ -372,7 +372,7 @@ void BooleanOpImp::computeFields(SweepEvent* le, SweepEvent* prev) {
   le->inResult = inResult(le);
 }
 
-bool BooleanOpImp::inResult(SweepEvent* le) {
+bool BooleanOpImp::inResult(SweepEvent* le) const {
   switch (le->type) {
     case NORMAL:
       switch (_operation) {
