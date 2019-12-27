@@ -81,13 +81,13 @@ def to_bound_with_ported_points_pair(x: float, y: float
 
 
 def to_bound_with_ported_contours_pair(
-        bound_with_ported_points_lists_pair: Tuple[List[BoundPoint],
-                                                   List[PortedPoint]],
+        bound_with_ported_vertices_pair: Tuple[List[BoundPoint],
+                                               List[PortedPoint]],
         holes: List[int],
         is_external: bool) -> Tuple[BoundContour, PortedContour]:
-    bound_points, ported_points = bound_with_ported_points_lists_pair
-    return (BoundContour(bound_points, holes, is_external),
-            PortedContour(ported_points, holes, is_external))
+    bound_vertices, ported_vertices = bound_with_ported_vertices_pair
+    return (BoundContour(bound_vertices, holes, is_external),
+            PortedContour(ported_vertices, holes, is_external))
 
 
 def to_bound_with_ported_segments_pair(

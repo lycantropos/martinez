@@ -20,12 +20,14 @@ from tests.strategies import (booleans,
                               to_bound_with_ported_contours_pair,
                               to_bound_with_ported_points_pair,
                               to_bound_with_ported_polygons_pair,
-                              to_bound_with_ported_sweep_events,
-                              unsigned_integers_lists)
+                              to_bound_with_ported_sweep_events)
 from tests.utils import (Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          strategy_to_pairs,
+                         to_bound_rectangle,
+                         to_ported_rectangle,
+                         to_valid_coordinates,
                          transpose,
                          vertices_form_strict_polygon)
 
@@ -103,18 +105,31 @@ def vertices_pair_form_strict_polygons(vertices_pair: Tuple[List[BoundPoint],
             and vertices_form_strict_polygon(ported_vertices))
 
 
-vertices_pairs = (strategies.lists(points_pairs,
-                                   min_size=3,
-                                   max_size=3)
-                  .map(transpose)
-                  .filter(vertices_pair_form_strict_polygons))
+coordinates = (strategies.lists(floats,
+                                min_size=2,
+                                unique=True)
+               .map(sorted)
+               .map(to_valid_coordinates))
+
+
+def to_rectangles_pair(xs: Tuple[float, float],
+                       ys: Tuple[float, float]
+                       ) -> Tuple[List[BoundPoint], List[PortedPoint]]:
+    return to_bound_rectangle(xs, ys), to_ported_rectangle(xs, ys)
+
+
+rectangles_vertices_pairs = strategies.builds(to_rectangles_pair,
+                                              coordinates, coordinates)
+contours_vertices_pairs = rectangles_vertices_pairs
 contours_pairs = strategies.builds(to_bound_with_ported_contours_pair,
-                                   vertices_pairs, unsigned_integers_lists,
-                                   booleans)
+                                   contours_vertices_pairs,
+                                   strategies.builds(list),
+                                   strategies.just(True))
 contours_lists_pairs = strategies.lists(contours_pairs).map(transpose)
 empty_contours_lists_pairs = strategy_to_pairs(strategies.builds(list))
 non_empty_contours_lists_pairs = strategies.lists(contours_pairs,
-                                                  min_size=1).map(transpose)
+                                                  min_size=1,
+                                                  max_size=1).map(transpose)
 polygons_pairs = strategies.builds(to_bound_with_ported_polygons_pair,
                                    contours_lists_pairs)
 empty_polygons_pairs = strategies.builds(to_bound_with_ported_polygons_pair,
@@ -140,6 +155,24 @@ def to_bound_with_ported_operations_pair(
 operations_pairs = strategies.builds(to_bound_with_ported_operations_pair,
                                      polygons_pairs, polygons_pairs,
                                      operations_types_pairs)
+non_trivial_operations_pairs = strategies.builds(
+        to_bound_with_ported_operations_pair,
+        non_empty_polygons_pairs, non_empty_polygons_pairs,
+        operations_types_pairs)
+
+
+def to_pre_processed_operations_pair(operations: Tuple[Bound, Ported]
+                                     ) -> Tuple[Bound, Ported]:
+    bound, ported = operations
+    bound.process_segments()
+    ported.process_segments()
+    return operations
+
+
+pre_processed_operations_pairs = (operations_pairs
+                                  .map(to_pre_processed_operations_pair))
+pre_processed_non_trivial_operations_pairs = (
+    non_trivial_operations_pairs.map(to_pre_processed_operations_pair))
 
 
 def to_operations_with_events_lists_pair(
@@ -149,11 +182,12 @@ def to_operations_with_events_lists_pair(
     bound, ported = operations
     bound.process_segments()
     ported.process_segments()
-    return operations, (Bound.collect_events(bound.events),
-                        Ported.collect_events(ported.events))
+    return operations, (Bound.collect_events(bound.sweep()),
+                        Ported.collect_events(ported.sweep()))
 
 
 operations_with_events_lists_pairs = (
         strategies.tuples(operations_pairs,
                           strategy_to_pairs(strategies.builds(list)))
-        | operations_pairs.map(to_operations_with_events_lists_pair))
+        | (pre_processed_operations_pairs
+           .map(to_operations_with_events_lists_pair)))
