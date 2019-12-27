@@ -31,6 +31,7 @@ points = scalars_strategies.flatmap(scalars_to_ported_points)
 sweep_events = scalars_strategies.flatmap(scalars_to_ported_sweep_events)
 nested_sweep_events = (scalars_strategies
                        .flatmap(scalars_to_nested_ported_sweep_events))
+maybe_nested_sweep_events = strategies.none() | nested_sweep_events
 non_empty_sweep_events_lists = strategies.lists(sweep_events,
                                                 min_size=1)
 
