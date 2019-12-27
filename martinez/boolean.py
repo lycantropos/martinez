@@ -10,6 +10,7 @@ from typing import (Callable,
                     Tuple,
                     TypeVar)
 
+from dendroid import red_black
 from prioq.base import PriorityQueue
 from reprit import seekers
 from reprit.base import generate_repr
@@ -600,6 +601,60 @@ class Operation:
             source_event.is_left = False
         self._events_queue.push(source_event)
         self._events_queue.push(target_event)
+
+    def sweep(self) -> List[SweepEvent]:
+        min_max_x = min(self._left.bounding_box.x_max,
+                        self._right.bounding_box.x_max)
+        result = []
+        events_queue = self._events_queue
+        sweep_line = red_black.tree(key=SweepLineKey)
+        while events_queue:
+            event = events_queue.peek()
+            if (self._type is OperationType.INTERSECTION
+                    and event.point.x > min_max_x
+                    or self._type is OperationType.DIFFERENCE
+                    and event.point.x > self._left.bounding_box.x_max):
+                break
+            result.append(event)
+            events_queue.pop()
+            if event.is_left:
+                sweep_line.add(event)
+                try:
+                    next_event = sweep_line.next(event)
+                except ValueError:
+                    next_event = None
+                try:
+                    previous_event = sweep_line.prev(event)
+                except ValueError:
+                    previous_event = None
+                self.compute_fields(event, previous_event)
+                if next_event is not None:
+                    if self.possible_intersection(event, next_event) == 2:
+                        self.compute_fields(event, previous_event)
+                        self.compute_fields(next_event, event)
+                if previous_event is not None:
+                    if self.possible_intersection(previous_event, event) == 2:
+                        try:
+                            pre_previous_event = sweep_line.prev(
+                                    previous_event)
+                        except ValueError:
+                            pre_previous_event = None
+                        self.compute_fields(previous_event, pre_previous_event)
+                        self.compute_fields(event, previous_event)
+            else:
+                event = event.other_event
+                if event not in sweep_line:
+                    continue
+                try:
+                    next_event = sweep_line.next(event)
+                except ValueError:
+                    continue
+                try:
+                    previous_event = sweep_line.prev(event)
+                except ValueError:
+                    continue
+                self.possible_intersection(previous_event, next_event)
+        return result
 
     def compute_fields(self, event: SweepEvent,
                        previous_event: Optional[SweepEvent]) -> None:
