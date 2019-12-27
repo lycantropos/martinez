@@ -37,7 +37,7 @@ non_empty_sweep_events_lists = strategies.lists(sweep_events,
 
 def to_sweep_events_lists_with_indices_and_booleans_lists(
         events: List[SweepEvent]
-) -> Strategy[Tuple[List[SweepEvent], List[bool]]]:
+) -> Strategy[Tuple[List[SweepEvent], int, List[bool]]]:
     return strategies.tuples(strategies.just(events),
                              strategies.integers(0, len(events) - 1),
                              strategies.lists(booleans,
