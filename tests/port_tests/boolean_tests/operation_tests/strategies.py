@@ -6,7 +6,8 @@ from typing import (List,
 from hypothesis import strategies
 
 from martinez.boolean import (Operation,
-                              OperationType)
+                              OperationType,
+                              SweepEvent)
 from martinez.contour import Contour
 from martinez.hints import Scalar
 from martinez.point import Point
@@ -30,6 +31,23 @@ points = scalars_strategies.flatmap(scalars_to_ported_points)
 sweep_events = scalars_strategies.flatmap(scalars_to_ported_sweep_events)
 nested_sweep_events = (scalars_strategies
                        .flatmap(scalars_to_nested_ported_sweep_events))
+non_empty_sweep_events_lists = strategies.lists(sweep_events,
+                                                min_size=1)
+
+
+def to_sweep_events_lists_with_indices_and_booleans_lists(
+        events: List[SweepEvent]
+) -> Strategy[Tuple[List[SweepEvent], List[bool]]]:
+    return strategies.tuples(strategies.just(events),
+                             strategies.integers(0, len(events) - 1),
+                             strategies.lists(booleans,
+                                              min_size=len(events),
+                                              max_size=len(events)))
+
+
+non_empty_sweep_events_lists_with_indices_and_booleans_lists = (
+    non_empty_sweep_events_lists.flatmap(
+            to_sweep_events_lists_with_indices_and_booleans_lists))
 nested_sweep_events_lists = strategies.lists(nested_sweep_events)
 non_degenerate_nested_sweep_events = (nested_sweep_events
                                       .filter(is_sweep_event_non_degenerate))
