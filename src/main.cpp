@@ -295,20 +295,22 @@ static py::tuple to_sweep_event_state(const cbop::SweepEvent& self) {
       &cbop::SweepEvent::prevInResult);
   py::list plain_states;
   for (const auto* event : events) {
-    plain_states.append(py::make_tuple(
-        event->left, event->point, event->pol, event->type, event->inOut,
-        event->otherInOut, event->inResult, event->pos, event->contourId));
+    plain_states.append(
+        py::make_tuple(event->left, event->point, event->pol, event->type,
+                       event->inOut, event->otherInOut, event->inResult,
+                       event->resultInOut, event->pos, event->contourId));
   }
   return py::make_tuple(plain_states, left_links, right_links);
 };
 
 static cbop::SweepEvent* from_plain_sweep_event_state(const py::tuple& state) {
-  if (state.size() != 9) throw std::runtime_error("Invalid state!");
+  if (state.size() != 10) throw std::runtime_error("Invalid state!");
   return new cbop::SweepEvent(
       state[0].cast<bool>(), state[1].cast<cbop::Point_2>(), nullptr,
       state[2].cast<cbop::PolygonType>(), state[3].cast<cbop::EdgeType>(),
       state[4].cast<bool>(), state[5].cast<bool>(), state[6].cast<bool>(),
-      state[7].cast<size_t>(), state[8].cast<size_t>(), nullptr);
+      state[7].cast<bool>(), state[8].cast<size_t>(), state[9].cast<size_t>(),
+      nullptr);
 }
 
 static cbop::SweepEvent* from_sweep_event_state(py::tuple state) {
