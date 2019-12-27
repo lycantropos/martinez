@@ -154,3 +154,14 @@ operations = (scalars_strategies
               .flatmap(partial(scalars_to_operations,
                                operations_types=operations_types))
               | trivial_operations)
+
+
+def to_operation_with_events_list(operation: Operation
+                                  ) -> Tuple[Operation, List[SweepEvent]]:
+    operation.process_segments()
+    return operation, Operation.collect_events(operation.events)
+
+
+operations_with_events_lists = (
+        strategies.tuples(operations, strategies.builds(list))
+        | operations.map(to_operation_with_events_list))
