@@ -45,8 +45,8 @@ struct SweepEvent {
              SweepEvent* otherEvent = nullptr,
              PolygonType polygonType = SUBJECT, EdgeType edgeType = NORMAL,
              bool inOut = false, bool otherInOut = false, bool inResult = false,
-             size_t position = 0, size_t contourId = 0,
-             SweepEvent* prevInResult = nullptr);
+             bool resultInOut = false, size_t position = 0,
+             size_t contourId = 0, SweepEvent* prevInResult = nullptr);
   bool left;               // is point the left endpoint of the edge (point,
                            // otherEvent->point)?
   Point_2 point;           // point associated with the event
