@@ -189,8 +189,9 @@ def are_bound_ported_contours_equal(bound: BoundContour,
 
 def are_bound_ported_polygons_equal(bound: BoundPolygon,
                                     ported: PortedPolygon) -> bool:
-    return all(map(are_bound_ported_contours_equal,
-                   bound.contours, ported.contours))
+    return (len(bound.contours) == len(ported.contours)
+            and all(map(are_bound_ported_contours_equal,
+                        bound.contours, ported.contours)))
 
 
 traverse_sweep_event = PortedSweepEvent._traverse
