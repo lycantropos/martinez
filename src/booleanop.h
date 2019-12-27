@@ -150,6 +150,7 @@ class BooleanOpImp
   static std::vector<SweepEvent*> collectEvents(
       const std::vector<SweepEvent*>& events);
   // connect the solution edges to build the result polygon
+  void computeFields(SweepEvent* le, SweepEvent* prev);
   void connectEdges(const std::vector<SweepEvent*>& events);
   /** @brief return if the left event le belongs to the result of the Boolean
    * operation */

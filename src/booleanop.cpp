@@ -350,6 +350,28 @@ void BooleanOpImp::computeFields(
   le->inResult = inResult(le);
 }
 
+void BooleanOpImp::computeFields(SweepEvent* le, SweepEvent* prev) {
+  // compute inOut and otherInOut fields
+  if (prev == nullptr) {
+    le->inOut = false;
+    le->otherInOut = true;
+  } else if (le->pol == prev->pol) {  // previous line segment in sl belongs to
+                                      // the same polygon that "se" belongs to
+    le->inOut = !prev->inOut;
+    le->otherInOut = prev->otherInOut;
+  } else {  // previous line segment in sl belongs to a different polygon that
+            // "se" belongs to
+    le->inOut = !prev->otherInOut;
+    le->otherInOut = prev->vertical() ? !prev->inOut : prev->inOut;
+  }
+  // compute prevInResult field
+  if (prev != nullptr)
+    le->prevInResult =
+        (!inResult(prev) || prev->vertical()) ? prev->prevInResult : prev;
+  // check if the line segment belongs to the Boolean operation
+  le->inResult = inResult(le);
+}
+
 bool BooleanOpImp::inResult(SweepEvent* le) {
   switch (le->type) {
     case NORMAL:
