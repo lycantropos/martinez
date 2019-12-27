@@ -24,6 +24,7 @@ from tests.utils import (Strategy,
 points = strategies.builds(Point, floats, floats)
 sweep_events = to_bound_sweep_events()
 nested_sweep_events = to_nested_bound_sweep_events()
+maybe_nested_sweep_events = strategies.none() | nested_sweep_events
 non_empty_sweep_events_lists = strategies.lists(sweep_events,
                                                 min_size=1)
 
