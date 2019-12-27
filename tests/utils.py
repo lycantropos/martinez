@@ -1,3 +1,4 @@
+import math
 import pickle
 from typing import (Any,
                     Hashable,
@@ -94,7 +95,9 @@ def is_even_permutation(permutation: Sequence[int]) -> bool:
 def to_valid_coordinates(candidates: List[Scalar],
                          *,
                          lower_bound: int = 1,
-                         upper_bound: int = 100) -> Tuple[Scalar, Scalar]:
+                         upper_bound: int = int(math.sqrt(MAX_VALUE
+                                                          - MIN_VALUE))
+                         ) -> Tuple[Scalar, Scalar]:
     start, *rest, end = candidates
     if not (lower_bound <= end - start <= upper_bound):
         start = next((candidate
