@@ -350,7 +350,7 @@ void BooleanOpImp::computeFields(
   le->inResult = inResult(le);
 }
 
-void BooleanOpImp::computeFields(SweepEvent* le, SweepEvent* prev) {
+void BooleanOpImp::computeFields(SweepEvent* le, SweepEvent* prev) const {
   // compute inOut and otherInOut fields
   if (prev == nullptr) {
     le->inOut = false;
