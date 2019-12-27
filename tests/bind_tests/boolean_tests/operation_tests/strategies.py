@@ -13,13 +13,11 @@ from tests.strategies import (booleans,
                               bound_operations_types,
                               floats,
                               to_bound_sweep_events,
-                              to_nested_bound_sweep_events,
-                              unsigned_integers_lists)
+                              to_nested_bound_sweep_events)
 from tests.utils import (Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
-                         is_sweep_event_non_degenerate,
-                         vertices_form_strict_polygon)
+                         is_sweep_event_non_degenerate)
 
 points = strategies.builds(Point, floats, floats)
 sweep_events = to_bound_sweep_events()
@@ -53,14 +51,38 @@ nested_sweep_events_pairs = (
         | nested_sweep_events_pairs
         .filter(are_sweep_events_pair_with_different_polygon_types))
 operations_types = bound_operations_types
-triangles_vertices = (strategies.lists(strategies.builds(Point,
-                                                         floats, floats),
-                                       min_size=3,
-                                       max_size=3)
-                      .filter(vertices_form_strict_polygon))
-contours_vertices = triangles_vertices
+
+
+def to_valid_coordinates(pair: Tuple[float, float]) -> Tuple[float, float]:
+    start, end = pair
+    if end - start < 1:
+        start = end - 10
+    elif end - start > 100:
+        end = start + 10
+    return start, end
+
+
+coordinates = (strategies.lists(floats,
+                                min_size=2,
+                                max_size=2,
+                                unique=True)
+               .map(sorted)
+               .map(tuple)
+               .map(to_valid_coordinates))
+
+
+def to_rectangle(xs: Tuple[float, float],
+                 ys: Tuple[float, float]) -> List[Point]:
+    min_x, max_x = xs
+    min_y, max_y = ys
+    return [Point(min_x, min_y), Point(max_x, min_y),
+            Point(max_x, max_y), Point(min_x, max_y)]
+
+
+rectangles_vertices = strategies.builds(to_rectangle, coordinates, coordinates)
+contours_vertices = rectangles_vertices
 contours = strategies.builds(Contour, contours_vertices,
-                             unsigned_integers_lists, booleans)
+                             strategies.builds(list), strategies.just(True))
 contours_lists = strategies.lists(contours)
 empty_contours_lists = strategies.builds(list)
 non_empty_contours_lists = strategies.lists(contours,
@@ -104,17 +126,27 @@ trivial_operations = (
                                               non_empty_polygons,
                                               non_empty_polygons),
                             operations_types))
-operations = strategies.builds(Operation, non_empty_polygons,
-                               non_empty_polygons, operations_types)
-operations |= trivial_operations
+non_trivial_operations = strategies.builds(Operation, non_empty_polygons,
+                                           non_empty_polygons,
+                                           operations_types)
+operations = trivial_operations | non_trivial_operations
+
+
+def pre_process_operation(operation: Operation) -> Operation:
+    operation.process_segments()
+    return operation
+
+
+pre_processed_operations = operations.map(pre_process_operation)
+pre_processed_non_trivial_operations = (non_trivial_operations
+                                        .map(pre_process_operation))
 
 
 def to_operation_with_events_list(operation: Operation
                                   ) -> Tuple[Operation, List[SweepEvent]]:
-    operation.process_segments()
-    return operation, Operation.collect_events(operation.events)
+    return operation, Operation.collect_events(operation.sweep())
 
 
 operations_with_events_lists = (
         strategies.tuples(operations, strategies.builds(list))
-        | operations.map(to_operation_with_events_list))
+        | pre_processed_operations.map(to_operation_with_events_list))
