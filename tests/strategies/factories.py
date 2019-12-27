@@ -284,8 +284,8 @@ def to_plain_bound_sweep_events(
     return strategies.builds(BoundSweepEvent, booleans,
                              strategies.builds(BoundPoint, floats, floats),
                              children, polygons_types, bound_edges_types,
-                             booleans, booleans, booleans, unsigned_integers,
-                             unsigned_integers, children)
+                             booleans, booleans, booleans, booleans,
+                             unsigned_integers, unsigned_integers, children)
 
 
 def to_bound_sweep_events(**kwargs: Any) -> Strategy[PortedSweepEvent]:
