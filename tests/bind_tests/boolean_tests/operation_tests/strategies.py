@@ -54,8 +54,7 @@ nested_sweep_events_pairs = (
         .filter(are_sweep_events_pair_with_different_polygon_types))
 operations_types = bound_operations_types
 coordinates = (strategies.lists(floats,
-                                min_size=2,
-                                unique=True)
+                                min_size=2)
                .map(sorted)
                .map(to_valid_coordinates))
 rectangles_vertices = strategies.builds(to_bound_rectangle,

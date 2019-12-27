@@ -147,8 +147,7 @@ def scalars_to_contours(scalars: Strategy[Scalar]) -> Strategy[Contour]:
 
 def scalars_to_contours_vertices(scalars: Strategy[Scalar]) -> List:
     coordinates = (strategies.lists(scalars,
-                                    min_size=2,
-                                    unique=True)
+                                    min_size=2)
                    .map(sorted)
                    .map(to_valid_coordinates))
     return strategies.builds(to_ported_rectangle, coordinates, coordinates)

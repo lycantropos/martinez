@@ -95,8 +95,7 @@ nested_sweep_events_pairs_pairs = (
         .filter(are_sweep_events_pair_pair_with_different_polygon_types))
 operations_types_pairs = bound_with_ported_operations_types_pairs
 coordinates = (strategies.lists(floats,
-                                min_size=2,
-                                unique=True)
+                                min_size=2)
                .map(sorted)
                .map(to_valid_coordinates))
 
