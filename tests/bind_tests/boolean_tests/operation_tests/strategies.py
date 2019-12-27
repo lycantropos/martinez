@@ -14,11 +14,13 @@ from tests.strategies import (booleans,
                               floats,
                               to_bound_sweep_events,
                               to_nested_bound_sweep_events)
-from tests.utils import (Strategy,
+from tests.utils import (MAX_CONTOURS_COUNT,
+                         Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
                          to_bound_rectangle,
+                         to_non_overlapping_contours_list,
                          to_valid_coordinates)
 
 points = strategies.builds(Point, floats, floats)
@@ -62,11 +64,13 @@ rectangles_vertices = strategies.builds(to_bound_rectangle,
 contours_vertices = rectangles_vertices
 contours = strategies.builds(Contour, contours_vertices,
                              strategies.builds(list), strategies.just(True))
-contours_lists = strategies.lists(contours)
+contours_lists = (strategies.lists(contours,
+                                   max_size=MAX_CONTOURS_COUNT)
+                  .map(to_non_overlapping_contours_list))
 empty_contours_lists = strategies.builds(list)
-non_empty_contours_lists = strategies.lists(contours,
-                                            min_size=1,
-                                            max_size=1)
+non_empty_contours_lists = (strategies.lists(contours,
+                                             min_size=1)
+                            .map(to_non_overlapping_contours_list))
 polygons = strategies.builds(Polygon, contours_lists)
 empty_polygons = strategies.builds(Polygon, empty_contours_lists)
 non_empty_polygons = strategies.builds(Polygon, non_empty_contours_lists)

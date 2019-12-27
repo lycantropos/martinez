@@ -33,7 +33,8 @@ from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
 from martinez.utilities import (
-    find_intersections as ported_find_intersections)
+    find_intersections as ported_find_intersections,
+    to_segments as to_ported_segments)
 
 Domain = TypeVar('Domain')
 Strategy = SearchStrategy
@@ -46,6 +47,7 @@ BoundPortedSweepEventsPair = Tuple[BoundSweepEvent, PortedSweepEvent]
 
 MAX_VALUE = 10 ** 4
 MIN_VALUE = -MAX_VALUE
+MAX_CONTOURS_COUNT = 5
 
 
 def equivalence(left_statement: bool, right_statement: bool) -> bool:
@@ -138,6 +140,23 @@ def is_bounding_box_empty(bounding_box: Union[BoundBoundingBox,
                 or bounding_box.x_max or bounding_box.y_max)
 
 
+AnyContour = TypeVar('AnyContour', BoundContour, PortedContour)
+
+
+def to_non_overlapping_contours_list(contours: List[AnyContour]
+                                     ) -> List[AnyContour]:
+    result = []
+    previous_segments = []
+    for contour in contours:
+        segments = to_segments(contour.points)
+        if all(are_non_overlapping_segments_pair(segment, previous_segment)
+               for segment in segments
+               for previous_segment in previous_segments):
+            result.append(contour)
+            previous_segments.extend(segments)
+    return result
+
+
 AnySweepEvent = TypeVar('AnySweepEvent', BoundSweepEvent, PortedSweepEvent)
 
 
@@ -150,7 +169,26 @@ def are_non_overlapping_sweep_events_pair(events_pair: Tuple[AnySweepEvent,
                                           ) -> bool:
     first_event, second_event = events_pair
     first_segment, second_segment = first_event.segment, second_event.segment
-    if isinstance(first_event, BoundSweepEvent):
+    return are_non_overlapping_segments_pair(first_segment, second_segment)
+
+
+AnyPoint = TypeVar('AnyPoint', BoundPoint, PortedPoint)
+AnySegment = TypeVar('AnySegment', BoundSegment, PortedSegment)
+
+
+def to_segments(points: AnyPoint) -> Sequence[AnySegment]:
+    if not points:
+        return []
+    if isinstance(points[0], BoundPoint):
+        return [BoundSegment(points[index], points[(index + 1) % len(points)])
+                for index in range(len(points))]
+    else:
+        return to_ported_segments(points)
+
+
+def are_non_overlapping_segments_pair(first_segment: AnySegment,
+                                      second_segment: AnySegment) -> bool:
+    if isinstance(first_segment, BoundSegment):
         intersections_count = bound_find_intersections(first_segment,
                                                        second_segment)[0]
     else:

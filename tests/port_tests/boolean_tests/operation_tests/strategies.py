@@ -19,11 +19,13 @@ from tests.strategies import (booleans,
                               scalars_to_nested_ported_sweep_events,
                               scalars_to_ported_points,
                               scalars_to_ported_sweep_events)
-from tests.utils import (Strategy,
+from tests.utils import (MAX_CONTOURS_COUNT,
+                         Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
                          strategy_to_pairs,
+                         to_non_overlapping_contours_list,
                          to_ported_rectangle,
                          to_valid_coordinates)
 
@@ -115,7 +117,7 @@ def scalars_to_trivial_operations(scalars: Strategy[Scalar],
 def scalars_to_polygons(scalars: Strategy[Scalar],
                         *,
                         min_size: int = 0,
-                        max_size: Optional[int] = None
+                        max_size: Optional[int] = MAX_CONTOURS_COUNT
                         ) -> Strategy[Polygon]:
     return strategies.builds(Polygon,
                              scalars_to_contours_lists(scalars,
@@ -132,12 +134,13 @@ non_empty_polygons = scalars_strategies.flatmap(partial(scalars_to_polygons,
 def scalars_to_contours_lists(scalars: Strategy[Scalar],
                               *,
                               min_size: int = 0,
-                              max_size: Optional[int] = None
+                              max_size: Optional[int] = MAX_CONTOURS_COUNT
                               ) -> Strategy[List[Contour]]:
     contours = scalars_to_contours(scalars)
-    return strategies.lists(contours,
-                            min_size=min_size,
-                            max_size=max_size)
+    return (strategies.lists(contours,
+                             min_size=min_size,
+                             max_size=max_size)
+            .map(to_non_overlapping_contours_list))
 
 
 def scalars_to_contours(scalars: Strategy[Scalar]) -> Strategy[Contour]:

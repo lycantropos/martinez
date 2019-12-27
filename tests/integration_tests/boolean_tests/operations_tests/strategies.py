@@ -1,7 +1,8 @@
 from typing import (List,
                     Tuple)
 
-from _martinez import (Operation as Bound,
+from _martinez import (Contour as BoundContour,
+                       Operation as Bound,
                        OperationType as BoundOperationType,
                        Point as BoundPoint,
                        Polygon as BoundPolygon,
@@ -12,7 +13,8 @@ from martinez.boolean import (Operation as Ported,
                               OperationType as PortedOperationType,
                               SweepEvent as PortedSweepEvent)
 from martinez.point import Point as PortedPoint
-from martinez.polygon import Polygon as PortedPolygon
+from martinez.polygon import (Contour as PortedContour,
+                              Polygon as PortedPolygon)
 from tests.strategies import (booleans,
                               bound_with_ported_operations_types_pairs,
                               make_cyclic_bound_with_ported_sweep_events,
@@ -21,11 +23,13 @@ from tests.strategies import (booleans,
                               to_bound_with_ported_points_pair,
                               to_bound_with_ported_polygons_pair,
                               to_bound_with_ported_sweep_events)
-from tests.utils import (Strategy,
+from tests.utils import (MAX_CONTOURS_COUNT,
+                         Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          strategy_to_pairs,
                          to_bound_rectangle,
+                         to_non_overlapping_contours_list,
                          to_ported_rectangle,
                          to_valid_coordinates,
                          transpose)
@@ -113,11 +117,26 @@ contours_pairs = strategies.builds(to_bound_with_ported_contours_pair,
                                    contours_vertices_pairs,
                                    strategies.builds(list),
                                    strategies.just(True))
-contours_lists_pairs = strategies.lists(contours_pairs).map(transpose)
+
+
+def to_non_overlapping_contours_lists_pair(
+        contours_lists_pair: Tuple[List[BoundContour], List[PortedContour]]
+) -> Tuple[List[BoundContour], List[PortedContour]]:
+    bound_contours, ported_contours = contours_lists_pair
+    return (to_non_overlapping_contours_list(bound_contours),
+            to_non_overlapping_contours_list(ported_contours))
+
+
+contours_lists_pairs = (strategies.lists(contours_pairs,
+                                         max_size=MAX_CONTOURS_COUNT)
+                        .map(transpose)
+                        .map(to_non_overlapping_contours_lists_pair))
 empty_contours_lists_pairs = strategy_to_pairs(strategies.builds(list))
-non_empty_contours_lists_pairs = strategies.lists(contours_pairs,
-                                                  min_size=1,
-                                                  max_size=1).map(transpose)
+non_empty_contours_lists_pairs = (strategies.lists(contours_pairs,
+                                                   min_size=1,
+                                                   max_size=1)
+                                  .map(transpose)
+                                  .map(to_non_overlapping_contours_lists_pair))
 polygons_pairs = strategies.builds(to_bound_with_ported_polygons_pair,
                                    contours_lists_pairs)
 empty_polygons_pairs = strategies.builds(to_bound_with_ported_polygons_pair,
