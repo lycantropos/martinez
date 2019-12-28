@@ -23,12 +23,14 @@ from martinez.hints import Scalar
 from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
-from tests.utils import (BoundPortedPointsPair,
+from tests.utils import (MAX_CONTOURS_COUNT,
+                         BoundPortedPointsPair,
                          BoundPortedSweepEventsPair,
                          PortedPointsPair,
                          PortedPointsTriplet,
                          Strategy,
                          to_bound_rectangle,
+                         to_non_overlapping_contours_list,
                          to_ported_rectangle,
                          to_valid_coordinates_pairs,
                          traverse_sweep_event)
@@ -39,6 +41,7 @@ from .literals import (booleans,
                        bound_with_ported_polygons_types_pairs,
                        floats,
                        non_negative_integers,
+                       non_negative_integers_lists,
                        ported_edges_types,
                        ported_polygons_types,
                        single_precision_floats,
@@ -70,6 +73,46 @@ def scalars_to_ported_points_lists(scalars: Strategy[Scalar],
     return strategies.lists(scalars_to_ported_points(scalars),
                             min_size=min_size,
                             max_size=max_size)
+
+
+def scalars_to_ported_polygons(scalars: Strategy[Scalar],
+                               *,
+                               min_size: int = 0,
+                               max_size: Optional[int] = MAX_CONTOURS_COUNT
+                               ) -> Strategy[PortedPolygon]:
+    contours_lists = scalars_to_ported_contours_lists(scalars,
+                                                      min_size=min_size,
+                                                      max_size=max_size)
+    return strategies.builds(PortedPolygon, contours_lists)
+
+
+def scalars_to_ported_contours_lists(
+        scalars: Strategy[Scalar],
+        *,
+        min_size: int = 0,
+        max_size: Optional[int] = MAX_CONTOURS_COUNT
+) -> Strategy[List[PortedContour]]:
+    contours = scalars_to_ported_contours(scalars)
+    return (strategies.lists(contours,
+                             min_size=min_size,
+                             max_size=max_size)
+            .map(to_non_overlapping_contours_list))
+
+
+def scalars_to_ported_contours(scalars: Strategy[Scalar]
+                               ) -> Strategy[PortedContour]:
+    return strategies.builds(PortedContour,
+                             scalars_to_ported_contours_vertices(scalars),
+                             non_negative_integers_lists, booleans)
+
+
+def scalars_to_ported_contours_vertices(scalars: Strategy[Scalar]
+                                        ) -> Strategy[List[PortedPoint]]:
+    coordinates = (strategies.lists(scalars,
+                                    min_size=2)
+                   .map(sorted)
+                   .map(to_valid_coordinates_pairs))
+    return strategies.builds(to_ported_rectangle, coordinates, coordinates)
 
 
 def scalars_to_ported_segments(scalars: Strategy[Scalar]

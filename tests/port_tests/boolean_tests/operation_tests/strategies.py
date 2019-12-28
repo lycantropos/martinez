@@ -1,6 +1,5 @@
 from functools import partial
 from typing import (List,
-                    Optional,
                     Tuple)
 
 from hypothesis import strategies
@@ -8,26 +7,21 @@ from hypothesis import strategies
 from martinez.boolean import (Operation,
                               OperationType,
                               SweepEvent)
-from martinez.contour import Contour
 from martinez.hints import Scalar
 from martinez.polygon import Polygon
 from tests.strategies import (booleans,
-                              non_negative_integers_lists,
                               ported_operations_types,
                               scalars_strategies,
                               scalars_to_nested_ported_sweep_events,
                               scalars_to_ported_points,
+                              scalars_to_ported_polygons,
                               scalars_to_ported_sweep_events)
-from tests.utils import (MAX_CONTOURS_COUNT,
-                         Strategy,
+from tests.utils import (Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
                          strategy_to_pairs,
-                         to_non_overlapping_contours_list,
-                         to_non_overlapping_ported_polygons_pair,
-                         to_ported_rectangle,
-                         to_valid_coordinates_pairs)
+                         to_non_overlapping_ported_polygons_pair)
 
 points = scalars_strategies.flatmap(scalars_to_ported_points)
 sweep_events = scalars_strategies.flatmap(scalars_to_ported_sweep_events)
@@ -75,17 +69,16 @@ def to_operation_with_non_overlapping_arguments(polygons_pair: Tuple[Polygon,
 def scalars_to_operations(scalars: Strategy[Scalar],
                           operations_types: Strategy[OperationType]
                           ) -> Strategy[Operation]:
-    polygons = scalars_to_polygons(scalars)
+    polygons = scalars_to_ported_polygons(scalars)
     return strategies.builds(Operation, polygons, polygons, operations_types)
 
 
 def scalars_to_trivial_operations(scalars: Strategy[Scalar],
                                   operations_types: Strategy[OperationType]):
-    empty_contours_lists = strategies.builds(list)
-    empty_polygons = strategies.builds(Polygon, empty_contours_lists)
-    polygons = scalars_to_polygons(scalars)
-    non_empty_polygons = scalars_to_polygons(scalars,
-                                             min_size=1)
+    empty_polygons = strategies.builds(Polygon, strategies.builds(list))
+    polygons = scalars_to_ported_polygons(scalars)
+    non_empty_polygons = scalars_to_ported_polygons(scalars,
+                                                    min_size=1)
     return (strategies.builds(Operation, empty_polygons, polygons,
                               operations_types)
             | strategies.builds(Operation, polygons, empty_polygons,
@@ -98,47 +91,10 @@ def scalars_to_trivial_operations(scalars: Strategy[Scalar],
                     operations_types))
 
 
-def scalars_to_polygons(scalars: Strategy[Scalar],
-                        *,
-                        min_size: int = 0,
-                        max_size: Optional[int] = MAX_CONTOURS_COUNT
-                        ) -> Strategy[Polygon]:
-    return strategies.builds(Polygon,
-                             scalars_to_contours_lists(scalars,
-                                                       min_size=min_size,
-                                                       max_size=max_size))
-
-
-polygons = scalars_strategies.flatmap(scalars_to_polygons)
-non_empty_polygons = scalars_strategies.flatmap(partial(scalars_to_polygons,
-                                                        min_size=1))
-
-
-def scalars_to_contours_lists(scalars: Strategy[Scalar],
-                              *,
-                              min_size: int = 0,
-                              max_size: Optional[int] = MAX_CONTOURS_COUNT
-                              ) -> Strategy[List[Contour]]:
-    contours = scalars_to_contours(scalars)
-    return (strategies.lists(contours,
-                             min_size=min_size,
-                             max_size=max_size)
-            .map(to_non_overlapping_contours_list))
-
-
-def scalars_to_contours(scalars: Strategy[Scalar]) -> Strategy[Contour]:
-    return strategies.builds(Contour, scalars_to_contours_vertices(scalars),
-                             non_negative_integers_lists, booleans)
-
-
-def scalars_to_contours_vertices(scalars: Strategy[Scalar]) -> List:
-    coordinates = (strategies.lists(scalars,
-                                    min_size=2)
-                   .map(sorted)
-                   .map(to_valid_coordinates_pairs))
-    return strategies.builds(to_ported_rectangle, coordinates, coordinates)
-
-
+polygons = scalars_strategies.flatmap(scalars_to_ported_polygons)
+non_empty_polygons = (scalars_strategies
+                      .flatmap(partial(scalars_to_ported_polygons,
+                                       min_size=1)))
 trivial_operations = (scalars_strategies
                       .flatmap(partial(scalars_to_trivial_operations,
                                        operations_types=operations_types)))
