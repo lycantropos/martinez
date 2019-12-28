@@ -18,10 +18,10 @@ import martinez
 def has_flag(compiler: CCompiler, name: str) -> bool:
     """Detects whether a flag name is supported on the specified compiler."""
     with tempfile.NamedTemporaryFile('w',
-                                     suffix='.cpp') as f:
-        f.write('int main (int argc, char **argv) { return 0; }')
+                                     suffix='.cpp') as file:
+        file.write('int main (int argc, char **argv) { return 0; }')
         try:
-            compiler.compile([f.name],
+            compiler.compile([file.name],
                              extra_postargs=[name])
         except CompileError:
             return False
