@@ -561,22 +561,23 @@ class Operation:
             position = index
             initial = event.point
             contour.add(initial)
-            while events[position].other_event.point != initial:
+            event = events[position]
+            while event.other_event.point != initial:
                 processed[position] = True
-                cursor = events[position]
-                if cursor.is_left:
-                    cursor.result_in_out = False
-                    cursor.contour_id = contour_id
+                if event.is_left:
+                    event.result_in_out = False
+                    event.contour_id = contour_id
                 else:
-                    cursor.other_event.result_in_out = True
-                    cursor.other_event.contour_id = contour_id
-                position = cursor.position
+                    event.other_event.result_in_out = True
+                    event.other_event.contour_id = contour_id
+                position = event.position
                 processed[position] = True
                 contour.add(events[position].point)
                 position = self.to_next_position(position, events, processed)
-            processed[position] = processed[events[position].position] = True
-            events[position].other_event.result_in_out = True
-            events[position].other_event.contour_id = contour_id
+                event = events[position]
+            processed[position] = processed[event.position] = True
+            event.other_event.result_in_out = True
+            event.other_event.contour_id = contour_id
             if depth[contour_id] & 1:
                 contour.reverse()
 
