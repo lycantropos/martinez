@@ -44,6 +44,29 @@ Install:
 python setup.py install
 ```
 
+Usage
+-----
+
+Let's for example
+```python
+>>> from martinez.contour import Contour
+>>> from martinez.point import Point
+>>> from martinez.polygon import Polygon
+>>> left_polygon = Polygon([Contour([Point(0.0, 0.0), Point(2.0, 0.0), Point(2.0, 2.0), Point(0.0, 2.0)], [], True)])
+>>> right_polygon = Polygon([Contour([Point(1.0, 1.0), Point(3.0, 1.0), Point(3.0, 3.0), Point(1.0, 3.0)], [], True)])
+>>> from martinez.boolean import OperationType, compute
+>>> compute(left_polygon, right_polygon, OperationType.INTERSECTION)
+Polygon([Contour([Point(1.0, 1.0), Point(2.0, 1.0), Point(2.0, 2.0), Point(1.0, 2.0)], [], True)])
+>>> compute(left_polygon, right_polygon, OperationType.UNION)
+Polygon([Contour([Point(0.0, 0.0), Point(2.0, 0.0), Point(2.0, 1.0), Point(3.0, 1.0), Point(3.0, 3.0), Point(1.0, 3.0), Point(1.0, 2.0), Point(0.0, 2.0)], [], True)])
+>>> compute(left_polygon, right_polygon, OperationType.DIFFERENCE)
+Polygon([Contour([Point(0.0, 0.0), Point(2.0, 0.0), Point(2.0, 1.0), Point(1.0, 1.0), Point(1.0, 2.0), Point(0.0, 2.0)], [], True)])
+>>> compute(left_polygon, right_polygon, OperationType.XOR)
+Polygon([Contour([Point(0.0, 0.0), Point(2.0, 0.0), Point(2.0, 1.0), Point(1.0, 1.0), Point(1.0, 2.0), Point(0.0, 2.0)], [], True), Contour([Point(1.0, 2.0), Point(2.0, 2.0), Point(2.0, 1.0), Point(3.0, 1.0), Point(3.0, 3.0), Point(1.0, 3.0)], [], True)])
+
+```
+original C++ implementation can be invoked by importing from `_martinez` module instead.
+
 Development
 -----------
 
