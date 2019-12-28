@@ -41,7 +41,7 @@ struct SegmentComp {
 };
 
 struct SweepEvent {
-  SweepEvent(bool left = false, const Point_2& point = Point_2(),
+  SweepEvent(bool left = false, const Point& point = Point(),
              SweepEvent* otherEvent = nullptr,
              PolygonType polygonType = SUBJECT, EdgeType edgeType = NORMAL,
              bool inOut = false, bool otherInOut = false, bool inResult = false,
@@ -49,7 +49,7 @@ struct SweepEvent {
              size_t contourId = 0, SweepEvent* prevInResult = nullptr);
   bool left;               // is point the left endpoint of the edge (point,
                            // otherEvent->point)?
-  Point_2 point;           // point associated with the event
+  Point point;             // point associated with the event
   SweepEvent* otherEvent;  // event associated to the other endpoint of the edge
   PolygonType pol;         // Polygon to which the associated segment belongs to
   EdgeType type;
@@ -67,13 +67,13 @@ struct SweepEvent {
   size_t contourId;
   // member functions
   /** Is the line segment (point, otherEvent->point) below point p */
-  bool below(const Point_2& p) const {
+  bool below(const Point& p) const {
     validate();
     return (left) ? signedArea(point, otherEvent->point, p) > 0.
                   : signedArea(otherEvent->point, point, p) > 0.;
   }
   /** Is the line segment (point, otherEvent->point) above point p */
-  bool above(const Point_2& p) const { return !below(p); }
+  bool above(const Point& p) const { return !below(p); }
   /** Is the line segment (point, otherEvent->point) a vertical line segment */
   bool vertical() const {
     validate();
@@ -167,7 +167,7 @@ class BooleanOpImp
 
   /** @brief Divide the segment associated to left event le,
    *  updating pq and (implicitly) the status line */
-  void divideSegment(SweepEvent* le, const Point_2& p);
+  void divideSegment(SweepEvent* le, const Point& p);
 
 #ifdef __STEPBYSTEP
   typedef std::set<SweepEvent*, SegmentComp>::const_iterator const_sl_iterator;
@@ -184,7 +184,7 @@ class BooleanOpImp
   SweepEvent* currentEvent() const { return _currentEvent; }
   SweepEvent* previousEvent() const { return _previousEvent; }
   SweepEvent* nextEvent() const { return _nextEvent; }
-  Point_2 currentPoint() const { return _currentPoint; }
+  Point currentPoint() const { return _currentPoint; }
   const_out_iterator beginOut() const { return out.begin(); }
   const_out_iterator endOut() const { return out.end(); }
 #endif
@@ -222,7 +222,7 @@ class BooleanOpImp
   SweepEvent* _currentEvent;
   SweepEvent* _previousEvent;
   SweepEvent* _nextEvent;
-  Point_2 _currentPoint;
+  Point _currentPoint;
   QSemaphore* doSomething;
   QSemaphore* somethingDone;
   std::vector<SweepEvent*> out;

@@ -15,11 +15,11 @@
 
 using namespace cbop;
 
-SweepEvent::SweepEvent(bool _left, const Point_2& _point,
-                       SweepEvent* _otherEvent, PolygonType _polygonType,
-                       EdgeType _edgeType, bool _inOut, bool _otherInOut,
-                       bool _inResult, bool _resultInOut, size_t position,
-                       size_t _contourId, SweepEvent* prevInResult)
+SweepEvent::SweepEvent(bool _left, const Point& _point, SweepEvent* _otherEvent,
+                       PolygonType _polygonType, EdgeType _edgeType,
+                       bool _inOut, bool _otherInOut, bool _inResult,
+                       bool _resultInOut, size_t position, size_t _contourId,
+                       SweepEvent* prevInResult)
     : left(_left),
       point(_point),
       otherEvent(_otherEvent),
@@ -326,7 +326,7 @@ int BooleanOpImp::possibleIntersection(SweepEvent* le1, SweepEvent* le2) {
   // you can uncomment this line if self-intersecting polygons are not allowed
   //	if (e1->pol == e2->pol) return 0;
 
-  Point_2 ip1, ip2;  // intersection points
+  Point ip1, ip2;  // intersection points
   int nintersections;
 
   if (!(nintersections =
@@ -402,7 +402,7 @@ int BooleanOpImp::possibleIntersection(SweepEvent* le1, SweepEvent* le2) {
   return 3;
 }
 
-void BooleanOpImp::divideSegment(SweepEvent* le, const Point_2& p) {
+void BooleanOpImp::divideSegment(SweepEvent* le, const Point& p) {
   //	std::cout << "YES. INTERSECTION" << std::endl;
   // "Right event" of the "left line segment" resulting from dividing
   // le->segment ()
@@ -483,7 +483,7 @@ void BooleanOpImp::processEvents(const std::vector<SweepEvent*>& events) {
       }
     }
     size_t pos = i;
-    Point_2 initial = events[i]->point;
+    Point initial = events[i]->point;
     contour.add(initial);
     while (events[pos]->otherEvent->point != initial) {
 #ifdef __STEPBYSTEP

@@ -18,7 +18,7 @@
 
 using namespace cbop;
 
-static bool are_counterclockwise(const std::vector<Point_2>& points) {
+static bool are_counterclockwise(const std::vector<Point>& points) {
   if (points.size() <= 1) return true;
   double area = 0.0;
   for (size_t index = 0; index < points.size() - 1; ++index)
@@ -31,7 +31,7 @@ static bool are_counterclockwise(const std::vector<Point_2>& points) {
 
 Contour::Contour() : _points(), _holes(), _external(true), _CC(true) {}
 
-Contour::Contour(const std::vector<cbop::Point_2>& points,
+Contour::Contour(const std::vector<cbop::Point>& points,
                  const std::vector<size_t>& holes, bool external)
     : _points(points),
       _holes(holes),
@@ -128,7 +128,7 @@ std::istream& cbop::operator>>(std::istream& is, Polygon& p) {
       if (j == npoints - 1 && px == contour.vertex(0).x() &&
           py == contour.vertex(0).y())
         continue;
-      contour.add(Point_2(px, py));
+      contour.add(Point(px, py));
     }
     if (contour.nvertices() < 3) {
       p.pop_back();

@@ -15,7 +15,7 @@
 
 #include <algorithm>
 
-#include "point_2.h"
+#include "point.h"
 
 namespace cbop {
 
@@ -25,22 +25,22 @@ class Segment_2 {
   Segment_2() {}
 
   /** Constructor from two points **/
-  Segment_2(const Point_2& source, const Point_2& target)
+  Segment_2(const Point& source, const Point& target)
       : _source(source), _target(target) {}
 
   /** Set the source point */
-  void setSource(const Point_2& source) { _source = source; }
+  void setSource(const Point& source) { _source = source; }
   /** Set the target point */
-  void setTarget(const Point_2& target) { _target = target; }
+  void setTarget(const Point& target) { _target = target; }
 
   /** Get the source point */
-  const Point_2& source() const { return _source; }
+  const Point& source() const { return _source; }
   /** Get the target point */
-  const Point_2& target() const { return _target; }
+  const Point& target() const { return _target; }
 
   /** Return the point of the segment with lexicographically smallest coordinate
    */
-  const Point_2& min() const {
+  const Point& min() const {
     return (_source.x() < _target.x()) ||
                    (_source.x() == _target.x() && _source.y() < _target.y())
                ? _source
@@ -48,7 +48,7 @@ class Segment_2 {
   }
   /** Return the point of the segment with lexicographically largest coordinate
    */
-  const Point_2& max() const {
+  const Point& max() const {
     return (_source.x() > _target.x()) ||
                    (_source.x() == _target.x() && _source.y() > _target.y())
                ? _source
@@ -61,7 +61,7 @@ class Segment_2 {
 
  private:
   /** Segment endpoints */
-  Point_2 _source, _target;
+  Point _source, _target;
 };
 
 inline std::ostream& operator<<(std::ostream& o, const Segment_2& p) {

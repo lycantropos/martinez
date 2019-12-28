@@ -14,7 +14,7 @@
 
 #include "bbox.h"
 #include "booleanop.h"
-#include "point_2.h"
+#include "point.h"
 #include "polygon.h"
 #include "segment_2.h"
 #include "utilities.h"
@@ -100,8 +100,8 @@ static std::ostringstream make_stream() {
   return stream;
 }
 
-static std::vector<cbop::Point_2> contour_to_points(const cbop::Contour& self) {
-  return std::vector<cbop::Point_2>(self.begin(), self.end());
+static std::vector<cbop::Point> contour_to_points(const cbop::Contour& self) {
+  return std::vector<cbop::Point>(self.begin(), self.end());
 }
 
 static std::vector<size_t> contour_to_holes(const cbop::Contour& self) {
@@ -116,7 +116,7 @@ static std::vector<cbop::Contour> polygon_to_contours(
   return std::vector<cbop::Contour>(self.begin(), self.end());
 }
 
-static std::string point_repr(const cbop::Point_2& self) {
+static std::string point_repr(const cbop::Point& self) {
   auto stream = make_stream();
   stream << C_STR(MODULE_NAME) "." POINT_NAME "(" << self.x() << ", "
          << self.y() << ")";
@@ -308,7 +308,7 @@ static py::tuple to_sweep_event_state(const cbop::SweepEvent& self) {
 static cbop::SweepEvent* from_plain_sweep_event_state(const py::tuple& state) {
   if (state.size() != 10) throw std::runtime_error("Invalid state!");
   return new cbop::SweepEvent(
-      state[0].cast<bool>(), state[1].cast<cbop::Point_2>(), nullptr,
+      state[0].cast<bool>(), state[1].cast<cbop::Point>(), nullptr,
       state[2].cast<cbop::PolygonType>(), state[3].cast<cbop::EdgeType>(),
       state[4].cast<bool>(), state[5].cast<bool>(), state[6].cast<bool>(),
       state[7].cast<bool>(), state[8].cast<size_t>(), state[9].cast<size_t>(),
@@ -377,7 +377,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       "find_intersections",
       [](const cbop::Segment_2& first_segment,
          const cbop::Segment_2& second_segment) -> py::tuple {
-        cbop::Point_2 first_intersection_point, second_intersection_point;
+        cbop::Point first_intersection_point, second_intersection_point;
         int intersections_count = cbop::findIntersection(
             first_segment, second_segment, first_intersection_point,
             second_intersection_point);
@@ -448,8 +448,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("y_max", &cbop::Bbox::ymax);
 
   py::class_<cbop::Contour>(m, CONTOUR_NAME)
-      .def(py::init<const std::vector<cbop::Point_2>&,
-                    const std::vector<size_t>&, bool>(),
+      .def(py::init<const std::vector<cbop::Point>&, const std::vector<size_t>&,
+                    bool>(),
            py::arg("points"), py::arg("holes"), py::arg("is_external"))
       .def(py::pickle(
           [](const cbop::Contour& self) {  // __getstate__
@@ -458,7 +458,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
           },
           [](py::tuple tuple) {  // __setstate__
             if (tuple.size() != 3) throw std::runtime_error("Invalid state!");
-            return cbop::Contour(tuple[0].cast<std::vector<cbop::Point_2>>(),
+            return cbop::Contour(tuple[0].cast<std::vector<cbop::Point>>(),
                                  tuple[1].cast<std::vector<size_t>>(),
                                  tuple[2].cast<bool>());
           }))
@@ -554,23 +554,23 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_static("to_next_position", &cbop::BooleanOpImp::nextPos,
                   py::arg("position"), py::arg("events"), py::arg("processed"));
 
-  py::class_<cbop::Point_2>(m, POINT_NAME)
+  py::class_<cbop::Point>(m, POINT_NAME)
       .def(py::init<double, double>(), py::arg("x") = 0., py::arg("y") = 0.)
       .def(py::pickle(
-          [](const cbop::Point_2& self) {  // __getstate__
+          [](const cbop::Point& self) {  // __getstate__
             return py::make_tuple(self.x(), self.y());
           },
           [](py::tuple tuple) {  // __setstate__
             if (tuple.size() != 2) throw std::runtime_error("Invalid state!");
-            return cbop::Point_2(tuple[0].cast<double>(),
-                                 tuple[1].cast<double>());
+            return cbop::Point(tuple[0].cast<double>(),
+                               tuple[1].cast<double>());
           }))
       .def(py::self == py::self)
       .def("__repr__", point_repr)
-      .def("distance_to", &cbop::Point_2::dist, py::arg("other"))
-      .def_property_readonly("x", &cbop::Point_2::x)
-      .def_property_readonly("y", &cbop::Point_2::y)
-      .def_property_readonly("bounding_box", &cbop::Point_2::bbox);
+      .def("distance_to", &cbop::Point::dist, py::arg("other"))
+      .def_property_readonly("x", &cbop::Point::x)
+      .def_property_readonly("y", &cbop::Point::y)
+      .def_property_readonly("bounding_box", &cbop::Point::bbox);
 
   py::class_<cbop::Polygon>(m, POLYGON_NAME)
       .def(py::init<const std::vector<cbop::Contour>&>(), py::arg("contours"))
@@ -594,17 +594,17 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def("join", &cbop::Polygon::join);
 
   py::class_<cbop::Segment_2>(m, SEGMENT_NAME)
-      .def(py::init<cbop::Point_2, cbop::Point_2>(),
-           py::arg("source") = cbop::Point_2(),
-           py::arg("target") = cbop::Point_2())
+      .def(py::init<cbop::Point, cbop::Point>(),
+           py::arg("source") = cbop::Point(),
+           py::arg("target") = cbop::Point())
       .def(py::pickle(
           [](const cbop::Segment_2& self) {  // __getstate__
             return py::make_tuple(self.source(), self.target());
           },
           [](py::tuple tuple) {  // __setstate__
             if (tuple.size() != 2) throw std::runtime_error("Invalid state!");
-            return cbop::Segment_2(tuple[0].cast<cbop::Point_2>(),
-                                   tuple[1].cast<cbop::Point_2>());
+            return cbop::Segment_2(tuple[0].cast<cbop::Point>(),
+                                   tuple[1].cast<cbop::Point>());
           }))
       .def("__eq__",
            [](const cbop::Segment_2& self, const cbop::Segment_2& other) {
@@ -631,7 +631,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
 
   py::class_<cbop::SweepEvent, std::unique_ptr<cbop::SweepEvent, py::nodelete>>(
       m, SWEEP_EVENT_NAME)
-      .def(py::init<bool, const cbop::Point_2&, cbop::SweepEvent*,
+      .def(py::init<bool, const cbop::Point&, cbop::SweepEvent*,
                     cbop::PolygonType, cbop::EdgeType, bool, bool, bool, bool,
                     size_t, size_t, cbop::SweepEvent*>(),
            py::arg("left"), py::arg("point"), py::arg("other_event").none(true),

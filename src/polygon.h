@@ -19,16 +19,16 @@ namespace cbop {
 
 class Contour {
  public:
-  typedef std::vector<Point_2>::iterator iterator;
-  typedef std::vector<Point_2>::const_iterator const_iterator;
+  typedef std::vector<Point>::iterator iterator;
+  typedef std::vector<Point>::const_iterator const_iterator;
 
   Contour();
-  Contour(const std::vector<Point_2>& points, const std::vector<size_t>& holes,
+  Contour(const std::vector<Point>& points, const std::vector<size_t>& holes,
           bool external);
 
   /** Get the p-th vertex of the external contour */
-  Point_2& vertex(size_t p) { return _points[p]; }
-  Point_2 vertex(size_t p) const { return _points[p]; }
+  Point& vertex(size_t p) { return _points[p]; }
+  Point vertex(size_t p) const { return _points[p]; }
   Segment_2 segment(size_t p) const {
     return (p == nvertices() - 1) ? Segment_2(_points.back(), _points.front())
                                   : Segment_2(_points[p], _points[p + 1]);
@@ -49,7 +49,7 @@ class Contour {
     if (clockwise()) changeOrientation();
   }
 
-  void add(const Point_2& s) { _points.push_back(s); }
+  void add(const Point& s) { _points.push_back(s); }
   void erase(iterator i) { _points.erase(i); }
   void clear() {
     _points.clear();
@@ -60,8 +60,8 @@ class Contour {
   iterator end() { return _points.end(); }
   const_iterator begin() const { return _points.begin(); }
   const_iterator end() const { return _points.end(); }
-  Point_2& back() { return _points.back(); }
-  const Point_2& back() const { return _points.back(); }
+  Point& back() { return _points.back(); }
+  const Point& back() const { return _points.back(); }
   void addHole(size_t ind) { _holes.push_back(ind); }
   size_t nholes() const { return _holes.size(); }
   size_t hole(size_t p) const { return _holes[p]; }
@@ -70,7 +70,7 @@ class Contour {
 
  private:
   /** Set of points conforming the external contour */
-  std::vector<Point_2> _points;
+  std::vector<Point> _points;
   /** Holes of the contour. They are stored as the indexes of the holes in a
    * polygon class */
   std::vector<size_t> _holes;
