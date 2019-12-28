@@ -47,7 +47,6 @@ python setup.py install
 Usage
 -----
 
-Let's for example
 ```python
 >>> from martinez.contour import Contour
 >>> from martinez.point import Point
