@@ -706,3 +706,10 @@ class Operation:
                 break
             result -= 1
         return result
+
+
+def compute(left: Polygon, right: Polygon,
+            operation_type: OperationType) -> Polygon:
+    operation = Operation(left, right, operation_type)
+    operation.run()
+    return operation.resultant
