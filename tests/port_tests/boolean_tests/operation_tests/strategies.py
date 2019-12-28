@@ -10,7 +10,6 @@ from martinez.boolean import (Operation,
                               SweepEvent)
 from martinez.contour import Contour
 from martinez.hints import Scalar
-from martinez.point import Point
 from martinez.polygon import Polygon
 from tests.strategies import (booleans,
                               non_negative_integers_lists,
@@ -26,8 +25,9 @@ from tests.utils import (MAX_CONTOURS_COUNT,
                          is_sweep_event_non_degenerate,
                          strategy_to_pairs,
                          to_non_overlapping_contours_list,
+                         to_non_overlapping_ported_polygons_pair,
                          to_ported_rectangle,
-                         to_valid_coordinates)
+                         to_valid_coordinates_pairs)
 
 points = scalars_strategies.flatmap(scalars_to_ported_points)
 sweep_events = scalars_strategies.flatmap(scalars_to_ported_sweep_events)
@@ -65,22 +65,6 @@ nested_sweep_events_pairs = (
 operations_types = ported_operations_types
 
 
-def to_non_overlapping_polygons_pair(first_polygon: Polygon,
-                                     second_polygon: Polygon
-                                     ) -> Tuple[Polygon, Polygon]:
-    first_bounding_box = first_polygon.bounding_box
-    second_bounding_box = second_polygon.bounding_box
-    delta_x = (max(first_bounding_box.x_max, second_bounding_box.x_max)
-               - min(first_bounding_box.x_min, second_bounding_box.x_min))
-    delta_y = (max(first_bounding_box.y_max, second_bounding_box.y_max)
-               - min(first_bounding_box.y_min, second_bounding_box.y_min))
-    return first_polygon, Polygon([Contour([Point(point.x + 2 * delta_x,
-                                                  point.y + 2 * delta_y)
-                                            for point in contour.points],
-                                           contour.holes, contour.is_external)
-                                   for contour in second_polygon.contours])
-
-
 def to_operation_with_non_overlapping_arguments(polygons_pair: Tuple[Polygon,
                                                                      Polygon],
                                                 operation_type: OperationType
@@ -106,12 +90,12 @@ def scalars_to_trivial_operations(scalars: Strategy[Scalar],
                               operations_types)
             | strategies.builds(Operation, polygons, empty_polygons,
                                 operations_types)
-            | strategies.builds(to_operation_with_non_overlapping_arguments,
-                                strategies.builds(
-                                        to_non_overlapping_polygons_pair,
-                                        non_empty_polygons,
-                                        non_empty_polygons),
-                                operations_types))
+            | strategies.builds(
+                    to_operation_with_non_overlapping_arguments,
+                    strategies.builds(to_non_overlapping_ported_polygons_pair,
+                                      non_empty_polygons,
+                                      non_empty_polygons),
+                    operations_types))
 
 
 def scalars_to_polygons(scalars: Strategy[Scalar],
@@ -127,8 +111,7 @@ def scalars_to_polygons(scalars: Strategy[Scalar],
 
 polygons = scalars_strategies.flatmap(scalars_to_polygons)
 non_empty_polygons = scalars_strategies.flatmap(partial(scalars_to_polygons,
-                                                        min_size=1,
-                                                        max_size=1))
+                                                        min_size=1))
 
 
 def scalars_to_contours_lists(scalars: Strategy[Scalar],
@@ -152,7 +135,7 @@ def scalars_to_contours_vertices(scalars: Strategy[Scalar]) -> List:
     coordinates = (strategies.lists(scalars,
                                     min_size=2)
                    .map(sorted)
-                   .map(to_valid_coordinates))
+                   .map(to_valid_coordinates_pairs))
     return strategies.builds(to_ported_rectangle, coordinates, coordinates)
 
 

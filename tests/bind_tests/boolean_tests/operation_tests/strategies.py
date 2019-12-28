@@ -1,8 +1,7 @@
 from typing import (List,
                     Tuple)
 
-from _martinez import (Contour,
-                       Operation,
+from _martinez import (Operation,
                        OperationType,
                        Point,
                        Polygon,
@@ -12,6 +11,7 @@ from hypothesis import strategies
 from tests.strategies import (booleans,
                               bound_operations_types,
                               floats,
+                              to_bound_contours,
                               to_bound_sweep_events,
                               to_nested_bound_sweep_events)
 from tests.utils import (MAX_CONTOURS_COUNT,
@@ -19,9 +19,8 @@ from tests.utils import (MAX_CONTOURS_COUNT,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
-                         to_bound_rectangle,
-                         to_non_overlapping_contours_list,
-                         to_valid_coordinates)
+                         to_non_overlapping_bound_polygons_pair,
+                         to_non_overlapping_contours_list)
 
 points = strategies.builds(Point, floats, floats)
 sweep_events = to_bound_sweep_events()
@@ -55,15 +54,7 @@ nested_sweep_events_pairs = (
         | nested_sweep_events_pairs
         .filter(are_sweep_events_pair_with_different_polygon_types))
 operations_types = bound_operations_types
-coordinates = (strategies.lists(floats,
-                                min_size=2)
-               .map(sorted)
-               .map(to_valid_coordinates))
-rectangles_vertices = strategies.builds(to_bound_rectangle,
-                                        coordinates, coordinates)
-contours_vertices = rectangles_vertices
-contours = strategies.builds(Contour, contours_vertices,
-                             strategies.builds(list), strategies.just(True))
+contours = to_bound_contours()
 contours_lists = (strategies.lists(contours,
                                    max_size=MAX_CONTOURS_COUNT)
                   .map(to_non_overlapping_contours_list))
@@ -74,22 +65,6 @@ non_empty_contours_lists = (strategies.lists(contours,
 polygons = strategies.builds(Polygon, contours_lists)
 empty_polygons = strategies.builds(Polygon, empty_contours_lists)
 non_empty_polygons = strategies.builds(Polygon, non_empty_contours_lists)
-
-
-def to_non_overlapping_polygons_pair(first_polygon: Polygon,
-                                     second_polygon: Polygon
-                                     ) -> Tuple[Polygon, Polygon]:
-    first_bounding_box = first_polygon.bounding_box
-    second_bounding_box = second_polygon.bounding_box
-    delta_x = (max(first_bounding_box.x_max, second_bounding_box.x_max)
-               - min(first_bounding_box.x_min, second_bounding_box.x_min))
-    delta_y = (max(first_bounding_box.y_max, second_bounding_box.y_max)
-               - min(first_bounding_box.y_min, second_bounding_box.y_min))
-    return first_polygon, Polygon([Contour([Point(point.x + 2 * delta_x,
-                                                  point.y + 2 * delta_y)
-                                            for point in contour.points],
-                                           contour.holes, contour.is_external)
-                                   for contour in second_polygon.contours])
 
 
 def to_operation_with_non_overlapping_arguments(polygons_pair: Tuple[Polygon,
@@ -105,9 +80,10 @@ trivial_operations = (
         | strategies.builds(Operation, polygons, empty_polygons,
                             operations_types)
         | strategies.builds(to_operation_with_non_overlapping_arguments,
-                            strategies.builds(to_non_overlapping_polygons_pair,
-                                              non_empty_polygons,
-                                              non_empty_polygons),
+                            strategies.builds(
+                                    to_non_overlapping_bound_polygons_pair,
+                                    non_empty_polygons,
+                                    non_empty_polygons),
                             operations_types))
 non_trivial_operations = strategies.builds(Operation, non_empty_polygons,
                                            non_empty_polygons,

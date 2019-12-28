@@ -28,6 +28,9 @@ from tests.utils import (BoundPortedPointsPair,
                          PortedPointsPair,
                          PortedPointsTriplet,
                          Strategy,
+                         to_bound_rectangle,
+                         to_ported_rectangle,
+                         to_valid_coordinates_pairs,
                          traverse_sweep_event)
 from .literals import (booleans,
                        bound_edges_types,
@@ -75,9 +78,45 @@ def scalars_to_ported_segments(scalars: Strategy[Scalar]
     return strategies.builds(PortedSegment, points_strategy, points_strategy)
 
 
+def to_bound_contours(coordinates: Strategy[float] = floats,
+                      *,
+                      holes: Strategy[List[int]] = strategies.builds(list),
+                      are_external: Strategy[bool] = strategies.just(True)
+                      ) -> Strategy[BoundContour]:
+    coordinates = (strategies.lists(coordinates,
+                                    min_size=2)
+                   .map(sorted)
+                   .map(to_valid_coordinates_pairs))
+    rectangles_vertices = strategies.builds(to_bound_rectangle,
+                                            coordinates, coordinates)
+    contours_vertices = rectangles_vertices
+    return strategies.builds(BoundContour,
+                             contours_vertices, holes, are_external)
+
+
 def to_bound_with_ported_points_pair(x: float, y: float
                                      ) -> BoundPortedPointsPair:
     return BoundPoint(x, y), PortedPoint(x, y)
+
+
+def to_bound_with_ported_contours_vertices_pair(
+        coordinates: Strategy[float] = floats
+) -> Strategy[Tuple[List[BoundPoint], List[PortedPoint]]]:
+    coordinates_pairs = (strategies.lists(coordinates,
+                                          min_size=2)
+                         .map(sorted)
+                         .map(to_valid_coordinates_pairs))
+
+    def to_bound_with_ported_rectangles_pair(xs: Tuple[float, float],
+                                             ys: Tuple[float, float]
+                                             ) -> Tuple[List[BoundPoint],
+                                                        List[PortedPoint]]:
+        return to_bound_rectangle(xs, ys), to_ported_rectangle(xs, ys)
+
+    rectangles_vertices_pairs = strategies.builds(
+            to_bound_with_ported_rectangles_pair,
+            coordinates_pairs, coordinates_pairs)
+    return rectangles_vertices_pairs
 
 
 def to_bound_with_ported_contours_pair(

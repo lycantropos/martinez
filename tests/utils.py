@@ -94,12 +94,12 @@ def is_even_permutation(permutation: Sequence[int]) -> bool:
     return not counter % 2
 
 
-def to_valid_coordinates(candidates: List[Scalar],
-                         *,
-                         lower_bound: int = 1,
-                         upper_bound: int = int(math.sqrt(MAX_VALUE
-                                                          - MIN_VALUE))
-                         ) -> Tuple[Scalar, Scalar]:
+def to_valid_coordinates_pairs(candidates: List[Scalar],
+                               *,
+                               lower_bound: int = 1,
+                               upper_bound: int = int(math.sqrt(MAX_VALUE
+                                                                - MIN_VALUE))
+                               ) -> Tuple[Scalar, Scalar]:
     start, *rest, end = candidates
     if not (lower_bound <= end - start <= upper_bound):
         start = next((candidate
@@ -157,6 +157,11 @@ def to_non_overlapping_contours_list(contours: List[AnyContour]
     return result
 
 
+def to_non_overlapping_contours_lists(lists: Tuple[List[AnyContour], ...]
+                                      ) -> Tuple[List[AnyContour], ...]:
+    return tuple(map(to_non_overlapping_contours_list, lists))
+
+
 AnySweepEvent = TypeVar('AnySweepEvent', BoundSweepEvent, PortedSweepEvent)
 
 
@@ -184,6 +189,49 @@ def to_segments(points: AnyPoint) -> Sequence[AnySegment]:
                 for index in range(len(points))]
     else:
         return to_ported_segments(points)
+
+
+def to_non_overlapping_bound_polygons_pair(first_polygon: BoundPolygon,
+                                           second_polygon: BoundPolygon
+                                           ) -> Tuple[BoundPolygon,
+                                                      BoundPolygon]:
+    delta_x, delta_y = to_bounding_boxes_offset(first_polygon.bounding_box,
+                                                second_polygon.bounding_box)
+    second_polygon = BoundPolygon(
+            [BoundContour([BoundPoint(point.x + 2 * delta_x,
+                                      point.y + 2 * delta_y)
+                           for point in contour.points],
+                          contour.holes, contour.is_external)
+             for contour in second_polygon.contours])
+    return first_polygon, second_polygon
+
+
+def to_non_overlapping_ported_polygons_pair(first_polygon: PortedPolygon,
+                                            second_polygon: PortedPolygon
+                                            ) -> Tuple[PortedPolygon,
+                                                       PortedPolygon]:
+    delta_x, delta_y = to_bounding_boxes_offset(first_polygon.bounding_box,
+                                                second_polygon.bounding_box)
+    second_polygon = PortedPolygon(
+            [PortedContour([PortedPoint(point.x + 2 * delta_x,
+                                        point.y + 2 * delta_y)
+                            for point in contour.points],
+                           contour.holes, contour.is_external)
+             for contour in second_polygon.contours])
+    return first_polygon, second_polygon
+
+
+AnyBoundingBox = TypeVar('AnyBoundingBox', BoundBoundingBox, PortedBoundingBox)
+
+
+def to_bounding_boxes_offset(first_bounding_box: AnyBoundingBox,
+                             second_bounding_box: AnyBoundingBox
+                             ) -> Tuple[Scalar, Scalar]:
+    delta_x = (max(first_bounding_box.x_max, second_bounding_box.x_max)
+               - min(first_bounding_box.x_min, second_bounding_box.x_min))
+    delta_y = (max(first_bounding_box.y_max, second_bounding_box.y_max)
+               - min(first_bounding_box.y_min, second_bounding_box.y_min))
+    return delta_x, delta_y
 
 
 def are_non_overlapping_segments_pair(first_segment: AnySegment,
