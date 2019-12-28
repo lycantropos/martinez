@@ -59,8 +59,6 @@ struct SweepEvent {
   bool inOut;
   bool otherInOut;  // inOut transition for the segment from the other polygon
                     // preceding this segment in sl
-  std::set<SweepEvent*, SegmentComp>::iterator
-      posSL;                 // Position of the event (line segment) in sl
   SweepEvent* prevInResult;  // previous segment in sl belonging to the result
                              // of the boolean operation
   bool inResult;
