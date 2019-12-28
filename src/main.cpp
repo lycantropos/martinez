@@ -373,6 +373,9 @@ PYBIND11_MODULE(MODULE_NAME, m) {
         Python binding of polygon clipping algorithm by F. Martínez et al.
     )pbdoc";
 
+  m.def("compute", &cbop::compute, pybind11::arg("left"),
+        pybind11::arg("right"), pybind11::arg("operation_type"));
+
   m.def(
       "find_intersections",
       [](const cbop::Segment& first_segment,
