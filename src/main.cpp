@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "bbox_2.h"
+#include "bbox.h"
 #include "booleanop.h"
 #include "point_2.h"
 #include "polygon.h"
@@ -414,39 +414,38 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .value("CLIPPING", cbop::PolygonType::CLIPPING)
       .export_values();
 
-  py::class_<cbop::Bbox_2>(m, BOUNDING_BOX_NAME)
+  py::class_<cbop::Bbox>(m, BOUNDING_BOX_NAME)
       .def(py::init<double, double, double, double>(), py::arg("x_min") = 0.,
            py::arg("y_min") = 0., py::arg("x_max") = 0., py::arg("y_max") = 0.)
       .def(py::pickle(
-          [](const cbop::Bbox_2& self) {  // __getstate__
+          [](const cbop::Bbox& self) {  // __getstate__
             return py::make_tuple(self.xmin(), self.ymin(), self.xmax(),
                                   self.ymax());
           },
           [](py::tuple tuple) {  // __setstate__
             if (tuple.size() != 4) throw std::runtime_error("Invalid state!");
-            return cbop::Bbox_2(
-                tuple[0].cast<double>(), tuple[1].cast<double>(),
-                tuple[2].cast<double>(), tuple[3].cast<double>());
+            return cbop::Bbox(tuple[0].cast<double>(), tuple[1].cast<double>(),
+                              tuple[2].cast<double>(), tuple[3].cast<double>());
           }))
-      .def("__add__", &cbop::Bbox_2::operator+)
+      .def("__add__", &cbop::Bbox::operator+)
       .def("__eq__",
-           [](const cbop::Bbox_2& self, const cbop::Bbox_2& other) {
+           [](const cbop::Bbox& self, const cbop::Bbox& other) {
              return self.xmin() == other.xmin() &&
                     self.ymin() == other.ymin() &&
                     self.xmax() == other.xmax() && self.ymax() == other.ymax();
            })
       .def("__repr__",
-           [](const cbop::Bbox_2& self) -> std::string {
+           [](const cbop::Bbox& self) -> std::string {
              auto stream = make_stream();
              stream << C_STR(MODULE_NAME) "." BOUNDING_BOX_NAME "("
                     << self.xmin() << ", " << self.ymin() << ", " << self.xmax()
                     << ", " << self.ymax() << ")";
              return stream.str();
            })
-      .def_property_readonly("x_min", &cbop::Bbox_2::xmin)
-      .def_property_readonly("y_min", &cbop::Bbox_2::ymin)
-      .def_property_readonly("x_max", &cbop::Bbox_2::xmax)
-      .def_property_readonly("y_max", &cbop::Bbox_2::ymax);
+      .def_property_readonly("x_min", &cbop::Bbox::xmin)
+      .def_property_readonly("y_min", &cbop::Bbox::ymin)
+      .def_property_readonly("x_max", &cbop::Bbox::xmax)
+      .def_property_readonly("y_max", &cbop::Bbox::ymax);
 
   py::class_<cbop::Contour>(m, CONTOUR_NAME)
       .def(py::init<const std::vector<cbop::Point_2>&,

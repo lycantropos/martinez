@@ -193,8 +193,8 @@ class BooleanOpImp
   const Polygon _clipping;
   Polygon _result;
   BooleanOpType _operation;
-  Bbox_2 _subjectBB;   // for optimizations 1 and 2
-  Bbox_2 _clippingBB;  // for optimizations 1 and 2
+  Bbox _subjectBB;   // for optimizations 1 and 2
+  Bbox _clippingBB;  // for optimizations 1 and 2
   bool _alreadyRun;
   std::priority_queue<SweepEvent*, std::vector<SweepEvent*>, SweepEventComp>
       eq;  // event queue (sorted events to be processed)

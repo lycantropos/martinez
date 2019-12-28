@@ -43,9 +43,9 @@ void Contour::changeOrientation() {
   _CC = are_counterclockwise(_points);
 }
 
-Bbox_2 Contour::bbox() const {
-  if (nvertices() == 0) return Bbox_2();
-  Bbox_2 b = vertex(0).bbox();
+Bbox Contour::bbox() const {
+  if (nvertices() == 0) return Bbox();
+  Bbox b = vertex(0).bbox();
   for (size_t i = 1; i < nvertices(); ++i) b = b + vertex(i).bbox();
   return b;
 }
@@ -88,9 +88,9 @@ size_t Polygon::nvertices() const {
   return nv;
 }
 
-Bbox_2 Polygon::bbox() const {
-  if (ncontours() == 0) return Bbox_2();
-  Bbox_2 bb = _contours[0].bbox();
+Bbox Polygon::bbox() const {
+  if (ncontours() == 0) return Bbox();
+  Bbox bb = _contours[0].bbox();
   for (size_t i = 1; i < ncontours(); i++) bb = bb + _contours[i].bbox();
   return bb;
 }

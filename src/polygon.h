@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "bbox_2.h"
+#include "bbox.h"
 #include "utilities.h"
 
 namespace cbop {
@@ -36,7 +36,7 @@ class Contour {
   /** Number of vertices and edges */
   size_t nvertices() const { return _points.size(); }
   /** Get the bounding box */
-  Bbox_2 bbox() const;
+  Bbox bbox() const;
   /** Return if the contour is counterclockwise oriented */
   bool counterclockwise() const { return _CC; };
   /** Return if the contour is clockwise oriented */
@@ -102,7 +102,7 @@ class Polygon {
   /** Number of vertices */
   size_t nvertices() const;
   /** Get the bounding box */
-  Bbox_2 bbox() const;
+  Bbox bbox() const;
   void push_back(const Contour& c) { _contours.push_back(c); }
   Contour& back() { return _contours.back(); }
   const Contour& back() const { return _contours.back(); }

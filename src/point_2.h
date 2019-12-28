@@ -16,7 +16,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "bbox_2.h"
+#include "bbox.h"
 
 namespace cbop {
 
@@ -25,7 +25,7 @@ class Point_2 {
   Point_2(double x = 0.0, double y = 0.0) : _x(x), _y(y) {}
   double x() const { return _x; }
   double y() const { return _y; }
-  Bbox_2 bbox() const { return Bbox_2(_x, _y, _x, _y); }
+  Bbox bbox() const { return Bbox(_x, _y, _x, _y); }
   /** Distance to other point */
   double dist(const Point_2& p) const {
     double dx = x() - p.x();
