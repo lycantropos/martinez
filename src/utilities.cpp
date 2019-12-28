@@ -32,8 +32,8 @@ static int findIntersection(double u0, double u1, double v0, double v1,
   }
 }
 
-int cbop::findIntersection(const Segment_2& seg0, const Segment_2& seg1,
-                           Point& pi0, Point& pi1) {
+int cbop::findIntersection(const Segment& seg0, const Segment& seg1, Point& pi0,
+                           Point& pi1) {
   static const double sqrEpsilon = 0.0000001;  // it was 0.001 before
   static const double threshold = 0.00000001;
   Point p0 = seg0.source();

@@ -37,7 +37,7 @@ std::string SweepEvent::toString() const {
   std::ostringstream oss;
   oss << '(' << point.x() << ',' << point.y() << ')';
   oss << " (" << (left ? "left" : "right") << ')';
-  Segment_2 s(point, otherEvent->point);
+  Segment s(point, otherEvent->point);
   oss << " S:[(" << s.min().x() << ',' << s.min().y() << ") - (" << s.max().x()
       << ',' << s.max().y() << ")]";
   oss << " (" << (pol == SUBJECT ? "SUBJECT" : "CLIPPING") << ')';
@@ -233,7 +233,7 @@ void BooleanOpImp::processSegments() {
       processSegment(_clipping.contour(i).segment(j), CLIPPING);
 }
 
-void BooleanOpImp::processSegment(const Segment_2& s, PolygonType pt) {
+void BooleanOpImp::processSegment(const Segment& s, PolygonType pt) {
   /*	if (s.degenerate ()) // if the two edge endpoints are equal the segment
      is dicarded
               return;          // This can be done as preprocessing to avoid

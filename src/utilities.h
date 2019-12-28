@@ -14,11 +14,11 @@
 #include <algorithm>
 
 #include "point.h"
-#include "segment_2.h"
+#include "segment.h"
 
 namespace cbop {
 
-int findIntersection(const Segment_2& seg0, const Segment_2& seg1, Point& ip0,
+int findIntersection(const Segment& seg0, const Segment& seg1, Point& ip0,
                      Point& ip1);
 
 /** Signed area of the triangle (p0, p1, p2) */

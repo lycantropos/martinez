@@ -80,9 +80,9 @@ struct SweepEvent {
     return point.x() == otherEvent->point.x();
   }
   /** Return the line segment associated to the SweepEvent */
-  Segment_2 segment() const {
+  Segment segment() const {
     validate();
-    return Segment_2(point, otherEvent->point);
+    return Segment(point, otherEvent->point);
   }
   void validate() const {
     if (!otherEvent) throw std::domain_error("No `otherEvent` found.");
@@ -206,7 +206,7 @@ class BooleanOpImp
   SweepEventComp sec;  // to compare events
   /** @brief Compute the events associated to segment s, and insert them into pq
    * and eq */
-  void processSegment(const Segment_2& s, PolygonType pt);
+  void processSegment(const Segment& s, PolygonType pt);
   /** @brief Store the SweepEvent e into the event holder, returning the address
    * of e */
   SweepEvent* storeSweepEvent(const SweepEvent& e) {

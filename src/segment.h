@@ -7,11 +7,11 @@
  ***************************************************************************/
 
 // ------------------------------------------------------------------
-// Segment_2 Class - A line segment in the plane
+// Segment Class - A line segment in the plane
 // ------------------------------------------------------------------
 
-#ifndef SEGMENT_2_H
-#define SEGMENT_2_H
+#ifndef SEGMENT_H
+#define SEGMENT_H
 
 #include <algorithm>
 
@@ -19,13 +19,13 @@
 
 namespace cbop {
 
-class Segment_2 {
+class Segment {
  public:
   /** Default constructor */
-  Segment_2() {}
+  Segment() {}
 
   /** Constructor from two points **/
-  Segment_2(const Point& source, const Point& target)
+  Segment(const Point& source, const Point& target)
       : _source(source), _target(target) {}
 
   /** Set the source point */
@@ -57,14 +57,14 @@ class Segment_2 {
   bool degenerate() const { return _source == _target; }
   bool is_vertical() const { return _source.x() == _target.x(); }
   /** Change the segment orientation */
-  Segment_2 changeOrientation() { return Segment_2(_target, _source); }
+  Segment changeOrientation() { return Segment(_target, _source); }
 
  private:
   /** Segment endpoints */
   Point _source, _target;
 };
 
-inline std::ostream& operator<<(std::ostream& o, const Segment_2& p) {
+inline std::ostream& operator<<(std::ostream& o, const Segment& p) {
   return o << p.source() << "-" << p.target();
 }
 

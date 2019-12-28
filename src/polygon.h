@@ -29,9 +29,9 @@ class Contour {
   /** Get the p-th vertex of the external contour */
   Point& vertex(size_t p) { return _points[p]; }
   Point vertex(size_t p) const { return _points[p]; }
-  Segment_2 segment(size_t p) const {
-    return (p == nvertices() - 1) ? Segment_2(_points.back(), _points.front())
-                                  : Segment_2(_points[p], _points[p + 1]);
+  Segment segment(size_t p) const {
+    return (p == nvertices() - 1) ? Segment(_points.back(), _points.front())
+                                  : Segment(_points[p], _points[p + 1]);
   }
   /** Number of vertices and edges */
   size_t nvertices() const { return _points.size(); }

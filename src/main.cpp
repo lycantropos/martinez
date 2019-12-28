@@ -16,7 +16,7 @@
 #include "booleanop.h"
 #include "point.h"
 #include "polygon.h"
-#include "segment_2.h"
+#include "segment.h"
 #include "utilities.h"
 
 namespace py = pybind11;
@@ -375,8 +375,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
 
   m.def(
       "find_intersections",
-      [](const cbop::Segment_2& first_segment,
-         const cbop::Segment_2& second_segment) -> py::tuple {
+      [](const cbop::Segment& first_segment,
+         const cbop::Segment& second_segment) -> py::tuple {
         cbop::Point first_intersection_point, second_intersection_point;
         int intersections_count = cbop::findIntersection(
             first_segment, second_segment, first_intersection_point,
@@ -593,41 +593,39 @@ PYBIND11_MODULE(MODULE_NAME, m) {
       .def_property_readonly("contours", polygon_to_contours)
       .def("join", &cbop::Polygon::join);
 
-  py::class_<cbop::Segment_2>(m, SEGMENT_NAME)
+  py::class_<cbop::Segment>(m, SEGMENT_NAME)
       .def(py::init<cbop::Point, cbop::Point>(),
            py::arg("source") = cbop::Point(),
            py::arg("target") = cbop::Point())
       .def(py::pickle(
-          [](const cbop::Segment_2& self) {  // __getstate__
+          [](const cbop::Segment& self) {  // __getstate__
             return py::make_tuple(self.source(), self.target());
           },
           [](py::tuple tuple) {  // __setstate__
             if (tuple.size() != 2) throw std::runtime_error("Invalid state!");
-            return cbop::Segment_2(tuple[0].cast<cbop::Point>(),
-                                   tuple[1].cast<cbop::Point>());
+            return cbop::Segment(tuple[0].cast<cbop::Point>(),
+                                 tuple[1].cast<cbop::Point>());
           }))
       .def("__eq__",
-           [](const cbop::Segment_2& self, const cbop::Segment_2& other) {
+           [](const cbop::Segment& self, const cbop::Segment& other) {
              return self.source() == other.source() &&
                     self.target() == other.target();
            })
       .def("__repr__",
-           [](const cbop::Segment_2& self) -> std::string {
+           [](const cbop::Segment& self) -> std::string {
              auto stream = make_stream();
              stream << C_STR(MODULE_NAME) "." SEGMENT_NAME "("
                     << point_repr(self.source()) << ", "
                     << point_repr(self.target()) << ")";
              return stream.str();
            })
-      .def_property("source", &cbop::Segment_2::source,
-                    &cbop::Segment_2::setSource)
-      .def_property("target", &cbop::Segment_2::target,
-                    &cbop::Segment_2::setTarget)
-      .def_property_readonly("max", &cbop::Segment_2::max)
-      .def_property_readonly("min", &cbop::Segment_2::min)
-      .def_property_readonly("is_degenerate", &cbop::Segment_2::degenerate)
-      .def_property_readonly("is_vertical", &cbop::Segment_2::is_vertical)
-      .def_property_readonly("reversed", &cbop::Segment_2::changeOrientation);
+      .def_property("source", &cbop::Segment::source, &cbop::Segment::setSource)
+      .def_property("target", &cbop::Segment::target, &cbop::Segment::setTarget)
+      .def_property_readonly("max", &cbop::Segment::max)
+      .def_property_readonly("min", &cbop::Segment::min)
+      .def_property_readonly("is_degenerate", &cbop::Segment::degenerate)
+      .def_property_readonly("is_vertical", &cbop::Segment::is_vertical)
+      .def_property_readonly("reversed", &cbop::Segment::changeOrientation);
 
   py::class_<cbop::SweepEvent, std::unique_ptr<cbop::SweepEvent, py::nodelete>>(
       m, SWEEP_EVENT_NAME)
