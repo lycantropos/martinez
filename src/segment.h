@@ -13,8 +13,6 @@
 #ifndef SEGMENT_H
 #define SEGMENT_H
 
-#include <algorithm>
-
 #include "point.h"
 
 namespace cbop {

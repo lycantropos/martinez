@@ -9,7 +9,6 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include <algorithm>
 #include <vector>
 
 #include "bbox.h"

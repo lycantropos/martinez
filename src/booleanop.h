@@ -10,8 +10,6 @@
 #define BOOLEANOP_H
 
 #include <functional>
-#include <iostream>
-#include <list>
 #include <queue>
 #include <set>
 #include <stdexcept>

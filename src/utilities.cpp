@@ -8,8 +8,6 @@
 
 #include "utilities.h"
 
-#include <algorithm>
-
 using namespace cbop;
 
 static int findIntersection(double u0, double u1, double v0, double v1,

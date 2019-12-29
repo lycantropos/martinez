@@ -11,8 +11,6 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-#include <algorithm>
-
 #include "point.h"
 #include "segment.h"
 

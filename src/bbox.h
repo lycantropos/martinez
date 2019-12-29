@@ -13,6 +13,8 @@
 #ifndef BBOX_H
 #define BBOX_H
 
+#include <algorithm>
+
 namespace cbop {
 
 class Bbox {
