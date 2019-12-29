@@ -28,11 +28,6 @@ class Segment {
   Segment(const Point& source, const Point& target)
       : _source(source), _target(target) {}
 
-  /** Set the source point */
-  void setSource(const Point& source) { _source = source; }
-  /** Set the target point */
-  void setTarget(const Point& target) { _target = target; }
-
   /** Get the source point */
   const Point& source() const { return _source; }
   /** Get the target point */
