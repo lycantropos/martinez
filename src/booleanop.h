@@ -87,7 +87,6 @@ struct SweepEvent {
   void validate() const {
     if (!otherEvent) throw std::domain_error("No `otherEvent` found.");
   }
-  std::string toString() const;
 };
 
 struct SweepEventComp

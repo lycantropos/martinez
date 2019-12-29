@@ -33,22 +33,6 @@ SweepEvent::SweepEvent(bool _left, const Point& _point, SweepEvent* _otherEvent,
       contourId(_contourId),
       prevInResult(prevInResult) {}
 
-std::string SweepEvent::toString() const {
-  std::ostringstream oss;
-  oss << '(' << point.x() << ',' << point.y() << ')';
-  oss << " (" << (left ? "left" : "right") << ')';
-  Segment s(point, otherEvent->point);
-  oss << " S:[(" << s.min().x() << ',' << s.min().y() << ") - (" << s.max().x()
-      << ',' << s.max().y() << ")]";
-  oss << " (" << (pol == SUBJECT ? "SUBJECT" : "CLIPPING") << ')';
-  std::string et[4] = {"NORMAL", "NON_CONTRIBUTING", "SAME_TRANSITION",
-                       "DIFFERENT_TRANSITION"};
-  oss << " (" << et[type] << ')';
-  oss << " (" << (inOut ? "inOut" : "outIn") << ')';
-  oss << " otherInOut: (" << (otherInOut ? "inOut" : "outIn") << ')';
-  return oss.str();
-}
-
 // le1 and le2 are the left events of line segments (le1->point,
 // le1->otherEvent->point) and (le2->point, le2->otherEvent->point)
 bool SegmentComp::operator()(const SweepEvent* le1,
