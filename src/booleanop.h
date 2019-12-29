@@ -17,10 +17,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#ifdef __STEPBYSTEP
-#include <QSemaphore>
-#include <QThread>
-#endif
 
 #include "polygon.h"
 
@@ -118,18 +114,9 @@ struct SweepEventComp
   }
 };
 
-class BooleanOpImp
-#ifdef __STEPBYSTEP
-    : public QThread
-#endif
-{
+class BooleanOpImp {
  public:
-  BooleanOpImp(const Polygon& subj, const Polygon& clip, BooleanOpType op
-#ifdef __STEPBYSTEP
-               ,
-               QSemaphore* ds = 0, QSemaphore* sd = 0, bool trace = false
-#endif
-  );
+  BooleanOpImp(const Polygon& subj, const Polygon& clip, BooleanOpType op);
 
   const Polygon& subject() const { return _subject; }
 
@@ -168,25 +155,6 @@ class BooleanOpImp
    *  updating pq and (implicitly) the status line */
   void divideSegment(SweepEvent* le, const Point& p);
 
-#ifdef __STEPBYSTEP
-  typedef std::set<SweepEvent*, SegmentComp>::const_iterator const_sl_iterator;
-  typedef std::deque<SweepEvent*>::const_iterator const_sortedEvents_iterator;
-  typedef std::vector<SweepEvent*>::const_iterator const_out_iterator;
-  const_sl_iterator beginSL() const { return sl.begin(); }
-  const_sl_iterator endSL() const { return sl.end(); }
-  const_sortedEvents_iterator beginSortedEvents() const {
-    return sortedEvents.begin();
-  }
-  const_sortedEvents_iterator endSortedEvents() const {
-    return sortedEvents.end();
-  }
-  SweepEvent* currentEvent() const { return _currentEvent; }
-  SweepEvent* previousEvent() const { return _previousEvent; }
-  SweepEvent* nextEvent() const { return _nextEvent; }
-  Point currentPoint() const { return _currentPoint; }
-  const_out_iterator beginOut() const { return out.begin(); }
-  const_out_iterator endOut() const { return out.end(); }
-#endif
  private:
   const Polygon _subject;
   const Polygon _clipping;
@@ -215,17 +183,6 @@ class BooleanOpImp
   /** @brief compute several fields of left event le */
   void computeFields(SweepEvent* le,
                      const std::set<SweepEvent*, SegmentComp>::iterator& prev);
-
-#ifdef __STEPBYSTEP
-  bool trace;
-  SweepEvent* _currentEvent;
-  SweepEvent* _previousEvent;
-  SweepEvent* _nextEvent;
-  Point _currentPoint;
-  QSemaphore* doSomething;
-  QSemaphore* somethingDone;
-  std::vector<SweepEvent*> out;
-#endif
 };
 
 inline Polygon compute(const Polygon& subj, const Polygon& clip,

@@ -62,12 +62,7 @@ bool SegmentComp::operator()(const SweepEvent* le1,
 }
 
 BooleanOpImp::BooleanOpImp(const Polygon& subject, const Polygon& clipping,
-                           BooleanOpType operation
-#ifdef __STEPBYSTEP
-                           ,
-                           QSemaphore* ds, QSemaphore* sd, bool t
-#endif
-                           )
+                           BooleanOpType operation)
     : _subject(subject),
       _clipping(clipping),
       _result(),
@@ -77,19 +72,7 @@ BooleanOpImp::BooleanOpImp(const Polygon& subject, const Polygon& clipping,
       _alreadyRun(false),
       eq(),
       sl(),
-      eventHolder()
-#ifdef __STEPBYSTEP
-      ,
-      trace(t),
-      _currentEvent(0),
-      _previousEvent(0),
-      _nextEvent(0),
-      doSomething(ds),
-      somethingDone(sd),
-      out()
-#endif
-{
-}
+      eventHolder() {}
 
 void BooleanOpImp::run() {
   if (_alreadyRun) return;
@@ -114,24 +97,11 @@ std::vector<SweepEvent*> BooleanOpImp::sweep() {
       break;
     }
     result.push_back(se);
-#ifdef __STEPBYSTEP
-    if (trace) {
-      doSomething->acquire();
-      _currentPoint = se->point;
-    }
-#endif
     eq.pop();
     if (se->left) {  // the line segment must be inserted into sl
       next = prev = it = sl.insert(se).first;
       (prev != sl.begin()) ? --prev : prev = sl.end();
       ++next;
-#ifdef __STEPBYSTEP
-      if (trace) {
-        _currentEvent = *it;
-        _previousEvent = prev != sl.end() ? *prev : 0;
-        _nextEvent = next != sl.end() ? *next : 0;
-      }
-#endif
       computeFields(se, prev);
       // Process a possible intersection between "se" and its next neighbor in
       // sl
@@ -159,22 +129,12 @@ std::vector<SweepEvent*> BooleanOpImp::sweep() {
       next = prev = it;
       (prev != sl.begin()) ? --prev : prev = sl.end();
       ++next;
-#ifdef __STEPBYSTEP
-      if (trace) {
-        _currentEvent = *it;
-        _previousEvent = prev != sl.end() ? *prev : 0;
-        _nextEvent = next != sl.end() ? *next : 0;
-      }
-#endif
       // delete line segment associated to "se" from sl and check for
       // intersection between the neighbors of "se" in sl
       sl.erase(it);
       if (next != sl.end() && prev != sl.end())
         possibleIntersection(*prev, *next);
     }
-#ifdef __STEPBYSTEP
-    if (trace) somethingDone->release();
-#endif
   }
   return result;
 }
@@ -470,13 +430,6 @@ void BooleanOpImp::processEvents(const std::vector<SweepEvent*>& events) {
     Point initial = events[i]->point;
     contour.add(initial);
     while (events[pos]->otherEvent->point != initial) {
-#ifdef __STEPBYSTEP
-      if (trace) {
-        doSomething->acquire();
-        out.push_back(events[pos]->left ? events[pos]
-                                        : events[pos]->otherEvent);
-      }
-#endif
       processed[pos] = true;
       if (events[pos]->left) {
         events[pos]->resultInOut = false;
@@ -488,14 +441,7 @@ void BooleanOpImp::processEvents(const std::vector<SweepEvent*>& events) {
       processed[pos = events[pos]->pos] = true;
       contour.add(events[pos]->point);
       pos = nextPos(pos, events, processed);
-#ifdef __STEPBYSTEP
-      if (trace) somethingDone->release();
-#endif
     }
-#ifdef __STEPBYSTEP
-    if (trace)
-      out.push_back(events[pos]->left ? events[pos] : events[pos]->otherEvent);
-#endif
     processed[pos] = processed[events[pos]->pos] = true;
     events[pos]->otherEvent->resultInOut = true;
     events[pos]->otherEvent->contourId = contourId;
