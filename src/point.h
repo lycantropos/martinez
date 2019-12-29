@@ -14,7 +14,6 @@
 #define POINT_H
 
 #include <cmath>
-#include <iostream>
 
 #include "bbox.h"
 
@@ -42,17 +41,5 @@ inline bool operator==(const Point& p1, const Point& p2) {
   return (p1.x() == p2.x()) && (p1.y() == p2.y());
 }
 inline bool operator!=(const Point& p1, const Point& p2) { return !(p1 == p2); }
-
-inline std::ostream& operator<<(std::ostream& o, const Point& p) {
-  return o << "(" << p.x() << "," << p.y() << ")";
-}
-
-inline std::istream& operator>>(std::istream& i, Point& p) {
-  double x, y;
-  i >> x >> y;
-  p = Point(x, y);
-  return i;
-}
-
 }  // end of namespace cbop
 #endif

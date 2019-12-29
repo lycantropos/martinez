@@ -79,8 +79,6 @@ class Contour {
   bool _CC;
 };
 
-std::ostream& operator<<(std::ostream& o, Contour& c);
-
 class Polygon {
  public:
   typedef std::vector<Contour>::iterator iterator;
@@ -89,8 +87,6 @@ class Polygon {
   Polygon() : _contours() {}
   Polygon(const std::vector<Contour>& contours) : _contours(contours) {}
 
-  // Get the polygon from a text file */
-  bool open(const std::string& filename);
   void join(const Polygon& pol);
   /** Get the p-th contour */
   Contour& contour(size_t p) { return _contours[p]; }
@@ -119,9 +115,5 @@ class Polygon {
   /** Set of contours conforming the polygon */
   std::vector<Contour> _contours;
 };
-
-std::ostream& operator<<(std::ostream& o, Polygon& p);
-std::istream& operator>>(std::istream& i, Polygon& p);
-
 }  // end of namespace cbop
 #endif

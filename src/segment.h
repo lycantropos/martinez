@@ -63,10 +63,5 @@ class Segment {
   /** Segment endpoints */
   Point _source, _target;
 };
-
-inline std::ostream& operator<<(std::ostream& o, const Segment& p) {
-  return o << p.source() << "-" << p.target();
-}
-
 }  // end of namespace cbop
 #endif
