@@ -622,8 +622,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
                     << point_repr(self.target()) << ")";
              return stream.str();
            })
-      .def_property("source", &cbop::Segment::source, &cbop::Segment::setSource)
-      .def_property("target", &cbop::Segment::target, &cbop::Segment::setTarget)
+      .def_property_readonly("source", &cbop::Segment::source)
+      .def_property_readonly("target", &cbop::Segment::target)
       .def_property_readonly("max", &cbop::Segment::max)
       .def_property_readonly("min", &cbop::Segment::min)
       .def_property_readonly("is_degenerate", &cbop::Segment::degenerate)
