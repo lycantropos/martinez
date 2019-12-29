@@ -28,7 +28,7 @@ Domain = TypeVar('Domain')
 
 class _EnumBase(enum.IntEnum):
     def __repr__(self) -> str:
-        return self.__class__.__qualname__ + '.' + self.name
+        return type(self).__qualname__ + '.' + self.name
 
 
 @enum.unique
