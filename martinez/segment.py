@@ -8,37 +8,45 @@ points_key = attrgetter('x', 'y')
 
 
 class Segment:
-    __slots__ = ('source', 'target')
+    __slots__ = ('_source', '_target')
 
     def __init__(self, source: Point, target: Point):
-        self.source = source
-        self.target = target
+        self._source = source
+        self._target = target
+
+    @property
+    def source(self) -> Point:
+        return self._source
+
+    @property
+    def target(self) -> Point:
+        return self._target
 
     __repr__ = generate_repr(__init__)
 
     def __eq__(self, other: 'Segment') -> bool:
-        return (self.source == other.source and self.target == other.target
+        return (self._source == other._source and self._target == other._target
                 if isinstance(other, Segment)
                 else NotImplemented)
 
     @property
     def max(self) -> Point:
-        return max(self.source, self.target,
+        return max(self._source, self._target,
                    key=points_key)
 
     @property
     def min(self) -> Point:
-        return min(self.source, self.target,
+        return min(self._source, self._target,
                    key=points_key)
 
     @property
     def is_degenerate(self) -> bool:
-        return self.source == self.target
+        return self._source == self._target
 
     @property
     def is_vertical(self) -> bool:
-        return self.source.x == self.target.x
+        return self._source.x == self._target.x
 
     @property
     def reversed(self) -> 'Segment':
-        return Segment(self.target, self.source)
+        return Segment(self._target, self._source)
