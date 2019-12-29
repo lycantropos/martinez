@@ -430,7 +430,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
             return cbop::Bbox(tuple[0].cast<double>(), tuple[1].cast<double>(),
                               tuple[2].cast<double>(), tuple[3].cast<double>());
           }))
-      .def("__add__", &cbop::Bbox::operator+)
+      .def(py::self + py::self)
       .def("__eq__",
            [](const cbop::Bbox& self, const cbop::Bbox& other) {
              return self.xmin() == other.xmin() &&
