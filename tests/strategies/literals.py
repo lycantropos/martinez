@@ -29,10 +29,10 @@ def to_decimals(*,
                 allow_nan: bool = False,
                 allow_infinity: bool = False,
                 max_digits_count: int = MAX_DIGITS_COUNT) -> Strategy[Decimal]:
-    return (strategies.floats(min_value=min_value,
-                              max_value=max_value,
-                              allow_nan=allow_nan,
-                              allow_infinity=allow_infinity)
+    return (strategies.decimals(min_value=min_value,
+                                max_value=max_value,
+                                allow_nan=allow_nan,
+                                allow_infinity=allow_infinity)
             .map(partial(to_digits_count,
                          max_digits_count=max_digits_count)))
 

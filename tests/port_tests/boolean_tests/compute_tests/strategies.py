@@ -6,15 +6,20 @@ from martinez.polygon import Polygon
 from tests.strategies import (ported_operations_types,
                               scalars_strategies,
                               scalars_to_ported_polygons)
-from tests.utils import to_non_overlapping_ported_polygons_pair
+from tests.utils import (identity,
+                         pack,
+                         to_non_overlapping_ported_polygons_pair,
+                         to_pairs)
 
 operations_types = ported_operations_types
 empty_polygons = strategies.builds(Polygon, strategies.builds(list))
 polygons = scalars_strategies.flatmap(scalars_to_ported_polygons)
-non_empty_polygons = (scalars_strategies
-                      .flatmap(partial(scalars_to_ported_polygons,
-                                       min_size=1)))
+non_empty_polygons_strategies = (scalars_strategies
+                                 .map(partial(scalars_to_ported_polygons,
+                                              min_size=1)))
+non_empty_polygons = non_empty_polygons_strategies.flatmap(identity)
 polygons_pairs = (strategies.tuples(empty_polygons, non_empty_polygons) |
                   strategies.tuples(non_empty_polygons, empty_polygons) |
-                  strategies.builds(to_non_overlapping_ported_polygons_pair,
-                                    non_empty_polygons, non_empty_polygons))
+                  non_empty_polygons_strategies
+                  .flatmap(to_pairs)
+                  .map(pack(to_non_overlapping_ported_polygons_pair)))

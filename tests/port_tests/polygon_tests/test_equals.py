@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from hypothesis import given
 
 from martinez.polygon import Polygon
@@ -11,23 +13,28 @@ def test_reflexivity(polygon: Polygon) -> None:
     assert polygon == polygon
 
 
-@given(strategies.polygons, strategies.polygons)
-def test_symmetry(first_polygon: Polygon, second_polygon: Polygon) -> None:
+@given(strategies.polygons_pairs)
+def test_symmetry(polygons_pair: Tuple[Polygon, Polygon]) -> None:
+    first_polygon, second_polygon = polygons_pair
+
     assert equivalence(first_polygon == second_polygon,
                        second_polygon == first_polygon)
 
 
-@given(strategies.polygons, strategies.polygons, strategies.polygons)
-def test_transitivity(first_polygon: Polygon,
-                      second_polygon: Polygon,
-                      third_polygon: Polygon) -> None:
+@given(strategies.polygons_triplets)
+def test_transitivity(polygons_triplet: Tuple[Polygon, Polygon, Polygon]
+                      ) -> None:
+    first_polygon, second_polygon, third_polygon = polygons_triplet
+
     assert implication(first_polygon == second_polygon
                        and second_polygon == third_polygon,
                        first_polygon == third_polygon)
 
 
-@given(strategies.polygons, strategies.polygons)
-def test_connection_with_inequality(first_polygon: Polygon,
-                                    second_polygon: Polygon) -> None:
+@given(strategies.polygons_pairs)
+def test_connection_with_inequality(polygons_pair: Tuple[Polygon, Polygon]
+                                    ) -> None:
+    first_polygon, second_polygon = polygons_pair
+
     assert equivalence(not first_polygon == second_polygon,
                        first_polygon != second_polygon)

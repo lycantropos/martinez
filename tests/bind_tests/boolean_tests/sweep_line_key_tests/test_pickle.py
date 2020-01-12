@@ -6,5 +6,5 @@ from . import strategies
 
 
 @given(strategies.sweep_line_keys)
-def test_round_trip(sweep_line_key: SweepLineKey) -> None:
-    assert pickle_round_trip(sweep_line_key) == sweep_line_key
+def test_round_trip(key: SweepLineKey) -> None:
+    assert pickle_round_trip(key) == key

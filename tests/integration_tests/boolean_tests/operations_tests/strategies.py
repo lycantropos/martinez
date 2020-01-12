@@ -21,24 +21,46 @@ from tests.strategies import (booleans,
                               to_bound_with_ported_polygons_pair,
                               to_bound_with_ported_sweep_events)
 from tests.utils import (MAX_CONTOURS_COUNT,
+                         MAX_NESTING_DEPTH,
                          Strategy,
                          are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
-                         strategy_to_pairs,
+                         to_double_nested_sweep_event,
                          to_non_overlapping_contours_lists,
+                         to_pairs,
                          transpose)
 
 booleans = booleans
 points_pairs = strategies.builds(to_bound_with_ported_points_pair,
                                  floats, floats)
-nones_pairs = strategy_to_pairs(strategies.none())
+nones_pairs = to_pairs(strategies.none())
 leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(nones_pairs)
 acyclic_sweep_events_pairs = strategies.recursive(
-        leaf_sweep_events_pairs, to_bound_with_ported_sweep_events)
-sweep_events_pairs = strategies.recursive(
-        acyclic_sweep_events_pairs, make_cyclic_bound_with_ported_sweep_events)
+        leaf_sweep_events_pairs, to_bound_with_ported_sweep_events,
+        max_leaves=MAX_NESTING_DEPTH)
+sweep_events_pairs = make_cyclic_bound_with_ported_sweep_events(
+        acyclic_sweep_events_pairs)
 nested_sweep_events_pairs = to_bound_with_ported_sweep_events(
         sweep_events_pairs)
+
+
+def to_double_nested_sweep_events_pairs(
+        strategy: Strategy[Tuple[BoundSweepEvent, PortedSweepEvent]]
+) -> Strategy[Tuple[BoundSweepEvent, PortedSweepEvent]]:
+    def to_double_nested_sweep_events_pair(events_pair: Tuple[BoundSweepEvent,
+                                                              PortedSweepEvent]
+                                           ) -> Tuple[BoundSweepEvent,
+                                                      PortedSweepEvent]:
+        bound, ported = events_pair
+        to_double_nested_sweep_event(bound)
+        to_double_nested_sweep_event(ported)
+        return bound, ported
+
+    return strategy.map(to_double_nested_sweep_events_pair)
+
+
+double_nested_sweep_events_pairs = (nested_sweep_events_pairs
+                                    .map(to_double_nested_sweep_events_pairs))
 maybe_nested_sweep_events_pairs = nones_pairs | nested_sweep_events_pairs
 non_empty_sweep_events_lists_pairs = (strategies.lists(sweep_events_pairs,
                                                        min_size=1)
@@ -62,7 +84,7 @@ non_empty_sweep_events_lists_pairs_with_indices_and_booleans_lists = (
             to_sweep_events_lists_pairs_with_indices_and_booleans_lists))
 nested_sweep_events_lists_pairs = (strategies.lists(nested_sweep_events_pairs)
                                    .map(transpose))
-nested_sweep_events_pairs_pairs = (strategy_to_pairs(nested_sweep_events_pairs)
+nested_sweep_events_pairs_pairs = (to_pairs(nested_sweep_events_pairs)
                                    .map(transpose))
 
 
@@ -101,7 +123,7 @@ contours_lists_pairs = (strategies.lists(contours_pairs,
                                          max_size=MAX_CONTOURS_COUNT)
                         .map(transpose)
                         .map(to_non_overlapping_contours_lists))
-empty_contours_lists_pairs = strategy_to_pairs(strategies.builds(list))
+empty_contours_lists_pairs = to_pairs(strategies.builds(list))
 non_empty_contours_lists_pairs = (strategies.lists(contours_pairs,
                                                    min_size=1,
                                                    max_size=1)
@@ -163,6 +185,6 @@ def to_operations_with_events_lists_pair(
 
 operations_with_events_lists_pairs = (
         strategies.tuples(operations_pairs,
-                          strategy_to_pairs(strategies.builds(list)))
+                          to_pairs(strategies.builds(list)))
         | (pre_processed_operations_pairs
            .map(to_operations_with_events_lists_pair)))

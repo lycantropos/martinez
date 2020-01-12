@@ -6,5 +6,5 @@ from . import strategies
 
 
 @given(strategies.events_queue_keys)
-def test_round_trip(events_queue_key: EventsQueueKey) -> None:
-    assert pickle_round_trip(events_queue_key) == events_queue_key
+def test_round_trip(key: EventsQueueKey) -> None:
+    assert pickle_round_trip(key) == key

@@ -14,7 +14,7 @@ from . import strategies
 
 
 @given(strategies.operations_pairs,
-       strategies.nested_sweep_events_pairs,
+       strategies.double_nested_sweep_events_pairs,
        strategies.points_pairs)
 def test_basic(operations_pair: Tuple[Bound, Ported],
                sweep_events_pair: Tuple[BoundSweepEvent, PortedSweepEvent],

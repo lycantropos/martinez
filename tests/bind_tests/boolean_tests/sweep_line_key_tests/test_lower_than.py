@@ -9,8 +9,8 @@ from . import strategies
 
 
 @given(strategies.nested_sweep_line_keys)
-def test_irreflexivity(sweep_line_key: SweepLineKey) -> None:
-    assert not sweep_line_key < sweep_line_key
+def test_irreflexivity(key: SweepLineKey) -> None:
+    assert not key < key
 
 
 @given(strategies.nested_sweep_line_keys,

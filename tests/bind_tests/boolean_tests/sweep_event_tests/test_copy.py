@@ -7,16 +7,16 @@ from . import strategies
 
 
 @given(strategies.sweep_events)
-def test_shallow(sweep_event: SweepEvent) -> None:
-    result = copy.copy(sweep_event)
+def test_shallow(event: SweepEvent) -> None:
+    result = copy.copy(event)
 
-    assert result is not sweep_event
-    assert result == sweep_event
+    assert result is not event
+    assert result == event
 
 
 @given(strategies.sweep_events)
-def test_deep(sweep_event: SweepEvent) -> None:
-    result = copy.deepcopy(sweep_event)
+def test_deep(event: SweepEvent) -> None:
+    result = copy.deepcopy(event)
 
-    assert result is not sweep_event
-    assert result == sweep_event
+    assert result is not event
+    assert result == event

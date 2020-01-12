@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from hypothesis import given
 
 from martinez.boolean import SweepEvent
@@ -7,29 +9,32 @@ from . import strategies
 
 
 @given(strategies.sweep_events)
-def test_reflexivity(sweep_event: SweepEvent) -> None:
-    assert sweep_event == sweep_event
+def test_reflexivity(event: SweepEvent) -> None:
+    assert event == event
 
 
-@given(strategies.sweep_events, strategies.sweep_events)
-def test_symmetry(first_sweep_event: SweepEvent,
-                  second_sweep_event: SweepEvent) -> None:
-    assert equivalence(first_sweep_event == second_sweep_event,
-                       second_sweep_event == first_sweep_event)
+@given(strategies.sweep_events_pairs)
+def test_symmetry(events_pair: Tuple[SweepEvent, SweepEvent]) -> None:
+    first_event, second_event = events_pair
+
+    assert equivalence(first_event == second_event,
+                       second_event == first_event)
 
 
-@given(strategies.sweep_events, strategies.sweep_events,
-       strategies.sweep_events)
-def test_transitivity(first_sweep_event: SweepEvent,
-                      second_sweep_event: SweepEvent,
-                      third_sweep_event: SweepEvent) -> None:
-    assert implication(first_sweep_event == second_sweep_event
-                       and second_sweep_event == third_sweep_event,
-                       first_sweep_event == third_sweep_event)
+@given(strategies.sweep_events_triplets)
+def test_transitivity(events_triplet: Tuple[SweepEvent, SweepEvent, SweepEvent]
+                      ) -> None:
+    first_event, second_event, third_event = events_triplet
+
+    assert implication(first_event == second_event
+                       and second_event == third_event,
+                       first_event == third_event)
 
 
-@given(strategies.sweep_events, strategies.sweep_events)
-def test_connection_with_inequality(first_sweep_event: SweepEvent,
-                                    second_sweep_event: SweepEvent) -> None:
-    assert equivalence(not first_sweep_event == second_sweep_event,
-                       first_sweep_event != second_sweep_event)
+@given(strategies.sweep_events_pairs)
+def test_connection_with_inequality(events_pair: Tuple[SweepEvent, SweepEvent]
+                                    ) -> None:
+    first_event, second_event = events_pair
+
+    assert equivalence(not first_event == second_event,
+                       first_event != second_event)

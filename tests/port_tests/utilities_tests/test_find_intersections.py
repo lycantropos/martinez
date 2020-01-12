@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from hypothesis import given
 
 from martinez.point import Point
@@ -7,9 +9,10 @@ from tests.utils import implication
 from . import strategies
 
 
-@given(strategies.segments, strategies.segments)
-def test_basic(first_segment: Segment,
-               second_segment: Segment) -> None:
+@given(strategies.segments_pairs)
+def test_basic(segments_pair: Tuple[Segment, Segment]) -> None:
+    first_segment, second_segment = segments_pair
+
     result = find_intersections(first_segment, second_segment)
 
     assert isinstance(result, tuple)

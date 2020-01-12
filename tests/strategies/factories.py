@@ -1,4 +1,5 @@
 from functools import partial
+from itertools import repeat
 from typing import (Any,
                     Dict,
                     List,
@@ -24,12 +25,15 @@ from martinez.point import Point as PortedPoint
 from martinez.polygon import Polygon as PortedPolygon
 from martinez.segment import Segment as PortedSegment
 from tests.utils import (MAX_CONTOURS_COUNT,
+                         MAX_NESTING_DEPTH,
                          BoundPortedPointsPair,
                          BoundPortedSweepEventsPair,
                          PortedPointsPair,
                          PortedPointsTriplet,
                          Strategy,
+                         compose,
                          to_bound_rectangle,
+                         to_double_nested_sweep_event,
                          to_non_overlapping_contours_list,
                          to_ported_rectangle,
                          to_valid_coordinates_pairs,
@@ -188,9 +192,9 @@ AnySweepEvent = TypeVar('AnySweepEvent', PortedSweepEvent, BoundSweepEvent)
 
 def make_cyclic(sweep_events: Strategy[AnySweepEvent]
                 ) -> Strategy[AnySweepEvent]:
-    def to_cyclic_sweep_events(sweep_event: AnySweepEvent
+    def to_cyclic_sweep_events(event: AnySweepEvent
                                ) -> Strategy[AnySweepEvent]:
-        events = traverse_sweep_event(sweep_event, {}, {})
+        events = traverse_sweep_event(event, {}, {})
         links = to_links(len(events))
         return (strategies.builds(to_left_relinked_sweep_event,
                                   strategies.just(events), links)
@@ -198,6 +202,11 @@ def make_cyclic(sweep_events: Strategy[AnySweepEvent]
                                     strategies.just(events), links))
 
     return sweep_events.flatmap(to_cyclic_sweep_events)
+
+
+def to_double_nested_sweep_events(strategy: Strategy[AnySweepEvent]
+                                  ) -> Strategy[AnySweepEvent]:
+    return strategy.map(to_double_nested_sweep_event)
 
 
 def to_links(events_count: int) -> Strategy[Dict[int, int]]:
@@ -335,36 +344,36 @@ def scalars_to_plain_ported_sweep_events(
                              children)
 
 
-def scalars_to_acyclic_ported_sweep_events(
-        scalars: Strategy[Scalar],
-        children: Strategy[Optional[PortedSweepEvent]] = strategies.none(),
-        **kwargs: Any
-) -> Strategy[PortedSweepEvent]:
+def scalars_to_acyclic_ported_sweep_events(scalars: Strategy[Scalar],
+                                           *,
+                                           min_depth: int = 1,
+                                           max_depth: int = MAX_NESTING_DEPTH,
+                                           **kwargs: Any
+                                           ) -> Strategy[PortedSweepEvent]:
     events_factory = partial(scalars_to_plain_ported_sweep_events, scalars,
                              **kwargs)
-    return strategies.recursive(events_factory(children), events_factory)
+    base = compose(*repeat(events_factory,
+                           times=min_depth))(strategies.none())
+    return strategies.recursive(base, events_factory,
+                                max_leaves=max_depth - min_depth)
 
 
-def scalars_to_nested_ported_sweep_events(scalars: Strategy[Scalar],
-                                          **kwargs: Any
-                                          ) -> Strategy[PortedSweepEvent]:
-    acyclic_events = scalars_to_acyclic_nested_ported_sweep_events(scalars,
-                                                                   **kwargs)
-    return strategies.recursive(acyclic_events, make_cyclic)
-
-
-def scalars_to_ported_sweep_events(scalars: Strategy[Scalar], **kwargs: Any
+def scalars_to_ported_sweep_events(scalars: Strategy[Scalar],
+                                   *,
+                                   min_depth: int = 1,
+                                   max_depth: int = MAX_NESTING_DEPTH,
+                                   **kwargs: Any
                                    ) -> Strategy[PortedSweepEvent]:
-    acyclic_events = scalars_to_acyclic_ported_sweep_events(scalars, **kwargs)
-    return strategies.recursive(acyclic_events, make_cyclic)
+    acyclic_events = scalars_to_acyclic_ported_sweep_events(
+            scalars,
+            min_depth=min_depth,
+            max_depth=max_depth,
+            **kwargs)
+    return make_cyclic(acyclic_events)
 
 
-def scalars_to_acyclic_nested_ported_sweep_events(
-        scalars: Strategy[Scalar],
-        **kwargs: Any) -> Strategy[PortedSweepEvent]:
-    events_factory = partial(scalars_to_acyclic_ported_sweep_events,
-                             scalars, **kwargs)
-    return events_factory(events_factory())
+scalars_to_nested_ported_sweep_events = partial(scalars_to_ported_sweep_events,
+                                                min_depth=2)
 
 
 def to_plain_bound_sweep_events(
@@ -379,27 +388,29 @@ def to_plain_bound_sweep_events(
                              unsigned_integers, unsigned_integers, children)
 
 
-def to_bound_sweep_events(**kwargs: Any) -> Strategy[PortedSweepEvent]:
-    acyclic_events = to_acyclic_bound_sweep_events(strategies.none(), **kwargs)
-    return strategies.recursive(acyclic_events, make_cyclic)
+def to_bound_sweep_events(*,
+                          min_depth: int = 1,
+                          max_depth: int = MAX_NESTING_DEPTH,
+                          **kwargs: Any) -> Strategy[PortedSweepEvent]:
+    acyclic_events = to_acyclic_bound_sweep_events(min_depth=min_depth,
+                                                   max_depth=max_depth,
+                                                   **kwargs)
+    return make_cyclic(acyclic_events)
 
 
-def to_nested_bound_sweep_events(**kwargs: Any) -> Strategy[PortedSweepEvent]:
-    acyclic_events = to_acyclic_nested_bound_sweep_events(**kwargs)
-    return strategies.recursive(acyclic_events, make_cyclic)
-
-
-def to_acyclic_nested_bound_sweep_events(**kwargs: Any
-                                         ) -> Strategy[BoundSweepEvent]:
-    events_factory = partial(to_acyclic_bound_sweep_events, **kwargs)
-    return events_factory(events_factory(strategies.none()))
-
-
-def to_acyclic_bound_sweep_events(
-        children: Strategy[Optional[BoundSweepEvent]],
-        **kwargs: Any) -> Strategy[BoundSweepEvent]:
+def to_acyclic_bound_sweep_events(*,
+                                  min_depth: int = 1,
+                                  max_depth: int = MAX_NESTING_DEPTH,
+                                  **kwargs: Any) -> Strategy[BoundSweepEvent]:
     events_factory = partial(to_plain_bound_sweep_events, **kwargs)
-    return strategies.recursive(events_factory(children), events_factory)
+    base = compose(*repeat(events_factory,
+                           times=min_depth))(strategies.none())
+    return strategies.recursive(base, events_factory,
+                                max_leaves=max_depth - min_depth)
+
+
+to_nested_bound_sweep_events = partial(to_bound_sweep_events,
+                                       min_depth=2)
 
 
 def to_bound_with_ported_polygons_pair(

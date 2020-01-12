@@ -1,9 +1,15 @@
 import math
 import pickle
+from functools import partial
+from itertools import repeat
+from types import MappingProxyType
 from typing import (Any,
+                    Callable,
+                    Dict,
                     Hashable,
                     Iterable,
                     List,
+                    Optional,
                     Sequence,
                     Tuple,
                     TypeVar,
@@ -37,6 +43,7 @@ from martinez.utilities import (
     to_segments as to_ported_segments)
 
 Domain = TypeVar('Domain')
+Range = TypeVar('Range')
 Strategy = SearchStrategy
 BoundPointsPair = Tuple[BoundPoint, BoundPoint]
 BoundPointsTriplet = Tuple[BoundPoint, BoundPoint, BoundPoint]
@@ -48,6 +55,70 @@ BoundPortedSweepEventsPair = Tuple[BoundSweepEvent, PortedSweepEvent]
 MAX_VALUE = 10 ** 4
 MIN_VALUE = -MAX_VALUE
 MAX_CONTOURS_COUNT = 5
+MAX_NESTING_DEPTH = 3
+
+
+def identity(value: Domain) -> Domain:
+    return value
+
+
+def _cleavage(functions: Iterable[Callable[[Domain], Range]],
+              *args: Domain, **kwargs: Domain) -> Iterable[Range]:
+    return (function(*args, **kwargs) for function in functions)
+
+
+def cleave(*functions: Callable[..., Range]) -> Callable[..., Iterable[Range]]:
+    return partial(_cleavage, functions)
+
+
+def _composition(functions: Tuple[Callable[[Domain], Range], ...],
+                 *args: Domain, **kwargs: Domain) -> Range:
+    result = functions[-1](*args, **kwargs)
+    for function in reversed(functions[:-1]):
+        result = function(result)
+    return result
+
+
+def compose(last_function: Callable[[Domain], Range],
+            *functions: Callable[..., Domain]) -> Callable[..., Range]:
+    return partial(_composition, (last_function,) + functions)
+
+
+def cleave_in_tuples(*functions: Callable[[Strategy[Domain]], Strategy[Range]]
+                     ) -> Callable[[Strategy[Domain]],
+                                   Strategy[Tuple[Range, ...]]]:
+    return compose(pack(strategies.tuples), cleave(*functions))
+
+
+def pack(function: Callable[..., Range]
+         ) -> Callable[[Iterable[Domain]], Range]:
+    return partial(apply, function)
+
+
+def apply(function: Callable[..., Range],
+          args: Iterable[Domain],
+          kwargs: Dict[str, Any] = MappingProxyType({})) -> Range:
+    return function(*args, **kwargs)
+
+
+to_builder = partial(partial, strategies.builds)
+
+
+def to_maybe(strategy: Strategy[Domain]) -> Strategy[Optional[Domain]]:
+    return strategies.none() | strategy
+
+
+def to_tuples(elements: Strategy[Domain],
+              *,
+              size: int) -> Strategy[Tuple[Domain, ...]]:
+    return strategies.tuples(*repeat(elements,
+                                     times=size))
+
+
+to_pairs = partial(to_tuples,
+                   size=2)
+to_triplets = partial(to_tuples,
+                      size=3)
 
 
 def equivalence(left_statement: bool, right_statement: bool) -> bool:
@@ -113,11 +184,6 @@ def pickle_round_trip(object_: Domain) -> Domain:
     return pickle.loads(pickle.dumps(object_))
 
 
-def strategy_to_pairs(strategy: Strategy[Domain]
-                      ) -> Strategy[Tuple[Domain, Domain]]:
-    return strategies.tuples(strategy, strategy)
-
-
 def to_bound_rectangle(xs: Tuple[float, float],
                        ys: Tuple[float, float]) -> List[BoundPoint]:
     min_x, max_x = xs
@@ -175,6 +241,14 @@ def are_non_overlapping_sweep_events_pair(events_pair: Tuple[AnySweepEvent,
     first_event, second_event = events_pair
     first_segment, second_segment = first_event.segment, second_event.segment
     return are_non_overlapping_segments_pair(first_segment, second_segment)
+
+
+def to_double_nested_sweep_event(event: AnySweepEvent) -> AnySweepEvent:
+    if event.other_event is None:
+        event.other_event = event
+    elif event.other_event.other_event is None:
+        event.other_event.other_event = event
+    return event
 
 
 AnyPoint = TypeVar('AnyPoint', BoundPoint, PortedPoint)

@@ -33,8 +33,8 @@ totally_ordered_nested_events_queue_keys = strategies.builds(
         EventsQueueKey, nested_sweep_events_with_same_polygon_type)
 
 
-def to_sweep_event_point(events_queue_key: EventsQueueKey) -> Point:
-    return events_queue_key.event.point
+def to_sweep_event_point(key: EventsQueueKey) -> Point:
+    return key.event.point
 
 
 totally_ordered_nested_events_queue_keys_triplets = (

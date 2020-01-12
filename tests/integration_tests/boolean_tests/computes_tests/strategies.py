@@ -10,10 +10,10 @@ from tests.strategies import (bound_with_ported_operations_types_pairs,
                               to_bound_with_ported_contours_vertices_pair,
                               to_bound_with_ported_polygons_pair)
 from tests.utils import (MAX_CONTOURS_COUNT,
-                         strategy_to_pairs,
                          to_non_overlapping_bound_polygons_pair,
                          to_non_overlapping_contours_lists,
                          to_non_overlapping_ported_polygons_pair,
+                         to_pairs,
                          transpose)
 
 operations_types_pairs = bound_with_ported_operations_types_pairs
@@ -26,7 +26,7 @@ contours_lists_pairs = (strategies.lists(contours_pairs,
                                          max_size=MAX_CONTOURS_COUNT)
                         .map(transpose)
                         .map(to_non_overlapping_contours_lists))
-empty_contours_lists_pairs = strategy_to_pairs(strategies.builds(list))
+empty_contours_lists_pairs = to_pairs(strategies.builds(list))
 non_empty_contours_lists_pairs = (strategies.lists(contours_pairs,
                                                    min_size=1,
                                                    max_size=1)

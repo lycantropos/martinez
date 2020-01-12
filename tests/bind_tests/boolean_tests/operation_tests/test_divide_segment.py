@@ -6,7 +6,7 @@ from hypothesis import given
 from . import strategies
 
 
-@given(strategies.operations, strategies.nested_sweep_events,
+@given(strategies.operations, strategies.double_nested_sweep_events,
        strategies.points)
 def test_basic(operation: Operation, event: SweepEvent, point: Point) -> None:
     result = operation.divide_segment(event, point)
@@ -14,7 +14,7 @@ def test_basic(operation: Operation, event: SweepEvent, point: Point) -> None:
     assert result is None
 
 
-@given(strategies.operations, strategies.nested_sweep_events,
+@given(strategies.operations, strategies.double_nested_sweep_events,
        strategies.points)
 def test_events(operation: Operation, event: SweepEvent, point: Point) -> None:
     events_before = operation.events

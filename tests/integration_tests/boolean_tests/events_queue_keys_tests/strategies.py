@@ -9,16 +9,17 @@ from martinez.boolean import (EventsQueueKey as PortedEventsQueueKey,
 from tests.strategies import (booleans,
                               make_cyclic_bound_with_ported_sweep_events,
                               to_bound_with_ported_sweep_events)
-from tests.utils import strategy_to_pairs
+from tests.utils import (MAX_NESTING_DEPTH,
+                         to_pairs)
 
 booleans = booleans
-nones_pairs = strategy_to_pairs(strategies.none())
+nones_pairs = to_pairs(strategies.none())
 leaf_sweep_events_pairs = to_bound_with_ported_sweep_events(nones_pairs)
 acyclic_sweep_events_pairs = strategies.recursive(
-        leaf_sweep_events_pairs, to_bound_with_ported_sweep_events)
-sweep_events_pairs = strategies.recursive(
-        acyclic_sweep_events_pairs,
-        make_cyclic_bound_with_ported_sweep_events)
+        leaf_sweep_events_pairs, to_bound_with_ported_sweep_events,
+        max_leaves=MAX_NESTING_DEPTH)
+sweep_events_pairs = make_cyclic_bound_with_ported_sweep_events(
+        acyclic_sweep_events_pairs)
 
 
 def to_events_queue_keys_pair(sweep_events_pair: Tuple[BoundSweepEvent,

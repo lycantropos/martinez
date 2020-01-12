@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from hypothesis import given
 
 from martinez.boolean import Operation
@@ -11,24 +13,28 @@ def test_reflexivity(operation: Operation) -> None:
     assert operation == operation
 
 
-@given(strategies.operations, strategies.operations)
-def test_symmetry(first_operation: Operation,
-                  second_operation: Operation) -> None:
+@given(strategies.operations_pairs)
+def test_symmetry(operations_pair: Tuple[Operation, Operation]) -> None:
+    first_operation, second_operation = operations_pair
+
     assert equivalence(first_operation == second_operation,
                        second_operation == first_operation)
 
 
-@given(strategies.operations, strategies.operations, strategies.operations)
-def test_transitivity(first_operation: Operation,
-                      second_operation: Operation,
-                      third_operation: Operation) -> None:
+@given(strategies.operations_triplets)
+def test_transitivity(operations_triplet: Tuple[Operation, Operation,
+                                                Operation]) -> None:
+    first_operation, second_operation, third_operation = operations_triplet
+
     assert implication(first_operation == second_operation
                        and second_operation == third_operation,
                        first_operation == third_operation)
 
 
-@given(strategies.operations, strategies.operations)
-def test_connection_with_inequality(first_operation: Operation,
-                                    second_operation: Operation) -> None:
+@given(strategies.operations_pairs)
+def test_connection_with_inequality(operations_pair: Tuple[Operation,
+                                                           Operation]) -> None:
+    first_operation, second_operation = operations_pair
+
     assert equivalence(not first_operation == second_operation,
                        first_operation != second_operation)

@@ -11,8 +11,8 @@ from . import strategies
 
 
 @given(strategies.nested_events_queue_keys)
-def test_irreflexivity(events_queue_key: EventsQueueKey) -> None:
-    assert not events_queue_key < events_queue_key
+def test_irreflexivity(key: EventsQueueKey) -> None:
+    assert not key < key
 
 
 @given(strategies.nested_events_queue_keys,

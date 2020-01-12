@@ -7,18 +7,18 @@ from . import strategies
 
 
 @given(strategies.leaf_sweep_events, strategies.points)
-def test_leaf(sweep_event: SweepEvent, point: Point) -> None:
+def test_leaf(event: SweepEvent, point: Point) -> None:
     with pytest.raises(ValueError):
-        sweep_event.is_below(point)
+        event.is_below(point)
 
 
 @given(strategies.nested_sweep_events, strategies.points)
-def test_nested(sweep_event: SweepEvent, point: Point) -> None:
-    result = sweep_event.is_below(point)
+def test_nested(event: SweepEvent, point: Point) -> None:
+    result = event.is_below(point)
 
     assert isinstance(result, bool)
 
 
 @given(strategies.nested_sweep_events)
-def test_self_point(sweep_event: SweepEvent) -> None:
-    assert not sweep_event.is_below(sweep_event.point)
+def test_self_point(event: SweepEvent) -> None:
+    assert not event.is_below(event.point)

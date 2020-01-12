@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from hypothesis import given
 
 from martinez.boolean import (Operation,
@@ -6,17 +8,21 @@ from martinez.point import Point
 from . import strategies
 
 
-@given(strategies.operations, strategies.nested_sweep_events,
-       strategies.points)
-def test_basic(operation: Operation, event: SweepEvent, point: Point) -> None:
+@given(strategies.operations_with_double_nested_sweep_events_and_points)
+def test_basic(operation_with_event_and_point: Tuple[Operation, SweepEvent,
+                                                     Point]) -> None:
+    operation, event, point = operation_with_event_and_point
+
     result = operation.divide_segment(event, point)
 
     assert result is None
 
 
-@given(strategies.operations, strategies.nested_sweep_events,
-       strategies.points)
-def test_events(operation: Operation, event: SweepEvent, point: Point) -> None:
+@given(strategies.operations_with_double_nested_sweep_events_and_points)
+def test_events(operation_with_event_and_point: Tuple[Operation, SweepEvent,
+                                                      Point]) -> None:
+    operation, event, point = operation_with_event_and_point
+
     events_before = operation.events
 
     operation.divide_segment(event, point)

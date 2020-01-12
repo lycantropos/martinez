@@ -6,5 +6,5 @@ from . import strategies
 
 
 @given(strategies.sweep_events)
-def test_round_trip(sweep_event: SweepEvent) -> None:
-    assert pickle_round_trip(sweep_event) == sweep_event
+def test_round_trip(event: SweepEvent) -> None:
+    assert pickle_round_trip(event) == event
