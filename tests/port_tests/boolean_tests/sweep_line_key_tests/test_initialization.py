@@ -1,7 +1,7 @@
 from hypothesis import given
 
-from martinez.boolean import (SweepLineKey,
-                              SweepEvent)
+from martinez.boolean import (SweepEvent,
+                              SweepLineKey)
 from . import strategies
 
 

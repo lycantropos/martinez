@@ -1,6 +1,7 @@
+from typing import Tuple
+
 from _martinez import Contour as Bound
 from hypothesis import given
-from typing import Tuple
 
 from martinez.contour import Contour as Ported
 from tests.utils import are_bound_ported_contours_equal
