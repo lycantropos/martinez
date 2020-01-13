@@ -44,23 +44,18 @@ nested_sweep_events_pairs = to_bound_with_ported_sweep_events(
         sweep_events_pairs)
 
 
-def to_double_nested_sweep_events_pairs(
-        strategy: Strategy[Tuple[BoundSweepEvent, PortedSweepEvent]]
-) -> Strategy[Tuple[BoundSweepEvent, PortedSweepEvent]]:
-    def to_double_nested_sweep_events_pair(events_pair: Tuple[BoundSweepEvent,
-                                                              PortedSweepEvent]
-                                           ) -> Tuple[BoundSweepEvent,
-                                                      PortedSweepEvent]:
-        bound, ported = events_pair
-        to_double_nested_sweep_event(bound)
-        to_double_nested_sweep_event(ported)
-        return bound, ported
-
-    return strategy.map(to_double_nested_sweep_events_pair)
+def to_double_nested_sweep_events_pair(events_pair: Tuple[BoundSweepEvent,
+                                                          PortedSweepEvent]
+                                       ) -> Tuple[BoundSweepEvent,
+                                                  PortedSweepEvent]:
+    bound, ported = events_pair
+    to_double_nested_sweep_event(bound)
+    to_double_nested_sweep_event(ported)
+    return bound, ported
 
 
 double_nested_sweep_events_pairs = (nested_sweep_events_pairs
-                                    .map(to_double_nested_sweep_events_pairs))
+                                    .map(to_double_nested_sweep_events_pair))
 maybe_nested_sweep_events_pairs = nones_pairs | nested_sweep_events_pairs
 non_empty_sweep_events_lists_pairs = (strategies.lists(sweep_events_pairs,
                                                        min_size=1)
