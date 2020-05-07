@@ -17,7 +17,7 @@ COPY README.md .
 COPY setup.py .
 COPY src src/
 COPY martinez martinez/
-RUN python -m pip install .
+RUN python -m pip install -e .
 
 COPY pytest.ini .
 COPY tests/ tests/
