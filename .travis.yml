@@ -1,6 +1,7 @@
-dist: xenial
+dist: bionic
 
 language: python
+
 services:
   - docker
 
@@ -13,35 +14,34 @@ matrix:
 
 env:
   global:
-    - CPPFLAGS=--coverage
+    - CPPFLAGS="-O0 --coverage"
     - TWINE_USERNAME=__token__
     - secure: xwkpuZv4jh8lAGnWS2Yu06rrvCsp3eZpPSOxjwiKMm8kwdCoqhz7nfpz3cC1HLvQJiIEX6FrZB6FBtw44/eJInM0p4yDnxKmEyqha8W+oLgMamEc5jw2lqHDrn7CZh8t/nVtw23Zw+wbLjvS6mSL5EUIFBDjDMsWz4Mqaj7iiwyqYWoCRoUkhYHJNvu6YYnjJpSdLT2Um4jD98rM5BZRybcSRvBSTJ+69IYBBtzLIY7wqNXiSGYRysowKSnM5290wdm7qIdrccrjOuhobNNbAta5xwO0hjCnIK65zqvH6wv1NkFtKcUjREut0zpVnWsm3SDclPiZrVAaDjw0WyR9u/Jzb+xJKhOke/tABD7vcTY/UfMX4W6lRZEz5CrPkl0Tq+Z7b34BcoD5Q3oud4CbqMilqdjjdHA9jtT5y1KUDZBEqt3811ZCY8N9g5DtYm0lVIbAojw00vrTNqMfF34k0NXTT686uuI2dT4qKPdkXiwSU9ssviKmEqY6ezw+Iz9RfDQP6DD3+66j3J2cIl8aRcZ/AEZMK6xZDOMB0kJQZqJOYDms9hyKQ1I2UyudXafVIlFfRTH6290qIOeGGiCZEX76EHKX1S+KRNJ9gjZGWelz+LsQ8XHmTl04nvNE/HS/0iv5GzDpLxHXgM1QxJF2ehoK4/JwB6MMiXggq7Cnt7E=
 
 install:
   - python -m pip install --upgrade pip setuptools
-  - python -m pip install --upgrade codecov
-  - python -m pip install --upgrade gcovr
+  - python -m pip install --upgrade gcovr codecov
   - python -m pip install --force-reinstall -r requirements.txt
   - python -m pip install --force-reinstall -r requirements-tests.txt
-  - python -m pip install -e .
-  - rm -rf build
+  - python setup.py develop
 
 script:
-  - pytest
   - python -m doctest README.md
+  - pytest
 
 after_success:
-  - gcovr --filter src/ --xml -o coverage_cpp.xml
+  - gcovr --filter src/ --xml -o coverage_cpp.xml -v
   - python -m codecov -f coverage.xml -X gcov
   - python -m codecov -f coverage_cpp.xml -X gcov
 
 before_deploy:
+  - rm -rf build
   - rm *.so
   - python setup.py sdist
   - python -m pip install --upgrade cibuildwheel
-  - CIBW_BEFORE_BUILD='python -m pip install -r requirements.txt'
-    CIBW_BUILD=$(python -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")')
-    cibuildwheel --output-dir dist
+  - CIBW_BEFORE_BUILD='python -m pip install -r requirements.txt' CIBW_BUILD=$(python
+    -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")') cibuildwheel
+    --output-dir dist
   - python -m pip install --upgrade twine
 
 deploy:
@@ -49,4 +49,4 @@ deploy:
   script: twine upload --skip-existing dist/*
   skip_cleanup: true
   on:
-    branch: master
+    tags: true
