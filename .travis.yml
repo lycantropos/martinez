@@ -21,6 +21,7 @@ env:
 install:
   - python -m pip install --upgrade pip setuptools
   - python -m pip install --upgrade gcovr codecov
+  - python -m pip install --force-reinstall -r requirements-setup.txt
   - python -m pip install --force-reinstall -r requirements.txt
   - python -m pip install --force-reinstall -r requirements-tests.txt
   - python setup.py develop
@@ -30,7 +31,7 @@ script:
   - pytest
 
 after_success:
-  - gcovr --filter src/ --xml -o coverage_cpp.xml -v
+  - gcovr --filter src/ --filter include/ --xml -o coverage_cpp.xml -v
   - python -m codecov -f coverage.xml -X gcov
   - python -m codecov -f coverage_cpp.xml -X gcov
 
@@ -39,7 +40,7 @@ before_deploy:
   - rm *.so
   - python setup.py sdist
   - python -m pip install --upgrade cibuildwheel
-  - CIBW_BEFORE_BUILD='python -m pip install -r requirements.txt' CIBW_BUILD=$(python
+  - CIBW_BEFORE_BUILD='python -m pip install -r requirements-setup.txt' CIBW_BUILD=$(python
     -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")') cibuildwheel
     --output-dir dist
   - python -m pip install --upgrade twine
