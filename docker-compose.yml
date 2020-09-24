@@ -12,6 +12,7 @@ services:
       - ./martinez/:/opt/martinez/martinez/
       - ./tests/:/opt/martinez/tests/
       - ./README.md:/opt/martinez/README.md
+      - ./requirements-setup.txt:/opt/voronoi/requirements-setup.txt
       - ./requirements.txt:/opt/martinez/requirements.txt
       - ./requirements-tests.txt:/opt/martinez/requirements-tests.txt
       - ./setup.py:/opt/martinez/setup.py
