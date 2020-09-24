@@ -608,7 +608,7 @@ class Operation:
                         self._right.bounding_box.x_max)
         result = []
         events_queue = self._events_queue
-        sweep_line = red_black.tree(key=SweepLineKey)
+        sweep_line = red_black.set_(key=SweepLineKey)
         while events_queue:
             event = events_queue.peek()
             if (self._type is OperationType.INTERSECTION

@@ -1,4 +1,4 @@
 pybind11>=2.5.0
 reprit>=0.2.2
-dendroid>=0.4.2
+dendroid>=1.0.0
 prioq>=0.1.1
