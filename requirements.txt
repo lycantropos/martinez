@@ -1,3 +1,3 @@
-reprit>=0.2.2
-dendroid>=1.0.0
-prioq>=0.1.1
+reprit>=0.3.0
+dendroid>=1.1.0
+prioq>=0.2.1
