@@ -46,10 +46,6 @@ jobs:
         displayName: 'Install packaging tools'
       - script: python -m pip install --upgrade codecov
         displayName: 'Install codecov'
-      - script: python -m pip install --force-reinstall -r requirements-setup.txt
-        displayName: 'Install setup requirements'
-      - script: python -m pip install --force-reinstall -r requirements.txt
-        displayName: 'Install requirements'
       - script: python -m pip install --force-reinstall -r requirements-tests.txt
         displayName: 'Install tests requirements'
       - script: python -m pip install .
@@ -67,7 +63,6 @@ jobs:
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
         displayName: 'Install build requirements'
       - bash:
-          CIBW_BEFORE_BUILD='python -m pip install -r requirements-setup.txt'
           CIBW_BUILD=$(python -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")')
           cibuildwheel --output-dir dist
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
@@ -106,10 +101,6 @@ jobs:
         displayName: 'Install codecov'
       - script: python -m pip install --upgrade gcovr
         displayName: 'Install gcovr'
-      - script: python -m pip install --force-reinstall -r requirements-setup.txt
-        displayName: 'Install setup requirements'
-      - script: python -m pip install --force-reinstall -r requirements.txt
-        displayName: 'Install requirements'
       - script: python -m pip install --force-reinstall -r requirements-tests.txt
         displayName: 'Install tests requirements'
       - script: python -m pip install -e .
@@ -136,7 +127,6 @@ jobs:
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
         displayName: 'Install build requirements'
       - bash:
-          CIBW_BEFORE_BUILD='python -m pip install -r requirements-setup.txt'
           CIBW_BUILD=$(python -c 'import sys; print("cp" + "".join(map(str, sys.version_info[:2])) + "-*")')
           cibuildwheel --output-dir dist
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
