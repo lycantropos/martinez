@@ -4,7 +4,7 @@ from .hints import Scalar
 
 
 class BoundingBox:
-    __slots__ = ('_x_min', '_y_min', '_x_max', '_y_max')
+    __slots__ = '_x_min', '_y_min', '_x_max', '_y_max'
 
     def __init__(self, x_min: Scalar, y_min: Scalar,
                  x_max: Scalar, y_max: Scalar) -> None:

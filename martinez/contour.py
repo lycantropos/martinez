@@ -10,7 +10,7 @@ from .point import Point
 
 
 class Contour:
-    __slots__ = ('_points', '_holes', 'is_external')
+    __slots__ = '_points', '_holes', 'is_external'
 
     def __init__(self, points: List[Point], holes: List[int], is_external: bool
                  ) -> None:

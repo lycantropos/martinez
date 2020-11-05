@@ -217,7 +217,7 @@ class SweepEvent:
 
 
 class EventsQueueKey:
-    __slots__ = ('_event',)
+    __slots__ = '_event',
 
     def __init__(self, event: SweepEvent) -> None:
         self._event = event
@@ -260,7 +260,7 @@ class EventsQueueKey:
 
 
 class SweepLineKey:
-    __slots__ = ('_event',)
+    __slots__ = '_event',
 
     def __init__(self, event: SweepEvent) -> None:
         self._event = event

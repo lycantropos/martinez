@@ -8,7 +8,7 @@ points_key = attrgetter('x', 'y')
 
 
 class Segment:
-    __slots__ = ('_source', '_target')
+    __slots__ = '_source', '_target'
 
     def __init__(self, source: Point, target: Point):
         self._source = source
