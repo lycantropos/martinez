@@ -1,7 +1,7 @@
 from itertools import repeat
+from typing import Hashable
 
 from _martinez import (EventsQueueKey,
-                       Point,
                        PolygonType,
                        SweepEvent)
 from hypothesis import strategies
@@ -33,8 +33,9 @@ totally_ordered_nested_events_queue_keys = strategies.builds(
         EventsQueueKey, nested_sweep_events_with_same_polygon_type)
 
 
-def to_sweep_event_point(key: EventsQueueKey) -> Point:
-    return key.event.point
+def to_sweep_event_point(key: EventsQueueKey) -> Hashable:
+    point = key.event.point
+    return point.x, point.y
 
 
 totally_ordered_nested_events_queue_keys_triplets = (
