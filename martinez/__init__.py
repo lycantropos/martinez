@@ -1,3 +1,3 @@
 """Python port of polygon clipping algorithm by F. Martinez et al."""
 
-__version__ = '0.5.2'
+__version__ = '0.5.3-alpha'
