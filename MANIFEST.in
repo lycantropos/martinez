@@ -1,2 +1,4 @@
 include requirements.txt
 include requirements-setup.txt
+include src/*.cpp
+include src/*.h
