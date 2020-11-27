@@ -2,8 +2,8 @@ from typing import Tuple
 
 from hypothesis import given
 
-from martinez.hints import Scalar
-from martinez.point import Point
+from tests.port_tests.hints import PortedPoint
+from tests.utils import Scalar
 from . import strategies
 
 
@@ -11,7 +11,7 @@ from . import strategies
 def test_basic(scalars_pair: Tuple[Scalar, Scalar]) -> None:
     x, y = scalars_pair
 
-    result = Point(x, y)
+    result = PortedPoint(x, y)
 
     assert result.x == x
     assert result.y == y

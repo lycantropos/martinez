@@ -2,17 +2,17 @@ from functools import partial
 
 from hypothesis import strategies
 
-from martinez.polygon import Polygon
-from tests.strategies import (ported_operations_types,
-                              scalars_strategies)
 from tests.port_tests.factories import scalars_to_ported_polygons
+from tests.port_tests.hints import PortedPolygon
+from tests.port_tests.utils import (ported_operations_types,
+                                    to_non_overlapping_ported_polygons_pair)
+from tests.strategies import scalars_strategies
 from tests.utils import (identity,
                          pack,
                          to_pairs)
-from tests.port_tests.utils import to_non_overlapping_ported_polygons_pair
 
 operations_types = ported_operations_types
-empty_polygons = strategies.builds(Polygon, strategies.builds(list))
+empty_polygons = strategies.builds(PortedPolygon, strategies.builds(list))
 polygons = scalars_strategies.flatmap(scalars_to_ported_polygons)
 non_empty_polygons_strategies = (scalars_strategies
                                  .map(partial(scalars_to_ported_polygons,

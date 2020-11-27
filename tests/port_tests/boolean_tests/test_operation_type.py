@@ -1,7 +1,7 @@
-from martinez.boolean import OperationType
+from tests.port_tests.hints import PortedOperationType
 
 from tests.utils import all_unique
 
 
 def test_basic():
-    assert all_unique(OperationType.__members__.values())
+    assert all_unique(PortedOperationType.__members__.values())

@@ -1,7 +1,7 @@
-from martinez.boolean import EdgeType
+from tests.port_tests.hints import PortedEdgeType
 
 from tests.utils import all_unique
 
 
 def test_basic():
-    assert all_unique(EdgeType.__members__.values())
+    assert all_unique(PortedEdgeType.__members__.values())

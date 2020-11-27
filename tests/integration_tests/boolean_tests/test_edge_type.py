@@ -1,7 +1,6 @@
-from _martinez import EdgeType as Bound
-
-from martinez.boolean import EdgeType as Ported
+from tests.bind_tests.hints import BoundEdgeType
+from tests.port_tests.hints import PortedEdgeType
 
 
 def test_basic():
-    assert Bound.__members__ == Ported.__members__
+    assert BoundEdgeType.__members__ == PortedEdgeType.__members__

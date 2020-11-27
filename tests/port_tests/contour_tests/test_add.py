@@ -1,19 +1,19 @@
 from hypothesis import given
 
-from martinez.contour import Contour
-from martinez.point import Point
+from tests.port_tests.hints import (PortedContour,
+                                    PortedPoint)
 from . import strategies
 
 
 @given(strategies.contours, strategies.points)
-def test_basic(contour: Contour, point: Point) -> None:
+def test_basic(contour: PortedContour, point: PortedPoint) -> None:
     result = contour.add(point)
 
     assert result is None
 
 
 @given(strategies.contours, strategies.points)
-def test_properties(contour: Contour, point: Point) -> None:
+def test_properties(contour: PortedContour, point: PortedPoint) -> None:
     contour.add(point)
 
     assert len(contour.points) > 0

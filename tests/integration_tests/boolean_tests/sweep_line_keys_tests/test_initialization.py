@@ -1,9 +1,10 @@
-from _martinez import SweepLineKey as BoundSweepLineKey
 from hypothesis import given
 
-from martinez.boolean import SweepLineKey as PortedSweepLineKey
-from ...utils import BoundPortedSweepEventsPair, \
-    are_bound_ported_sweep_line_keys_equal
+from tests.bind_tests.hints import BoundSweepLineKey
+from tests.integration_tests.hints import BoundPortedSweepEventsPair
+from tests.integration_tests.utils import (
+    are_bound_ported_sweep_line_keys_equal)
+from tests.port_tests.hints import PortedSweepLineKey
 from . import strategies
 
 

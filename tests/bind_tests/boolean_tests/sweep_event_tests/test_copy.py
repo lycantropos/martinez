@@ -1,13 +1,13 @@
 import copy
 
-from _martinez import SweepEvent
 from hypothesis import given
 
+from tests.bind_tests.hints import BoundSweepEvent
 from . import strategies
 
 
 @given(strategies.sweep_events)
-def test_shallow(event: SweepEvent) -> None:
+def test_shallow(event: BoundSweepEvent) -> None:
     result = copy.copy(event)
 
     assert result is not event
@@ -15,7 +15,7 @@ def test_shallow(event: SweepEvent) -> None:
 
 
 @given(strategies.sweep_events)
-def test_deep(event: SweepEvent) -> None:
+def test_deep(event: BoundSweepEvent) -> None:
     result = copy.deepcopy(event)
 
     assert result is not event

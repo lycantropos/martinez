@@ -4,8 +4,8 @@ from _martinez import sign as bound_sign
 from hypothesis import given
 
 from martinez.utilities import sign as ported_sign
-from ...port_tests.utils import PortedPointsTriplet
-from ...bind_tests.utils import BoundPointsTriplet
+from tests.bind_tests.hints import BoundPointsTriplet
+from tests.port_tests.hints import PortedPointsTriplet
 from . import strategies
 
 

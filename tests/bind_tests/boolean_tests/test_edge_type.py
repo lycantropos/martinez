@@ -1,7 +1,7 @@
-from _martinez import EdgeType
+from tests.bind_tests.hints import BoundEdgeType
 
 from tests.utils import all_unique
 
 
 def test_basic():
-    assert all_unique(EdgeType.__members__.values())
+    assert all_unique(BoundEdgeType.__members__.values())

@@ -3,11 +3,11 @@ from typing import (List,
 
 from hypothesis import strategies
 
-from tests.bind_tests.utils import (BoundOperation,
+from tests.bind_tests.hints import (BoundOperation,
                                     BoundOperationType,
                                     BoundPolygon,
-                                    BoundSweepEvent,
-                                    are_non_overlapping_bound_sweep_events)
+                                    BoundSweepEvent)
+from tests.bind_tests.utils import are_non_overlapping_bound_sweep_events
 from tests.integration_tests.factories import (
     make_cyclic_bound_with_ported_sweep_events,
     to_bound_with_ported_contours_pair,
@@ -15,13 +15,14 @@ from tests.integration_tests.factories import (
     to_bound_with_ported_points_pair,
     to_bound_with_ported_polygons_pair,
     to_bound_with_ported_sweep_events)
-from tests.integration_tests.utils import to_non_overlapping_contours_lists
-from tests.port_tests.utils import (PortedOperation,
+from tests.integration_tests.utils import (
+    bound_with_ported_operations_types_pairs,
+    to_non_overlapping_contours_lists)
+from tests.port_tests.hints import (PortedOperation,
                                     PortedOperationType,
                                     PortedPolygon,
                                     PortedSweepEvent)
 from tests.strategies import (booleans,
-                              bound_with_ported_operations_types_pairs,
                               single_precision_floats as floats)
 from tests.utils import (MAX_CONTOURS_COUNT,
                          MAX_NESTING_DEPTH,

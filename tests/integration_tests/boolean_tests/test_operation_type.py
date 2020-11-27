@@ -1,7 +1,6 @@
-from _martinez import OperationType as Bound
-
-from martinez.boolean import OperationType as Ported
+from tests.bind_tests.hints import BoundOperationType
+from tests.port_tests.hints import PortedOperationType
 
 
 def test_basic():
-    assert Bound.__members__ == Ported.__members__
+    assert BoundOperationType.__members__ == PortedOperationType.__members__

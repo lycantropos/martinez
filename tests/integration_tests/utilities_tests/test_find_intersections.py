@@ -1,12 +1,13 @@
 from typing import Tuple
 
-from _martinez import (Segment as BoundSegment,
-                       find_intersections as bound_find_intersections)
+from _martinez import find_intersections as bound_find_intersections
 from hypothesis import given
 
-from martinez.segment import Segment as PortedSegment
 from martinez.utilities import find_intersections as ported_find_intersections
-from ..utils import are_bound_ported_points_sequences_equal
+from tests.bind_tests.hints import BoundSegment
+from tests.integration_tests.utils import (
+    are_bound_ported_points_sequences_equal)
+from tests.port_tests.hints import PortedSegment
 from . import strategies
 
 

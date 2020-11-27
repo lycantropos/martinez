@@ -1,11 +1,11 @@
-from _martinez import Polygon
 from hypothesis import strategies
 
-from tests.strategies import (bound_operations_types)
 from tests.bind_tests.factories import to_bound_contours
-from tests.utils import (MAX_CONTOURS_COUNT)
-from tests.bind_tests.utils import to_non_overlapping_bound_contours_list, \
-    to_non_overlapping_bound_polygons_pair
+from tests.bind_tests.hints import BoundPolygon
+from tests.bind_tests.utils import (bound_operations_types,
+                                    to_non_overlapping_bound_contours_list,
+                                    to_non_overlapping_bound_polygons_pair)
+from tests.utils import MAX_CONTOURS_COUNT
 
 operations_types = bound_operations_types
 contours = to_bound_contours()
@@ -16,9 +16,9 @@ empty_contours_lists = strategies.builds(list)
 non_empty_contours_lists = (strategies.lists(contours,
                                              min_size=1)
                             .map(to_non_overlapping_bound_contours_list))
-polygons = strategies.builds(Polygon, contours_lists)
-empty_polygons = strategies.builds(Polygon, empty_contours_lists)
-non_empty_polygons = strategies.builds(Polygon, non_empty_contours_lists)
+polygons = strategies.builds(BoundPolygon, contours_lists)
+empty_polygons = strategies.builds(BoundPolygon, empty_contours_lists)
+non_empty_polygons = strategies.builds(BoundPolygon, non_empty_contours_lists)
 polygons_pairs = (strategies.tuples(empty_polygons, non_empty_polygons) |
                   strategies.tuples(non_empty_polygons, empty_polygons) |
                   strategies.builds(to_non_overlapping_bound_polygons_pair,

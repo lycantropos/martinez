@@ -1,14 +1,15 @@
 from hypothesis import strategies
 
+from tests.integration_tests.factories import (
+    make_cyclic_bound_with_ported_sweep_events,
+    to_bound_with_ported_points_pair,
+    to_bound_with_ported_sweep_events)
+from tests.integration_tests.utils import (
+    bound_with_ported_edges_types_pairs,
+    bound_with_ported_polygons_types_pairs)
 from tests.strategies import (booleans,
-                              bound_with_ported_edges_types_pairs,
-                              bound_with_ported_polygons_types_pairs,
                               single_precision_floats as floats,
                               unsigned_integers)
-from tests.integration_tests.factories import \
-    make_cyclic_bound_with_ported_sweep_events, \
-    to_bound_with_ported_points_pair, \
-    to_bound_with_ported_sweep_events
 from tests.utils import (MAX_NESTING_DEPTH,
                          to_pairs)
 

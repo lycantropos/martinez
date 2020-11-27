@@ -1,13 +1,13 @@
 from hypothesis import given
 
-from martinez.point import Point
-from martinez.segment import Segment
+from tests.port_tests.hints import (PortedPoint,
+                                    PortedSegment)
 from . import strategies
 
 
 @given(strategies.segments)
-def test_basic(segment: Segment) -> None:
+def test_basic(segment: PortedSegment) -> None:
     result = segment.min
 
-    assert isinstance(result, Point)
+    assert isinstance(result, PortedPoint)
     assert result == segment.source or result == segment.target

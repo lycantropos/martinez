@@ -1,20 +1,22 @@
 import copy
 
-from _martinez import Polygon
 from hypothesis import given
 
+from tests.bind_tests.hints import BoundPolygon as BoundPolygon
 from . import strategies
 
 
 @given(strategies.polygons, strategies.polygons)
-def test_basic(first_polygon: Polygon, second_polygon: Polygon) -> None:
+def test_basic(first_polygon: BoundPolygon,
+               second_polygon: BoundPolygon) -> None:
     result = first_polygon.join(second_polygon)
 
     assert result is None
 
 
 @given(strategies.polygons, strategies.polygons)
-def test_size(first_polygon: Polygon, second_polygon: Polygon) -> None:
+def test_size(first_polygon: BoundPolygon,
+              second_polygon: BoundPolygon) -> None:
     original_first_polygon = copy.deepcopy(first_polygon)
 
     first_polygon.join(second_polygon)
@@ -24,7 +26,8 @@ def test_size(first_polygon: Polygon, second_polygon: Polygon) -> None:
 
 
 @given(strategies.polygons, strategies.polygons)
-def test_elements(first_polygon: Polygon, second_polygon: Polygon) -> None:
+def test_elements(first_polygon: BoundPolygon,
+                  second_polygon: BoundPolygon) -> None:
     first_polygon.join(second_polygon)
 
     assert all(first_contour.points == second_contour.points

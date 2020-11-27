@@ -1,7 +1,6 @@
-from _martinez import PolygonType as Bound
-
-from martinez.boolean import PolygonType as Ported
+from tests.bind_tests.hints import BoundPolygonType
+from tests.port_tests.hints import PortedPolygonType
 
 
 def test_basic():
-    assert Bound.__members__ == Ported.__members__
+    assert BoundPolygonType.__members__ == PortedPolygonType.__members__

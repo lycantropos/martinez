@@ -1,15 +1,15 @@
 from typing import Tuple
 
-from _martinez import Point as Bound
 from hypothesis import given
 
-from martinez.point import Point as Ported
+from tests.bind_tests.hints import BoundPoint
+from tests.port_tests.hints import PortedPoint
 from . import strategies
 
 
 @given(strategies.points_pairs, strategies.points_pairs)
-def test_basic(first_points_pair: Tuple[Bound, Ported],
-               second_points_pair: Tuple[Bound, Ported]) -> None:
+def test_basic(first_points_pair: Tuple[BoundPoint, PortedPoint],
+               second_points_pair: Tuple[BoundPoint, PortedPoint]) -> None:
     first_bound, first_ported = first_points_pair
     second_bound, second_ported = second_points_pair
 

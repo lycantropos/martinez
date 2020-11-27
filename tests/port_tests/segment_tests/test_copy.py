@@ -2,12 +2,12 @@ import copy
 
 from hypothesis import given
 
-from martinez.segment import Segment
+from tests.port_tests.hints import PortedSegment
 from . import strategies
 
 
 @given(strategies.segments)
-def test_shallow(segment: Segment) -> None:
+def test_shallow(segment: PortedSegment) -> None:
     result = copy.copy(segment)
 
     assert result is not segment
@@ -17,7 +17,7 @@ def test_shallow(segment: Segment) -> None:
 
 
 @given(strategies.segments)
-def test_deep(segment: Segment) -> None:
+def test_deep(segment: PortedSegment) -> None:
     result = copy.deepcopy(segment)
 
     assert result is not segment

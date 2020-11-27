@@ -2,36 +2,18 @@ from typing import (List,
                     Sequence,
                     Tuple)
 
-from martinez.boolean import (EdgeType as PortedEdgeType,
-                              EventsQueueKey as PortedEventsQueueKey,
-                              Operation as PortedOperation,
-                              OperationType as PortedOperationType,
-                              PolygonType as PortedPolygonType,
-                              SweepEvent as PortedSweepEvent,
-                              SweepLineKey as PortedSweepLineKey)
-from martinez.bounding_box import BoundingBox as PortedBoundingBox
-from martinez.contour import Contour as PortedContour
-from martinez.hints import Scalar
-from martinez.point import Point as PortedPoint
-from martinez.polygon import Polygon as PortedPolygon
-from martinez.segment import Segment as PortedSegment
-from martinez.utilities import find_intersections as ported_find_intersections
-from tests.utils import to_bounding_boxes_offset
+from hypothesis import strategies
 
-PortedBoundingBox = PortedBoundingBox
-PortedContour = PortedContour
-PortedEdgeType = PortedEdgeType
-PortedEventsQueueKey = PortedEventsQueueKey
-PortedOperation = PortedOperation
-PortedOperationType = PortedOperationType
-PortedPoint = PortedPoint
-PortedPointsPair = Tuple[PortedPoint, PortedPoint]
-PortedPointsTriplet = Tuple[PortedPoint, PortedPoint, PortedPoint]
-PortedPolygon = PortedPolygon
-PortedPolygonType = PortedPolygonType
-PortedSegment = PortedSegment
-PortedSweepEvent = PortedSweepEvent
-PortedSweepLineKey = PortedSweepLineKey
+from martinez.utilities import find_intersections as ported_find_intersections
+from tests.utils import (Scalar,
+                         to_bounding_boxes_offset)
+from .hints import (PortedContour,
+                    PortedEdgeType,
+                    PortedOperationType,
+                    PortedPoint,
+                    PortedPolygon,
+                    PortedPolygonType,
+                    PortedSegment)
 
 
 def to_ported_rectangle(xs: Tuple[Scalar, Scalar],
@@ -79,3 +61,11 @@ def to_non_overlapping_ported_polygons_pair(first_polygon: PortedPolygon,
                            contour.holes, contour.is_external)
              for contour in second_polygon.contours])
     return first_polygon, second_polygon
+
+
+ported_edges_types = strategies.sampled_from(list(PortedEdgeType
+                                                  .__members__.values()))
+ported_polygons_types = strategies.sampled_from(list(PortedPolygonType
+                                                     .__members__.values()))
+ported_operations_types = strategies.sampled_from(
+        list(PortedOperationType.__members__.values()))

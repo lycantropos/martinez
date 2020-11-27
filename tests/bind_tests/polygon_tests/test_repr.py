@@ -1,21 +1,21 @@
 import sys
 
-from _martinez import Polygon
 from hypothesis import given
 
+from tests.bind_tests.hints import BoundPolygon as BoundPolygon
 from . import strategies
 
 
 @given(strategies.polygons)
-def test_basic(polygon: Polygon) -> None:
+def test_basic(polygon: BoundPolygon) -> None:
     result = repr(polygon)
 
-    assert result.startswith(Polygon.__module__)
-    assert Polygon.__qualname__ in result
+    assert result.startswith(BoundPolygon.__module__)
+    assert BoundPolygon.__qualname__ in result
 
 
 @given(strategies.polygons)
-def test_round_trip(polygon: Polygon) -> None:
+def test_round_trip(polygon: BoundPolygon) -> None:
     result = repr(polygon)
 
     assert eval(result, sys.modules) == polygon

@@ -1,14 +1,14 @@
 from typing import Tuple
 
-from _martinez import Segment as Bound
 from hypothesis import given
 
-from martinez.segment import Segment as Ported
+from tests.bind_tests.hints import BoundSegment
+from tests.port_tests.hints import PortedSegment
 from . import strategies
 
 
 @given(strategies.segments_pairs)
-def test_basic(segments_pair: Tuple[Bound, Ported]) -> None:
+def test_basic(segments_pair: Tuple[BoundSegment, PortedSegment]) -> None:
     bound, ported = segments_pair
 
     assert bound.is_vertical is ported.is_vertical

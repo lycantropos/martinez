@@ -6,24 +6,24 @@ from typing import (Any,
 
 from hypothesis import strategies
 
-from martinez.hints import Scalar
-from tests.port_tests.utils import (PortedContour,
+from tests.port_tests.hints import (PortedContour,
                                     PortedPoint,
                                     PortedPointsPair,
                                     PortedPointsTriplet,
                                     PortedPolygon,
                                     PortedPolygonType,
                                     PortedSegment,
-                                    PortedSweepEvent,
+                                    PortedSweepEvent)
+from tests.port_tests.utils import (ported_edges_types,
+                                    ported_polygons_types,
                                     to_non_overlapping_ported_contours_list,
                                     to_ported_rectangle)
 from tests.strategies import (booleans,
                               non_negative_integers,
-                              non_negative_integers_lists,
-                              ported_edges_types,
-                              ported_polygons_types)
+                              non_negative_integers_lists)
 from tests.utils import (MAX_CONTOURS_COUNT,
                          MAX_NESTING_DEPTH,
+                         Scalar,
                          Strategy,
                          compose,
                          make_cyclic,

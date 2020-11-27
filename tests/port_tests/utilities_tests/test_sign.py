@@ -3,9 +3,9 @@ from itertools import permutations
 from hypothesis import given
 
 from martinez.utilities import sign
+from tests.port_tests.hints import PortedPointsTriplet
 from tests.utils import (is_even_permutation,
                          permute)
-from ..utils import PortedPointsTriplet
 from . import strategies
 
 

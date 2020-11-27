@@ -1,10 +1,10 @@
 from hypothesis import given
 
-from martinez.boolean import Operation
-from martinez.polygon import Polygon
+from tests.port_tests.hints import (PortedOperation,
+                                    PortedPolygon)
 from . import strategies
 
 
 @given(strategies.operations)
-def test_basic(operation: Operation) -> None:
-    assert isinstance(operation.resultant, Polygon)
+def test_basic(operation: PortedOperation) -> None:
+    assert isinstance(operation.resultant, PortedPolygon)

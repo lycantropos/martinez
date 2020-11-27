@@ -2,12 +2,12 @@ import copy
 
 from hypothesis import given
 
-from martinez.boolean import Operation
+from tests.port_tests.hints import PortedOperation
 from . import strategies
 
 
 @given(strategies.operations)
-def test_shallow(operation: Operation) -> None:
+def test_shallow(operation: PortedOperation) -> None:
     result = copy.copy(operation)
 
     assert result is not operation
@@ -17,7 +17,7 @@ def test_shallow(operation: Operation) -> None:
 
 
 @given(strategies.operations)
-def test_deep(operation: Operation) -> None:
+def test_deep(operation: PortedOperation) -> None:
     result = copy.deepcopy(operation)
 
     assert result is not operation

@@ -2,12 +2,12 @@ import copy
 
 from hypothesis import given
 
-from martinez.contour import Contour
+from tests.port_tests.hints import PortedContour
 from . import strategies
 
 
 @given(strategies.contours)
-def test_shallow(contour: Contour) -> None:
+def test_shallow(contour: PortedContour) -> None:
     result = copy.copy(contour)
 
     assert result is not contour
@@ -17,7 +17,7 @@ def test_shallow(contour: Contour) -> None:
 
 
 @given(strategies.contours)
-def test_deep(contour: Contour) -> None:
+def test_deep(contour: PortedContour) -> None:
     result = copy.deepcopy(contour)
 
     assert result is not contour

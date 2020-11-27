@@ -1,15 +1,16 @@
-from _martinez import (Operation,
-                       OperationType,
-                       Polygon)
 from hypothesis import given
 
+from tests.bind_tests.hints import (BoundOperation,
+                                    BoundOperationType,
+                                    BoundPolygon)
 from . import strategies
 
 
 @given(strategies.polygons, strategies.polygons, strategies.operations_types)
-def test_basic(left: Polygon, right: Polygon,
-               operation_type: OperationType) -> None:
-    result = Operation(left, right, operation_type)
+def test_basic(left: BoundPolygon,
+               right: BoundPolygon,
+               operation_type: BoundOperationType) -> None:
+    result = BoundOperation(left, right, operation_type)
 
     assert result.left == left
     assert result.right == right

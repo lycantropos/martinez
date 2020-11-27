@@ -5,14 +5,8 @@ from functools import partial
 from typing import (Optional,
                     SupportsFloat)
 
-from _martinez import (EdgeType as BoundEdgeType,
-                       OperationType as BoundOperationType,
-                       PolygonType as BoundPolygonType)
 from hypothesis import strategies
 
-from martinez.boolean import (EdgeType as PortedEdgeType,
-                              OperationType as PortedOperationType,
-                              PolygonType as PortedPolygonType)
 from martinez.hints import Scalar
 from tests.utils import (MAX_VALUE,
                          MIN_VALUE,
@@ -125,30 +119,3 @@ unsigned_integers = strategies.integers(0, 65535)
 unsigned_integers_lists = strategies.lists(unsigned_integers)
 non_negative_integers = strategies.integers(0)
 non_negative_integers_lists = strategies.lists(non_negative_integers)
-bound_edges_types = strategies.sampled_from(list(BoundEdgeType
-                                                 .__members__.values()))
-bound_polygons_types = strategies.sampled_from(list(BoundPolygonType
-                                                    .__members__.values()))
-bound_operations_types = strategies.sampled_from(
-        list(BoundOperationType.__members__.values()))
-ported_edges_types = strategies.sampled_from(list(PortedEdgeType
-                                                  .__members__.values()))
-ported_polygons_types = strategies.sampled_from(list(PortedPolygonType
-                                                     .__members__.values()))
-ported_operations_types = strategies.sampled_from(
-        list(PortedOperationType.__members__.values()))
-bound_with_ported_edges_types_pairs = strategies.sampled_from(
-        [(BoundEdgeType.__members__[name],
-          PortedEdgeType.__members__[name])
-         for name in (BoundEdgeType.__members__.keys() &
-                      PortedEdgeType.__members__.keys())])
-bound_with_ported_polygons_types_pairs = strategies.sampled_from(
-        [(BoundPolygonType.__members__[name],
-          PortedPolygonType.__members__[name])
-         for name in (BoundPolygonType.__members__.keys() &
-                      PortedPolygonType.__members__.keys())])
-bound_with_ported_operations_types_pairs = strategies.sampled_from(
-        [(BoundOperationType.__members__[name],
-          PortedOperationType.__members__[name])
-         for name in (BoundOperationType.__members__.keys() &
-                      PortedOperationType.__members__.keys())])

@@ -1,13 +1,13 @@
 from typing import (List,
                     Tuple)
 
-from _martinez import (Contour as Bound,
-                       Point as BoundPoint)
 from hypothesis import given
 
-from martinez.contour import Contour as Ported
-from martinez.point import Point as PortedPoint
-from ..utils import are_bound_ported_contours_equal
+from tests.bind_tests.hints import (BoundContour,
+                                    BoundPoint)
+from tests.integration_tests.utils import are_bound_ported_contours_equal
+from tests.port_tests.hints import (PortedContour,
+                                    PortedPoint)
 from . import strategies
 
 
@@ -18,7 +18,7 @@ def test_basic(points_lists_pair: Tuple[List[BoundPoint], List[PortedPoint]],
                is_external: bool) -> None:
     bound_points, ported_points = points_lists_pair
 
-    bound, ported = (Bound(bound_points, holes, is_external),
-                     Ported(ported_points, holes, is_external))
+    bound, ported = (BoundContour(bound_points, holes, is_external),
+                     PortedContour(ported_points, holes, is_external))
 
     assert are_bound_ported_contours_equal(bound, ported)

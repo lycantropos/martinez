@@ -2,36 +2,19 @@ from typing import (List,
                     Sequence,
                     Tuple)
 
-from _martinez import (BoundingBox as BoundBoundingBox,
-                       Contour as BoundContour,
-                       EdgeType as BoundEdgeType,
-                       EventsQueueKey as BoundEventsQueueKey,
-                       Operation as BoundOperation,
-                       OperationType as BoundOperationType,
-                       Point as BoundPoint,
-                       Polygon as BoundPolygon,
-                       PolygonType as BoundPolygonType,
-                       Segment as BoundSegment,
-                       SweepEvent as BoundSweepEvent,
-                       SweepLineKey as BoundSweepLineKey,
-                       find_intersections as bound_find_intersections)
+from hypothesis import strategies
 
+from tests.bind_tests.hints import \
+    find_intersections as bound_find_intersections
 from tests.utils import to_bounding_boxes_offset
-
-BoundBoundingBox = BoundBoundingBox
-BoundContour = BoundContour
-BoundEdgeType = BoundEdgeType
-BoundEventsQueueKey = BoundEventsQueueKey
-BoundOperation = BoundOperation
-BoundOperationType = BoundOperationType
-BoundPoint = BoundPoint
-BoundPolygon = BoundPolygon
-BoundPolygonType = BoundPolygonType
-BoundSegment = BoundSegment
-BoundSweepEvent = BoundSweepEvent
-BoundSweepLineKey = BoundSweepLineKey
-BoundPointsPair = Tuple[BoundPoint, BoundPoint]
-BoundPointsTriplet = Tuple[BoundPoint, BoundPoint, BoundPoint]
+from .hints import (BoundContour,
+                    BoundEdgeType,
+                    BoundOperationType,
+                    BoundPoint,
+                    BoundPolygon,
+                    BoundPolygonType,
+                    BoundSegment,
+                    BoundSweepEvent)
 
 
 def to_bound_rectangle(xs: Tuple[float, float],
@@ -87,3 +70,11 @@ def are_non_overlapping_bound_sweep_events(events_pair: Tuple[BoundSweepEvent,
 def are_non_overlapping_bound_segments(first_segment: BoundSegment,
                                        second_segment: BoundSegment) -> bool:
     return bound_find_intersections(first_segment, second_segment)[0] != 2
+
+
+bound_edges_types = strategies.sampled_from(list(BoundEdgeType
+                                                 .__members__.values()))
+bound_polygons_types = strategies.sampled_from(list(BoundPolygonType
+                                                    .__members__.values()))
+bound_operations_types = strategies.sampled_from(
+        list(BoundOperationType.__members__.values()))

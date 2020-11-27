@@ -2,8 +2,8 @@ from typing import Tuple
 
 from hypothesis import given
 
-from martinez.bounding_box import BoundingBox
-from martinez.hints import Scalar
+from tests.port_tests.hints import PortedBoundingBox
+from tests.utils import Scalar
 from . import strategies
 
 
@@ -12,7 +12,7 @@ def test_basic(scalars_quadruple: Tuple[Scalar, Scalar, Scalar, Scalar]
                ) -> None:
     x_min, y_min, x_max, y_max = scalars_quadruple
 
-    result = BoundingBox(x_min, y_min, x_max, y_max)
+    result = PortedBoundingBox(x_min, y_min, x_max, y_max)
 
     assert result.x_min == x_min
     assert result.y_min == y_min

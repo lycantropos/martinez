@@ -3,12 +3,12 @@ from typing import Tuple
 
 from hypothesis import given
 
-from martinez.polygon import Polygon
+from tests.port_tests.hints import PortedPolygon
 from . import strategies
 
 
 @given(strategies.polygons_pairs)
-def test_basic(polygons_pair: Tuple[Polygon, Polygon]) -> None:
+def test_basic(polygons_pair: Tuple[PortedPolygon, PortedPolygon]) -> None:
     first_polygon, second_polygon = polygons_pair
 
     result = first_polygon.join(second_polygon)
@@ -17,7 +17,7 @@ def test_basic(polygons_pair: Tuple[Polygon, Polygon]) -> None:
 
 
 @given(strategies.polygons_pairs)
-def test_size(polygons_pair: Tuple[Polygon, Polygon]) -> None:
+def test_size(polygons_pair: Tuple[PortedPolygon, PortedPolygon]) -> None:
     first_polygon, second_polygon = polygons_pair
 
     original_first_polygon = copy.deepcopy(first_polygon)
@@ -29,7 +29,7 @@ def test_size(polygons_pair: Tuple[Polygon, Polygon]) -> None:
 
 
 @given(strategies.polygons_pairs)
-def test_elements(polygons_pair: Tuple[Polygon, Polygon]) -> None:
+def test_elements(polygons_pair: Tuple[PortedPolygon, PortedPolygon]) -> None:
     first_polygon, second_polygon = polygons_pair
 
     first_polygon.join(second_polygon)

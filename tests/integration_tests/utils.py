@@ -1,32 +1,36 @@
 from typing import (List,
                     Sequence,
-                    Tuple,
-                    Union)
+                    Tuple)
 
-from tests.bind_tests.utils import (BoundBoundingBox,
+from hypothesis import strategies
+
+from tests.bind_tests.hints import (BoundBoundingBox,
                                     BoundContour,
+                                    BoundEdgeType,
                                     BoundEventsQueueKey,
                                     BoundOperation,
+                                    BoundOperationType,
                                     BoundPoint,
                                     BoundPolygon,
+                                    BoundPolygonType,
                                     BoundSegment,
                                     BoundSweepEvent,
-                                    BoundSweepLineKey,
-                                    to_non_overlapping_bound_contours_list)
-from tests.port_tests.utils import (PortedBoundingBox,
+                                    BoundSweepLineKey)
+from tests.bind_tests.utils import to_non_overlapping_bound_contours_list
+from tests.port_tests.hints import (PortedBoundingBox,
                                     PortedContour,
+                                    PortedEdgeType,
                                     PortedEventsQueueKey,
                                     PortedOperation,
+                                    PortedOperationType,
                                     PortedPoint,
                                     PortedPolygon,
+                                    PortedPolygonType,
                                     PortedSegment,
                                     PortedSweepEvent,
-                                    PortedSweepLineKey,
-                                    to_non_overlapping_ported_contours_list)
+                                    PortedSweepLineKey)
+from tests.port_tests.utils import to_non_overlapping_ported_contours_list
 from tests.utils import traverse_sweep_event
-
-BoundPortedPointsPair = Tuple[BoundPoint, PortedPoint]
-BoundPortedSweepEventsPair = Tuple[BoundSweepEvent, PortedSweepEvent]
 
 
 def are_bound_ported_bounding_boxes_equal(bound: BoundBoundingBox,
@@ -121,12 +125,6 @@ def are_bound_ported_operations_equal(bound: BoundOperation,
             and bound.type == ported.type)
 
 
-def are_bounding_boxes_empty(bounding_box: Union[BoundBoundingBox,
-                                                 PortedBoundingBox]) -> bool:
-    return not (bounding_box.x_min or bounding_box.y_min
-                or bounding_box.x_max or bounding_box.y_max)
-
-
 def to_non_overlapping_contours_lists(lists: Tuple[List[BoundContour],
                                                    List[PortedContour]]
                                       ) -> Tuple[List[BoundContour],
@@ -134,3 +132,20 @@ def to_non_overlapping_contours_lists(lists: Tuple[List[BoundContour],
     bound, ported = lists
     return (to_non_overlapping_bound_contours_list(bound),
             to_non_overlapping_ported_contours_list(ported))
+
+
+bound_with_ported_edges_types_pairs = strategies.sampled_from(
+        [(BoundEdgeType.__members__[name],
+          PortedEdgeType.__members__[name])
+         for name in (BoundEdgeType.__members__.keys() &
+                      PortedEdgeType.__members__.keys())])
+bound_with_ported_polygons_types_pairs = strategies.sampled_from(
+        [(BoundPolygonType.__members__[name],
+          PortedPolygonType.__members__[name])
+         for name in (BoundPolygonType.__members__.keys() &
+                      PortedPolygonType.__members__.keys())])
+bound_with_ported_operations_types_pairs = strategies.sampled_from(
+        [(BoundOperationType.__members__[name],
+          PortedOperationType.__members__[name])
+         for name in (BoundOperationType.__members__.keys() &
+                      PortedOperationType.__members__.keys())])

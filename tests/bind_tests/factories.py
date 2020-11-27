@@ -7,8 +7,6 @@ from typing import (Any,
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
-                              bound_edges_types,
-                              bound_polygons_types,
                               floats,
                               unsigned_integers)
 from tests.utils import (MAX_NESTING_DEPTH,
@@ -16,10 +14,12 @@ from tests.utils import (MAX_NESTING_DEPTH,
                          compose,
                          make_cyclic,
                          to_valid_coordinates_pairs)
-from .utils import (BoundContour,
+from .hints import (BoundContour,
                     BoundPoint,
                     BoundPolygonType,
-                    BoundSweepEvent,
+                    BoundSweepEvent)
+from .utils import (bound_edges_types,
+                    bound_polygons_types,
                     to_bound_rectangle)
 
 

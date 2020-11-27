@@ -1,6 +1,6 @@
-from _martinez import BoundingBox
 from hypothesis import strategies
 
+from tests.bind_tests.hints import BoundBoundingBox as BoundingBox
 from tests.strategies import floats
 
 floats = floats

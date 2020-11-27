@@ -1,13 +1,13 @@
 import copy
 
-from _martinez import Operation
 from hypothesis import given
 
+from tests.bind_tests.hints import BoundOperation
 from . import strategies
 
 
 @given(strategies.operations)
-def test_shallow(operation: Operation) -> None:
+def test_shallow(operation: BoundOperation) -> None:
     result = copy.copy(operation)
 
     assert result is not operation
@@ -15,7 +15,7 @@ def test_shallow(operation: Operation) -> None:
 
 
 @given(strategies.operations)
-def test_deep(operation: Operation) -> None:
+def test_deep(operation: BoundOperation) -> None:
     result = copy.deepcopy(operation)
 
     assert result is not operation

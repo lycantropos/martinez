@@ -1,12 +1,12 @@
 from typing import (List,
                     Tuple)
 
-from _martinez import (Operation as Bound,
-                       SweepEvent as BoundSweepEvent)
 from hypothesis import given
 
-from martinez.boolean import (Operation as Ported,
-                              SweepEvent as PortedSweepEvent)
+from tests.bind_tests.hints import (BoundOperation,
+                                    BoundSweepEvent)
+from tests.port_tests.hints import (PortedOperation,
+                                    PortedSweepEvent)
 from . import strategies
 
 
@@ -19,7 +19,9 @@ def test_basic(events_pair_with_position_and_processed
     ((bound_events, ported_events),
      position, processed) = events_pair_with_position_and_processed
 
-    bound_result = Bound.to_next_position(position, bound_events, processed)
-    ported_result = Ported.to_next_position(position, ported_events, processed)
+    bound_result = BoundOperation.to_next_position(position, bound_events,
+                                                   processed)
+    ported_result = PortedOperation.to_next_position(position, ported_events,
+                                                     processed)
 
     assert bound_result == ported_result

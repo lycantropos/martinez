@@ -1,7 +1,7 @@
-from _martinez import PolygonType
+from tests.bind_tests.hints import BoundPolygonType
 
 from tests.utils import all_unique
 
 
 def test_basic():
-    assert all_unique(PolygonType.__members__.values())
+    assert all_unique(BoundPolygonType.__members__.values())

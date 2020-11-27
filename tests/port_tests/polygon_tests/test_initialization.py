@@ -2,13 +2,13 @@ from typing import List
 
 from hypothesis import given
 
-from martinez.contour import Contour
-from martinez.polygon import Polygon
+from tests.port_tests.hints import (PortedContour,
+                                    PortedPolygon)
 from . import strategies
 
 
 @given(strategies.contours_lists)
-def test_basic(contours: List[Contour]) -> None:
-    result = Polygon(contours)
+def test_basic(contours: List[PortedContour]) -> None:
+    result = PortedPolygon(contours)
 
     assert result.contours == contours

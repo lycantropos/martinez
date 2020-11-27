@@ -1,9 +1,9 @@
-from _martinez import (BoundingBox,
-                       Contour)
 from hypothesis import given
 
-from tests.integration_tests.utils import are_bounding_boxes_empty
-from tests.utils import implication
+from tests.bind_tests.hints import (BoundingBox,
+                                    Contour)
+from tests.utils import (are_bounding_boxes_empty,
+                         implication)
 from . import strategies
 
 

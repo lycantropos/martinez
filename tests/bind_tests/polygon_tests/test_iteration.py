@@ -1,13 +1,12 @@
-from _martinez import (Contour,
-                       Polygon)
 from hypothesis import given
 
+from tests.bind_tests.hints import (BoundPolygon, Contour)
 from tests.utils import capacity
 from . import strategies
 
 
 @given(strategies.polygons)
-def test_basic(polygon: Polygon) -> None:
+def test_basic(polygon: BoundPolygon) -> None:
     result = iter(polygon)
 
     assert all(isinstance(element, Contour)
@@ -15,7 +14,7 @@ def test_basic(polygon: Polygon) -> None:
 
 
 @given(strategies.polygons)
-def test_elements(polygon: Polygon) -> None:
+def test_elements(polygon: BoundPolygon) -> None:
     result = iter(polygon)
 
     assert all(element in polygon.contours
@@ -23,7 +22,7 @@ def test_elements(polygon: Polygon) -> None:
 
 
 @given(strategies.polygons)
-def test_size(polygon: Polygon) -> None:
+def test_size(polygon: BoundPolygon) -> None:
     result = iter(polygon)
 
     assert capacity(result) == len(polygon.contours)

@@ -2,10 +2,10 @@ from typing import Optional
 
 from hypothesis import given
 
-from martinez.boolean import (EdgeType,
-                              PolygonType,
-                              SweepEvent)
-from martinez.point import Point
+from tests.port_tests.hints import (PortedEdgeType,
+                                    PortedPoint,
+                                    PortedPolygonType,
+                                    PortedSweepEvent)
 from . import strategies
 
 
@@ -15,20 +15,21 @@ from . import strategies
        strategies.non_negative_integers, strategies.non_negative_integers,
        strategies.maybe_sweep_events)
 def test_basic(is_left: bool,
-               point: Point,
-               other_event: Optional[SweepEvent],
-               polygon_type: PolygonType,
-               edge_type: EdgeType,
+               point: PortedPoint,
+               other_event: Optional[PortedSweepEvent],
+               polygon_type: PortedPolygonType,
+               edge_type: PortedEdgeType,
                in_out: bool,
                other_in_out: bool,
                in_result: bool,
                result_in_out: bool,
                position: int,
                contour_id: int,
-               prev_in_result_event: Optional[SweepEvent]) -> None:
-    result = SweepEvent(is_left, point, other_event, polygon_type, edge_type,
-                        in_out, other_in_out, in_result, result_in_out,
-                        position, contour_id, prev_in_result_event)
+               prev_in_result_event: Optional[PortedSweepEvent]) -> None:
+    result = PortedSweepEvent(is_left, point, other_event, polygon_type,
+                              edge_type, in_out, other_in_out, in_result,
+                              result_in_out, position, contour_id,
+                              prev_in_result_event)
 
     assert result.is_left is is_left
     assert result.point == point

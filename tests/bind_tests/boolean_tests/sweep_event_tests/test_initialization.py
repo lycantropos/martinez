@@ -1,11 +1,9 @@
 from typing import Optional
 
-from _martinez import (EdgeType,
-                       Point,
-                       PolygonType,
-                       SweepEvent)
 from hypothesis import given
 
+from tests.bind_tests.hints import (BoundEdgeType, BoundPoint,
+                                    BoundPolygonType, BoundSweepEvent)
 from . import strategies
 
 
@@ -14,14 +12,21 @@ from . import strategies
        strategies.booleans, strategies.booleans, strategies.booleans,
        strategies.booleans, strategies.unsigned_integers,
        strategies.unsigned_integers, strategies.maybe_sweep_events)
-def test_basic(is_left: bool, point: Point, other_event: Optional[SweepEvent],
-               polygon_type: PolygonType, edge_type: EdgeType, in_out: bool,
-               other_in_out: bool, in_result: bool, result_in_out: bool,
-               position: int, contour_id: int,
-               prev_in_result_event: Optional[SweepEvent]) -> None:
-    result = SweepEvent(is_left, point, other_event, polygon_type, edge_type,
-                        in_out, other_in_out, in_result, result_in_out,
-                        position, contour_id, prev_in_result_event)
+def test_basic(is_left: bool, point: BoundPoint,
+               other_event: Optional[BoundSweepEvent],
+               polygon_type: BoundPolygonType,
+               edge_type: BoundEdgeType,
+               in_out: bool,
+               other_in_out: bool,
+               in_result: bool,
+               result_in_out: bool,
+               position: int,
+               contour_id: int,
+               prev_in_result_event: Optional[BoundSweepEvent]) -> None:
+    result = BoundSweepEvent(is_left, point, other_event, polygon_type,
+                             edge_type, in_out, other_in_out, in_result,
+                             result_in_out, position, contour_id,
+                             prev_in_result_event)
 
     assert result.is_left is is_left
     assert result.point == point

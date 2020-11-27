@@ -2,15 +2,16 @@ from functools import partial
 
 from hypothesis import strategies
 
+from tests.port_tests.factories import (scalars_to_acyclic_ported_sweep_events,
+                                        scalars_to_nested_ported_sweep_events,
+                                        scalars_to_plain_ported_sweep_events,
+                                        scalars_to_ported_points,
+                                        scalars_to_ported_sweep_events)
+from tests.port_tests.utils import (ported_edges_types,
+                                    ported_polygons_types)
 from tests.strategies import (booleans,
                               non_negative_integers,
-                              ported_edges_types,
-                              ported_polygons_types,
                               scalars_strategies)
-from tests.port_tests.factories import scalars_to_acyclic_ported_sweep_events, \
-    scalars_to_nested_ported_sweep_events, \
-    scalars_to_plain_ported_sweep_events, \
-    scalars_to_ported_points, scalars_to_ported_sweep_events
 from tests.utils import (cleave_in_tuples,
                          identity,
                          to_maybe,

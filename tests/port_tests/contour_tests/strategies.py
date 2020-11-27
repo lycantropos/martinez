@@ -1,10 +1,10 @@
+from tests.port_tests.factories import (scalars_to_ported_contours,
+                                        scalars_to_ported_points,
+                                        scalars_to_ported_points_lists)
 from tests.strategies import (booleans,
                               non_negative_integers,
                               non_negative_integers_lists,
                               scalars_strategies)
-from tests.port_tests.factories import scalars_to_ported_contours, \
-    scalars_to_ported_points, \
-    scalars_to_ported_points_lists
 from tests.utils import (identity,
                          to_pairs,
                          to_triplets)

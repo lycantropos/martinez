@@ -1,13 +1,13 @@
 from typing import (List,
                     Tuple)
 
-from _martinez import (Contour as BoundContour,
-                       Polygon as Bound)
 from hypothesis import given
 
-from martinez.contour import Contour as PortedContour
-from martinez.polygon import Polygon as Ported
-from ..utils import are_bound_ported_polygons_equal
+from tests.bind_tests.hints import (BoundContour,
+                                    BoundPolygon)
+from tests.integration_tests.utils import are_bound_ported_polygons_equal
+from tests.port_tests.hints import (PortedContour,
+                                    PortedPolygon)
 from . import strategies
 
 
@@ -16,6 +16,7 @@ def test_basic(contours_lists_pair: Tuple[List[BoundContour],
                                           List[PortedContour]]) -> None:
     bound_contours, ported_contours = contours_lists_pair
 
-    bound, ported = Bound(bound_contours), Ported(ported_contours)
+    bound, ported = (BoundPolygon(bound_contours),
+                     PortedPolygon(ported_contours))
 
     assert are_bound_ported_polygons_equal(bound, ported)

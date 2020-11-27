@@ -1,28 +1,29 @@
 from typing import (List,
                     Tuple)
 
-from _martinez import (Operation,
-                       OperationType,
-                       Point,
-                       Polygon,
-                       SweepEvent)
 from hypothesis import strategies
 
+from tests.bind_tests.factories import (to_bound_contours,
+                                        to_bound_sweep_events,
+                                        to_nested_bound_sweep_events)
+from tests.bind_tests.hints import (BoundOperation,
+                                    BoundOperationType,
+                                    BoundPoint,
+                                    BoundPolygon,
+                                    BoundSweepEvent)
+from tests.bind_tests.utils import (are_non_overlapping_bound_sweep_events,
+                                    bound_operations_types,
+                                    to_non_overlapping_bound_contours_list,
+                                    to_non_overlapping_bound_polygons_pair)
 from tests.strategies import (booleans,
-                              bound_operations_types,
                               floats)
-from tests.bind_tests.factories import to_bound_contours, \
-    to_bound_sweep_events, to_nested_bound_sweep_events
 from tests.utils import (MAX_CONTOURS_COUNT,
                          Strategy,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
                          to_double_nested_sweep_events)
-from tests.bind_tests.utils import are_non_overlapping_bound_sweep_events, \
-    to_non_overlapping_bound_contours_list, \
-    to_non_overlapping_bound_polygons_pair
 
-points = strategies.builds(Point, floats, floats)
+points = strategies.builds(BoundPoint, floats, floats)
 sweep_events = to_bound_sweep_events()
 nested_sweep_events = to_nested_bound_sweep_events()
 double_nested_sweep_events = to_double_nested_sweep_events(nested_sweep_events)
@@ -32,8 +33,8 @@ non_empty_sweep_events_lists = strategies.lists(sweep_events,
 
 
 def to_sweep_events_lists_with_indices_and_booleans_lists(
-        events: List[SweepEvent]
-) -> Strategy[Tuple[List[SweepEvent], int, List[bool]]]:
+        events: List[BoundSweepEvent]
+) -> Strategy[Tuple[List[BoundSweepEvent], int, List[bool]]]:
     return strategies.tuples(strategies.just(events),
                              strategies.integers(0, len(events) - 1),
                              strategies.lists(booleans,
@@ -63,22 +64,23 @@ empty_contours_lists = strategies.builds(list)
 non_empty_contours_lists = (strategies.lists(contours,
                                              min_size=1)
                             .map(to_non_overlapping_bound_contours_list))
-polygons = strategies.builds(Polygon, contours_lists)
-empty_polygons = strategies.builds(Polygon, empty_contours_lists)
-non_empty_polygons = strategies.builds(Polygon, non_empty_contours_lists)
+polygons = strategies.builds(BoundPolygon, contours_lists)
+empty_polygons = strategies.builds(BoundPolygon, empty_contours_lists)
+non_empty_polygons = strategies.builds(BoundPolygon, non_empty_contours_lists)
 
 
-def to_operation_with_non_overlapping_arguments(polygons_pair: Tuple[Polygon,
-                                                                     Polygon],
-                                                operation_type: OperationType
-                                                ) -> Operation:
-    return Operation(*polygons_pair, operation_type)
+def to_operation_with_non_overlapping_arguments(
+        polygons_pair: Tuple[BoundPolygon,
+                             BoundPolygon],
+        operation_type: BoundOperationType
+) -> BoundOperation:
+    return BoundOperation(*polygons_pair, operation_type)
 
 
 trivial_operations = (
-        strategies.builds(Operation, empty_polygons, polygons,
+        strategies.builds(BoundOperation, empty_polygons, polygons,
                           operations_types)
-        | strategies.builds(Operation, polygons, empty_polygons,
+        | strategies.builds(BoundOperation, polygons, empty_polygons,
                             operations_types)
         | strategies.builds(to_operation_with_non_overlapping_arguments,
                             strategies.builds(
@@ -86,13 +88,13 @@ trivial_operations = (
                                     non_empty_polygons,
                                     non_empty_polygons),
                             operations_types))
-non_trivial_operations = strategies.builds(Operation, non_empty_polygons,
+non_trivial_operations = strategies.builds(BoundOperation, non_empty_polygons,
                                            non_empty_polygons,
                                            operations_types)
 operations = trivial_operations | non_trivial_operations
 
 
-def pre_process_operation(operation: Operation) -> Operation:
+def pre_process_operation(operation: BoundOperation) -> BoundOperation:
     operation.process_segments()
     return operation
 
@@ -102,9 +104,10 @@ pre_processed_non_trivial_operations = (non_trivial_operations
                                         .map(pre_process_operation))
 
 
-def to_operation_with_events_list(operation: Operation
-                                  ) -> Tuple[Operation, List[SweepEvent]]:
-    return operation, Operation.collect_events(operation.sweep())
+def to_operation_with_events_list(operation: BoundOperation
+                                  ) -> Tuple[
+    BoundOperation, List[BoundSweepEvent]]:
+    return operation, BoundOperation.collect_events(operation.sweep())
 
 
 operations_with_events_lists = (

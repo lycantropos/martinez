@@ -12,19 +12,21 @@ from typing import (Any,
                     Optional,
                     Sequence,
                     Tuple,
-                    TypeVar)
+                    TypeVar,
+                    Union)
 
 from hypothesis import strategies
 from hypothesis.strategies import SearchStrategy
 
 from martinez.hints import Scalar
-from tests.port_tests.utils import PortedSweepEvent
+from tests.port_tests.hints import PortedSweepEvent
 
 Domain = TypeVar('Domain')
 Range = TypeVar('Range')
 Strategy = SearchStrategy
 AnyBoundingBox = TypeVar('AnyBoundingBox')
 AnySweepEvent = TypeVar('AnySweepEvent')
+Scalar = Scalar
 
 MAX_VALUE = 10 ** 4
 MIN_VALUE = -MAX_VALUE
@@ -158,16 +160,10 @@ def pickle_round_trip(object_: Domain) -> Domain:
     return pickle.loads(pickle.dumps(object_))
 
 
-def is_sweep_event_non_degenerate(event: AnySweepEvent) -> bool:
-    return not event.segment.is_degenerate
-
-
-def to_double_nested_sweep_event(event: AnySweepEvent) -> AnySweepEvent:
-    if event.other_event is None:
-        event.other_event = event
-    elif event.other_event.other_event is None:
-        event.other_event.other_event = event
-    return event
+def are_bounding_boxes_empty(bounding_box: Union[AnyBoundingBox,
+                                                 AnyBoundingBox]) -> bool:
+    return not (bounding_box.x_min or bounding_box.y_min
+                or bounding_box.x_max or bounding_box.y_max)
 
 
 def are_sweep_events_pair_with_different_polygon_types(
@@ -176,17 +172,8 @@ def are_sweep_events_pair_with_different_polygon_types(
     return first_event.polygon_type != second_event.polygon_type
 
 
-def to_bounding_boxes_offset(first_bounding_box: AnyBoundingBox,
-                             second_bounding_box: AnyBoundingBox
-                             ) -> Tuple[Scalar, Scalar]:
-    delta_x = (max(first_bounding_box.x_max, second_bounding_box.x_max)
-               - min(first_bounding_box.x_min, second_bounding_box.x_min))
-    delta_y = (max(first_bounding_box.y_max, second_bounding_box.y_max)
-               - min(first_bounding_box.y_min, second_bounding_box.y_min))
-    return delta_x, delta_y
-
-
-traverse_sweep_event = PortedSweepEvent._traverse
+def is_sweep_event_non_degenerate(event: AnySweepEvent) -> bool:
+    return not event.segment.is_degenerate
 
 
 def make_cyclic(sweep_events: Strategy[AnySweepEvent]
@@ -203,15 +190,27 @@ def make_cyclic(sweep_events: Strategy[AnySweepEvent]
     return sweep_events.flatmap(to_cyclic_sweep_events)
 
 
+def to_bounding_boxes_offset(first_bounding_box: AnyBoundingBox,
+                             second_bounding_box: AnyBoundingBox
+                             ) -> Tuple[Scalar, Scalar]:
+    delta_x = (max(first_bounding_box.x_max, second_bounding_box.x_max)
+               - min(first_bounding_box.x_min, second_bounding_box.x_min))
+    delta_y = (max(first_bounding_box.y_max, second_bounding_box.y_max)
+               - min(first_bounding_box.y_min, second_bounding_box.y_min))
+    return delta_x, delta_y
+
+
+def to_double_nested_sweep_event(event: AnySweepEvent) -> AnySweepEvent:
+    if event.other_event is None:
+        event.other_event = event
+    elif event.other_event.other_event is None:
+        event.other_event.other_event = event
+    return event
+
+
 def to_double_nested_sweep_events(strategy: Strategy[AnySweepEvent]
                                   ) -> Strategy[AnySweepEvent]:
     return strategy.map(to_double_nested_sweep_event)
-
-
-def to_links(events_count: int) -> Strategy[Dict[int, int]]:
-    return strategies.dictionaries(strategies.integers(0, events_count - 1),
-                                   strategies.integers(0, events_count - 1),
-                                   min_size=events_count // 2)
 
 
 def to_left_relinked_sweep_event(events: List[AnySweepEvent],
@@ -221,8 +220,17 @@ def to_left_relinked_sweep_event(events: List[AnySweepEvent],
     return events[0]
 
 
+def to_links(events_count: int) -> Strategy[Dict[int, int]]:
+    return strategies.dictionaries(strategies.integers(0, events_count - 1),
+                                   strategies.integers(0, events_count - 1),
+                                   min_size=events_count // 2)
+
+
 def to_right_relinked_sweep_event(events: List[AnySweepEvent],
                                   links: Dict[int, int]) -> AnySweepEvent:
     for source, destination in links.items():
         events[source].prev_in_result_event = events[destination]
     return events[0]
+
+
+traverse_sweep_event = PortedSweepEvent._traverse

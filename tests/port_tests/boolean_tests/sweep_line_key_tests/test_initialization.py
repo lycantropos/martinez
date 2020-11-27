@@ -1,12 +1,12 @@
 from hypothesis import given
 
-from martinez.boolean import (SweepEvent,
-                              SweepLineKey)
+from tests.port_tests.hints import (PortedSweepEvent,
+                                    PortedSweepLineKey)
 from . import strategies
 
 
 @given(strategies.sweep_events)
-def test_basic(event: SweepEvent) -> None:
-    result = SweepLineKey(event)
+def test_basic(event: PortedSweepEvent) -> None:
+    result = PortedSweepLineKey(event)
 
     assert result.event == event

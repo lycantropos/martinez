@@ -1,14 +1,14 @@
-from _martinez import Segment
 from hypothesis import given
 
+from tests.bind_tests.hints import BoundSegment as BoundSegment
 from . import strategies
 
 
 @given(strategies.segments)
-def test_basic(segment: Segment) -> None:
-    assert isinstance(segment.reversed, Segment)
+def test_basic(segment: BoundSegment) -> None:
+    assert isinstance(segment.reversed, BoundSegment)
 
 
 @given(strategies.segments)
-def test_involution(segment: Segment) -> None:
+def test_involution(segment: BoundSegment) -> None:
     assert segment.reversed.reversed == segment

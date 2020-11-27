@@ -1,13 +1,13 @@
 import copy
 
-from _martinez import Polygon
 from hypothesis import given
 
+from tests.bind_tests.hints import BoundPolygon as BoundPolygon
 from . import strategies
 
 
 @given(strategies.polygons)
-def test_shallow(polygon: Polygon) -> None:
+def test_shallow(polygon: BoundPolygon) -> None:
     result = copy.copy(polygon)
 
     assert result is not polygon
@@ -15,7 +15,7 @@ def test_shallow(polygon: Polygon) -> None:
 
 
 @given(strategies.polygons)
-def test_deep(polygon: Polygon) -> None:
+def test_deep(polygon: BoundPolygon) -> None:
     result = copy.deepcopy(polygon)
 
     assert result is not polygon

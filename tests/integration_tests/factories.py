@@ -5,25 +5,23 @@ from typing import (Dict,
 
 from hypothesis import strategies
 
-from tests.bind_tests.utils import (BoundContour,
+from tests.bind_tests.hints import (BoundContour,
                                     BoundEdgeType,
                                     BoundPoint,
                                     BoundPolygon,
                                     BoundPolygonType,
                                     BoundSegment,
-                                    BoundSweepEvent,
-                                    to_bound_rectangle)
-from tests.port_tests.utils import (PortedContour,
+                                    BoundSweepEvent)
+from tests.bind_tests.utils import to_bound_rectangle
+from tests.port_tests.hints import (PortedContour,
                                     PortedEdgeType,
                                     PortedPoint,
                                     PortedPolygon,
                                     PortedPolygonType,
                                     PortedSegment,
-                                    PortedSweepEvent,
-                                    to_ported_rectangle)
+                                    PortedSweepEvent)
+from tests.port_tests.utils import to_ported_rectangle
 from tests.strategies import (booleans,
-                              bound_with_ported_edges_types_pairs,
-                              bound_with_ported_polygons_types_pairs,
                               floats,
                               single_precision_floats,
                               unsigned_integers)
@@ -33,8 +31,10 @@ from tests.utils import (Strategy,
                          to_right_relinked_sweep_event,
                          to_valid_coordinates_pairs,
                          traverse_sweep_event)
-from .utils import (BoundPortedPointsPair,
+from .hints import (BoundPortedPointsPair,
                     BoundPortedSweepEventsPair)
+from .utils import (bound_with_ported_edges_types_pairs,
+                    bound_with_ported_polygons_types_pairs)
 
 
 def to_bound_with_ported_points_pair(x: float, y: float

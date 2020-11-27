@@ -1,21 +1,21 @@
 import sys
 
-from _martinez import Segment
 from hypothesis import given
 
+from tests.bind_tests.hints import BoundSegment as BoundSegment
 from . import strategies
 
 
 @given(strategies.segments)
-def test_basic(segment: Segment) -> None:
+def test_basic(segment: BoundSegment) -> None:
     result = repr(segment)
 
-    assert result.startswith(Segment.__module__)
-    assert Segment.__qualname__ in result
+    assert result.startswith(BoundSegment.__module__)
+    assert BoundSegment.__qualname__ in result
 
 
 @given(strategies.segments)
-def test_round_trip(segment: Segment) -> None:
+def test_round_trip(segment: BoundSegment) -> None:
     result = repr(segment)
 
     assert eval(result, sys.modules) == segment

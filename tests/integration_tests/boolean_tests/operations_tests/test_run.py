@@ -1,15 +1,16 @@
 from typing import Tuple
 
-from _martinez import Operation as Bound
 from hypothesis import given
 
-from martinez.boolean import Operation as Ported
-from ...utils import are_bound_ported_polygons_equal
+from tests.bind_tests.hints import BoundOperation
+from tests.integration_tests.utils import are_bound_ported_polygons_equal
+from tests.port_tests.hints import PortedOperation
 from . import strategies
 
 
 @given(strategies.operations_pairs)
-def test_basic(operations_pair: Tuple[Bound, Ported]) -> None:
+def test_basic(operations_pair: Tuple[BoundOperation, PortedOperation]
+               ) -> None:
     bound, ported = operations_pair
 
     bound.run()

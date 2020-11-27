@@ -2,12 +2,12 @@ import copy
 
 from hypothesis import given
 
-from martinez.point import Point
+from tests.port_tests.hints import PortedPoint
 from . import strategies
 
 
 @given(strategies.points)
-def test_shallow(point: Point) -> None:
+def test_shallow(point: PortedPoint) -> None:
     result = copy.copy(point)
 
     assert result is not point
@@ -15,7 +15,7 @@ def test_shallow(point: Point) -> None:
 
 
 @given(strategies.points)
-def test_deep(point: Point) -> None:
+def test_deep(point: PortedPoint) -> None:
     result = copy.deepcopy(point)
 
     assert result is not point

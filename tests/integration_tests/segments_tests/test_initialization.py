@@ -1,12 +1,12 @@
 from typing import Tuple
 
-from _martinez import (Point as BoundPoint,
-                       Segment as Bound)
 from hypothesis import given
 
-from martinez.point import Point as PortedPoint
-from martinez.segment import Segment as Ported
-from ..utils import are_bound_ported_points_equal
+from tests.bind_tests.hints import (BoundPoint,
+                                    BoundSegment)
+from tests.integration_tests.utils import are_bound_ported_points_equal
+from tests.port_tests.hints import (PortedPoint,
+                                    PortedSegment)
 from . import strategies
 
 
@@ -16,8 +16,8 @@ def test_basic(sources_pair: Tuple[BoundPoint, PortedPoint],
     bound_source, ported_source = sources_pair
     bound_target, ported_target = targets_pair
 
-    bound, ported = (Bound(bound_source, bound_target),
-                     Ported(ported_source, ported_target))
+    bound, ported = (BoundSegment(bound_source, bound_target),
+                     PortedSegment(ported_source, ported_target))
 
     assert are_bound_ported_points_equal(bound.source, ported.source)
     assert are_bound_ported_points_equal(bound.target, ported.target)

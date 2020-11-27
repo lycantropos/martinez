@@ -1,22 +1,23 @@
 from typing import Tuple
 
-from _martinez import (Operation as Bound,
-                       Point as BoundPoint,
-                       SweepEvent as BoundSweepEvent)
 from hypothesis import given
 
-from martinez.boolean import (Operation as Ported,
-                              SweepEvent as PortedSweepEvent)
-from martinez.point import Point as PortedPoint
-from ...utils import are_bound_ported_operations_equal, \
-    are_bound_ported_sweep_events_lists_equal
+from tests.bind_tests.hints import (BoundOperation,
+                                    BoundPoint,
+                                    BoundSweepEvent)
+from tests.integration_tests.utils import (
+    are_bound_ported_operations_equal,
+    are_bound_ported_sweep_events_lists_equal)
+from tests.port_tests.hints import (PortedOperation,
+                                    PortedPoint,
+                                    PortedSweepEvent)
 from . import strategies
 
 
 @given(strategies.operations_pairs,
        strategies.double_nested_sweep_events_pairs,
        strategies.points_pairs)
-def test_basic(operations_pair: Tuple[Bound, Ported],
+def test_basic(operations_pair: Tuple[BoundOperation, PortedOperation],
                sweep_events_pair: Tuple[BoundSweepEvent, PortedSweepEvent],
                points_pair: Tuple[BoundPoint, PortedPoint]) -> None:
     bound, ported = operations_pair

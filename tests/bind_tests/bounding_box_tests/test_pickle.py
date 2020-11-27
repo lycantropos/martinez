@@ -1,6 +1,6 @@
-from _martinez import BoundingBox
 from hypothesis import given
 
+from tests.bind_tests.hints import BoundBoundingBox as BoundingBox
 from tests.utils import pickle_round_trip
 from . import strategies
 

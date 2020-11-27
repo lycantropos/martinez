@@ -1,17 +1,16 @@
 from typing import Tuple
 
-from _martinez import (Point as BoundPoint,
-                       SweepEvent as Bound)
 from hypothesis import given
 
-from martinez.boolean import SweepEvent as Ported
-from martinez.point import Point as PortedPoint
+from tests.bind_tests.hints import (BoundPoint,
+                                    BoundSweepEvent)
+from tests.port_tests.hints import (PortedPoint,
+                                    PortedSweepEvent)
 from . import strategies
 
 
-@given(strategies.nested_sweep_events_pairs,
-       strategies.points_pairs)
-def test_basic(sweep_events_pair: Tuple[Bound, Ported],
+@given(strategies.nested_sweep_events_pairs, strategies.points_pairs)
+def test_basic(sweep_events_pair: Tuple[BoundSweepEvent, PortedSweepEvent],
                points_pair: Tuple[BoundPoint, PortedPoint]) -> None:
     bound, ported = sweep_events_pair
     bound_point, ported_point = points_pair

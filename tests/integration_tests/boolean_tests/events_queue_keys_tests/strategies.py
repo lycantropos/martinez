@@ -6,10 +6,10 @@ from hypothesis import strategies
 
 from martinez.boolean import (EventsQueueKey as PortedEventsQueueKey,
                               SweepEvent as PortedSweepEvent)
-from tests.strategies import (booleans)
-from tests.integration_tests.factories import \
-    make_cyclic_bound_with_ported_sweep_events, \
-    to_bound_with_ported_sweep_events
+from tests.integration_tests.factories import (
+    make_cyclic_bound_with_ported_sweep_events,
+    to_bound_with_ported_sweep_events)
+from tests.strategies import booleans
 from tests.utils import (MAX_NESTING_DEPTH,
                          to_pairs)
 

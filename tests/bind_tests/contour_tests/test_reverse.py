@@ -1,8 +1,8 @@
 from copy import deepcopy
 
-from _martinez import Contour
 from hypothesis import given
 
+from tests.bind_tests.hints import BoundContour as Contour
 from . import strategies
 
 

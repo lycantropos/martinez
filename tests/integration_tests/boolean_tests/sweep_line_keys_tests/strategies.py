@@ -1,15 +1,15 @@
 from typing import Tuple
 
-from _martinez import (SweepEvent as BoundSweepEvent,
-                       SweepLineKey as BoundSweepLineKey)
 from hypothesis import strategies
 
-from martinez.boolean import (SweepEvent as PortedSweepEvent,
-                              SweepLineKey as PortedSweepLineKey)
-from tests.strategies import (booleans)
-from tests.integration_tests.factories import \
-    make_cyclic_bound_with_ported_sweep_events, \
-    to_bound_with_ported_sweep_events
+from tests.bind_tests.hints import (BoundSweepEvent,
+                                    BoundSweepLineKey)
+from tests.integration_tests.factories import (
+    make_cyclic_bound_with_ported_sweep_events,
+    to_bound_with_ported_sweep_events)
+from tests.port_tests.hints import (PortedSweepEvent,
+                                    PortedSweepLineKey)
+from tests.strategies import booleans
 from tests.utils import (MAX_NESTING_DEPTH,
                          to_pairs)
 

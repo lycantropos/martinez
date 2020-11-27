@@ -1,6 +1,6 @@
-from tests.strategies import (scalars_strategies)
-from tests.port_tests.factories import scalars_to_ported_points_pairs, \
-    scalars_to_ported_segments
+from tests.port_tests.factories import (scalars_to_ported_points_pairs,
+                                        scalars_to_ported_segments)
+from tests.strategies import scalars_strategies
 from tests.utils import (identity,
                          to_pairs,
                          to_triplets)

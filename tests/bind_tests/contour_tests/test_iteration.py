@@ -1,7 +1,6 @@
-from _martinez import (Contour,
-                       Point)
 from hypothesis import given
 
+from tests.bind_tests.hints import (BoundPoint, Contour)
 from tests.utils import capacity
 from . import strategies
 
@@ -10,7 +9,7 @@ from . import strategies
 def test_basic(contour: Contour) -> None:
     result = iter(contour)
 
-    assert all(isinstance(element, Point)
+    assert all(isinstance(element, BoundPoint)
                for element in result)
 
 
