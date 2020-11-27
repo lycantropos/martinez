@@ -2,10 +2,9 @@ from typing import (List,
                     Sequence,
                     Tuple)
 
+from _martinez import find_intersections as bound_find_intersections
 from hypothesis import strategies
 
-from tests.bind_tests.hints import \
-    find_intersections as bound_find_intersections
 from tests.utils import to_bounding_boxes_offset
 from .hints import (BoundContour,
                     BoundEdgeType,

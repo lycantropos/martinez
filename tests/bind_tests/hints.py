@@ -1,17 +1,17 @@
 from typing import Tuple
 
-from tests.bind_tests.hints import (BoundEventsQueueKey as BoundEventsQueueKey,
-                                    BoundOperation as BoundOperation,
-                                    BoundOperationType as BoundOperationType,
-                                    BoundPoint as BoundPoint,
-                                    BoundPolygon as BoundPolygon,
-                                    BoundPolygonType as BoundPolygonType,
-                                    BoundSweepEvent as BoundSweepEvent,
-                                    BoundingBox as BoundBoundingBox,
-                                    Contour as BoundContour,
-                                    BoundEdgeType as BoundEdgeType,
-                                    BoundSegment as BoundSegment,
-                                    SweepLineKey as BoundSweepLineKey)
+from _martinez import (BoundingBox as BoundBoundingBox,
+                       Contour as BoundContour,
+                       EdgeType as BoundEdgeType,
+                       EventsQueueKey as BoundEventsQueueKey,
+                       Operation as BoundOperation,
+                       OperationType as BoundOperationType,
+                       Point as BoundPoint,
+                       Polygon as BoundPolygon,
+                       PolygonType as BoundPolygonType,
+                       Segment as BoundSegment,
+                       SweepEvent as BoundSweepEvent,
+                       SweepLineKey as BoundSweepLineKey)
 
 BoundBoundingBox = BoundBoundingBox
 BoundContour = BoundContour

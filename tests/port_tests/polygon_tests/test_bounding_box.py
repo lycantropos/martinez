@@ -1,7 +1,9 @@
 from hypothesis import given
 
-from tests.port_tests.hints import PortedBoundingBox, PortedPolygon
-from tests.utils import (are_bounding_boxes_empty, implication)
+from tests.port_tests.hints import (PortedBoundingBox,
+                                    PortedPolygon)
+from tests.utils import (are_bounding_boxes_empty,
+                         implication)
 from . import strategies
 
 

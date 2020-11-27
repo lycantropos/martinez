@@ -1,7 +1,8 @@
 import pytest
 from hypothesis import given
 
-from tests.bind_tests.hints import (BoundSweepEvent, BoundSegment)
+from tests.bind_tests.hints import (BoundSegment,
+                                    BoundSweepEvent)
 from . import strategies
 
 

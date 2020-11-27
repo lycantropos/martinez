@@ -1,13 +1,15 @@
 from hypothesis import given
 
-from tests.bind_tests.hints import (BoundPolygon, BoundingBox)
-from tests.utils import (are_bounding_boxes_empty, implication)
+from tests.bind_tests.hints import (BoundBoundingBox,
+                                    BoundPolygon)
+from tests.utils import (are_bounding_boxes_empty,
+                         implication)
 from . import strategies
 
 
 @given(strategies.polygons)
 def test_basic(polygon: BoundPolygon) -> None:
-    assert isinstance(polygon.bounding_box, BoundingBox)
+    assert isinstance(polygon.bounding_box, BoundBoundingBox)
 
 
 @given(strategies.polygons)

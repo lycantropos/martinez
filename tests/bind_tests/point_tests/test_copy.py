@@ -2,7 +2,7 @@ import copy
 
 from hypothesis import given
 
-from tests.bind_tests.hints import BoundPoint as BoundPoint
+from tests.bind_tests.hints import BoundPoint
 from . import strategies
 
 

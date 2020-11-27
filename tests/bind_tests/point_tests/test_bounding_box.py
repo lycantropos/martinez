@@ -1,13 +1,14 @@
 from hypothesis import given
 
-from tests.bind_tests.hints import (BoundPoint, BoundingBox)
+from tests.bind_tests.hints import (BoundBoundingBox,
+                                    BoundPoint)
 from tests.utils import equivalence
 from . import strategies
 
 
 @given(strategies.points)
 def test_basic(point: BoundPoint) -> None:
-    assert isinstance(point.bounding_box, BoundingBox)
+    assert isinstance(point.bounding_box, BoundBoundingBox)
 
 
 @given(strategies.points, strategies.points)

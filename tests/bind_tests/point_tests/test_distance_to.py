@@ -2,7 +2,7 @@ import math
 
 from hypothesis import given
 
-from tests.bind_tests.hints import BoundPoint as BoundPoint
+from tests.bind_tests.hints import BoundPoint
 from tests.utils import equivalence
 from . import strategies
 

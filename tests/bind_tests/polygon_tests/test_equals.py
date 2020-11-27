@@ -1,6 +1,6 @@
 from hypothesis import given
 
-from tests.bind_tests.hints import BoundPolygon as BoundPolygon
+from tests.bind_tests.hints import BoundPolygon
 from tests.utils import (equivalence,
                          implication)
 from . import strategies

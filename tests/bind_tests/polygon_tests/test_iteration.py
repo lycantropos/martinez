@@ -1,6 +1,7 @@
 from hypothesis import given
 
-from tests.bind_tests.hints import (BoundPolygon, Contour)
+from tests.bind_tests.hints import (BoundContour,
+                                    BoundPolygon)
 from tests.utils import capacity
 from . import strategies
 
@@ -9,7 +10,7 @@ from . import strategies
 def test_basic(polygon: BoundPolygon) -> None:
     result = iter(polygon)
 
-    assert all(isinstance(element, Contour)
+    assert all(isinstance(element, BoundContour)
                for element in result)
 
 

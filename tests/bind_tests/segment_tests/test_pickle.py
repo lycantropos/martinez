@@ -1,6 +1,6 @@
 from hypothesis import given
 
-from tests.bind_tests.hints import BoundSegment as BoundSegment
+from tests.bind_tests.hints import BoundSegment
 from tests.utils import pickle_round_trip
 from . import strategies
 

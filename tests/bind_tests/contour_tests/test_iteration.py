@@ -1,12 +1,13 @@
 from hypothesis import given
 
-from tests.bind_tests.hints import (BoundPoint, Contour)
+from tests.bind_tests.hints import (BoundContour,
+                                    BoundPoint)
 from tests.utils import capacity
 from . import strategies
 
 
 @given(strategies.contours)
-def test_basic(contour: Contour) -> None:
+def test_basic(contour: BoundContour) -> None:
     result = iter(contour)
 
     assert all(isinstance(element, BoundPoint)
@@ -14,7 +15,7 @@ def test_basic(contour: Contour) -> None:
 
 
 @given(strategies.contours)
-def test_elements(contour: Contour) -> None:
+def test_elements(contour: BoundContour) -> None:
     result = iter(contour)
 
     assert all(element in contour.points
@@ -22,7 +23,7 @@ def test_elements(contour: Contour) -> None:
 
 
 @given(strategies.contours)
-def test_size(contour: Contour) -> None:
+def test_size(contour: BoundContour) -> None:
     result = iter(contour)
 
     assert capacity(result) == len(contour.points)

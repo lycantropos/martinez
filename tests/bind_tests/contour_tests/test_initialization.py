@@ -2,7 +2,8 @@ from typing import List
 
 from hypothesis import given
 
-from tests.bind_tests.hints import (BoundPoint, Contour)
+from tests.bind_tests.hints import (BoundContour,
+                                    BoundPoint)
 from . import strategies
 
 
@@ -11,7 +12,7 @@ from . import strategies
 def test_basic(points: List[BoundPoint],
                holes: List[int],
                is_external: bool) -> None:
-    result = Contour(points, holes, is_external)
+    result = BoundContour(points, holes, is_external)
 
     assert result.points == points
     assert result.holes == holes
