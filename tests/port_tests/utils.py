@@ -13,7 +13,8 @@ from .hints import (PortedContour,
                     PortedPoint,
                     PortedPolygon,
                     PortedPolygonType,
-                    PortedSegment)
+                    PortedSegment,
+                    PortedSweepEvent)
 
 
 def to_ported_rectangle(xs: Tuple[Scalar, Scalar],
@@ -22,6 +23,14 @@ def to_ported_rectangle(xs: Tuple[Scalar, Scalar],
     min_y, max_y = ys
     return [PortedPoint(min_x, min_y), PortedPoint(max_x, min_y),
             PortedPoint(max_x, max_y), PortedPoint(min_x, max_y)]
+
+
+def are_non_overlapping_ported_sweep_events(events_pair
+                                            : Tuple[PortedSweepEvent,
+                                                    PortedSweepEvent]) -> bool:
+    first_event, second_event = events_pair
+    first_segment, second_segment = first_event.segment, second_event.segment
+    return are_non_overlapping_ported_segments(first_segment, second_segment)
 
 
 def are_non_overlapping_ported_segments(first_segment: PortedSegment,

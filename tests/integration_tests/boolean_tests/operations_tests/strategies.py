@@ -22,6 +22,7 @@ from tests.port_tests.hints import (PortedOperation,
                                     PortedOperationType,
                                     PortedPolygon,
                                     PortedSweepEvent)
+from tests.port_tests.utils import are_non_overlapping_ported_sweep_events
 from tests.strategies import (booleans,
                               single_precision_floats as floats)
 from tests.utils import (MAX_CONTOURS_COUNT,
@@ -92,7 +93,7 @@ def are_non_overlapping_sweep_events_pair_pair(
     bound_events_pair, ported_events_pair = events_pair_pair
     return (are_non_overlapping_bound_sweep_events(bound_events_pair)
             and
-            are_non_overlapping_bound_sweep_events(ported_events_pair))
+            are_non_overlapping_ported_sweep_events(ported_events_pair))
 
 
 def are_sweep_events_pair_pair_with_different_polygon_types(

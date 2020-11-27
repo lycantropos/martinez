@@ -3,7 +3,6 @@ from typing import (List,
 
 from hypothesis import strategies
 
-from tests.bind_tests.utils import are_non_overlapping_bound_sweep_events
 from tests.port_tests.factories import (scalars_to_nested_ported_sweep_events,
                                         scalars_to_ported_points,
                                         scalars_to_ported_polygons,
@@ -12,7 +11,8 @@ from tests.port_tests.hints import (PortedOperation,
                                     PortedOperationType,
                                     PortedPolygon,
                                     PortedSweepEvent)
-from tests.port_tests.utils import (ported_operations_types,
+from tests.port_tests.utils import (are_non_overlapping_ported_sweep_events,
+                                    ported_operations_types,
                                     to_non_overlapping_ported_polygons_pair)
 from tests.strategies import (booleans,
                               scalars_strategies)
@@ -58,7 +58,7 @@ nested_sweep_events_pairs = (scalars_strategies
                              .flatmap(to_pairs))
 nested_sweep_events_pairs = (
         nested_sweep_events_pairs
-        .filter(are_non_overlapping_bound_sweep_events)
+        .filter(are_non_overlapping_ported_sweep_events)
         | nested_sweep_events_pairs
         .filter(are_sweep_events_pair_with_different_polygon_types))
 operations_types = ported_operations_types
@@ -98,8 +98,8 @@ def scalars_to_non_trivial_operations(scalars: Strategy[Scalar]
                              operations_types)
 
 
-def scalars_to_operations(scalars: Strategy[Scalar]) -> Strategy[
-    PortedOperation]:
+def scalars_to_operations(scalars: Strategy[Scalar]
+                          ) -> Strategy[PortedOperation]:
     return (scalars_to_trivial_operations(scalars)
             | scalars_to_non_trivial_operations(scalars))
 
