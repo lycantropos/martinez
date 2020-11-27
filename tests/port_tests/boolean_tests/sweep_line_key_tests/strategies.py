@@ -1,9 +1,9 @@
 from hypothesis import strategies
 
 from martinez.boolean import SweepLineKey
-from tests.strategies import (scalars_strategies,
-                              scalars_to_nested_ported_sweep_events,
-                              scalars_to_ported_sweep_events)
+from tests.strategies import (scalars_strategies)
+from tests.port_tests.factories import scalars_to_nested_ported_sweep_events, \
+    scalars_to_ported_sweep_events
 from tests.utils import (identity,
                          to_builder,
                          to_pairs,

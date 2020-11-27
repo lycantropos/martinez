@@ -10,18 +10,17 @@ from hypothesis import strategies
 
 from tests.strategies import (booleans,
                               bound_operations_types,
-                              floats,
-                              to_bound_contours,
-                              to_bound_sweep_events,
-                              to_double_nested_sweep_events,
-                              to_nested_bound_sweep_events)
+                              floats)
+from tests.bind_tests.factories import to_bound_contours, \
+    to_bound_sweep_events, to_nested_bound_sweep_events
 from tests.utils import (MAX_CONTOURS_COUNT,
                          Strategy,
-                         are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          is_sweep_event_non_degenerate,
-                         to_non_overlapping_bound_polygons_pair,
-                         to_non_overlapping_contours_list)
+                         to_double_nested_sweep_events)
+from tests.bind_tests.utils import are_non_overlapping_bound_sweep_events, \
+    to_non_overlapping_bound_contours_list, \
+    to_non_overlapping_bound_polygons_pair
 
 points = strategies.builds(Point, floats, floats)
 sweep_events = to_bound_sweep_events()
@@ -52,18 +51,18 @@ nested_sweep_events_pairs = strategies.tuples(nested_sweep_events,
                                               nested_sweep_events)
 nested_sweep_events_pairs = (
         nested_sweep_events_pairs
-        .filter(are_non_overlapping_sweep_events_pair)
+        .filter(are_non_overlapping_bound_sweep_events)
         | nested_sweep_events_pairs
         .filter(are_sweep_events_pair_with_different_polygon_types))
 operations_types = bound_operations_types
 contours = to_bound_contours()
 contours_lists = (strategies.lists(contours,
                                    max_size=MAX_CONTOURS_COUNT)
-                  .map(to_non_overlapping_contours_list))
+                  .map(to_non_overlapping_bound_contours_list))
 empty_contours_lists = strategies.builds(list)
 non_empty_contours_lists = (strategies.lists(contours,
                                              min_size=1)
-                            .map(to_non_overlapping_contours_list))
+                            .map(to_non_overlapping_bound_contours_list))
 polygons = strategies.builds(Polygon, contours_lists)
 empty_polygons = strategies.builds(Polygon, empty_contours_lists)
 non_empty_polygons = strategies.builds(Polygon, non_empty_contours_lists)

@@ -2,8 +2,8 @@ from hypothesis import given
 
 from martinez.bounding_box import BoundingBox
 from martinez.polygon import Polygon
-from tests.utils import (implication,
-                         is_bounding_box_empty)
+from tests.utils import (implication)
+from ...integration_tests.utils import are_bounding_boxes_empty
 from . import strategies
 
 
@@ -15,4 +15,4 @@ def test_basic(polygon: Polygon) -> None:
 @given(strategies.polygons)
 def test_empty(polygon: Polygon) -> None:
     assert implication(not polygon.contours,
-                       is_bounding_box_empty(polygon.bounding_box))
+                       are_bounding_boxes_empty(polygon.bounding_box))

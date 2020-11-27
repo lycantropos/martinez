@@ -2,8 +2,8 @@ from _martinez import EventsQueueKey as BoundEventsQueueKey
 from hypothesis import given
 
 from martinez.boolean import EventsQueueKey as PortedEventsQueueKey
-from tests.utils import (BoundPortedSweepEventsPair,
-                         are_bound_ported_events_queue_keys_equal)
+from ...utils import BoundPortedSweepEventsPair, \
+    are_bound_ported_events_queue_keys_equal
 from . import strategies
 
 

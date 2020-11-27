@@ -11,7 +11,7 @@ from martinez.boolean import (EdgeType as PortedEdgeType,
                               PolygonType as PortedPolygonType,
                               SweepEvent as Ported)
 from martinez.point import Point as PortedPoint
-from tests.utils import are_bound_ported_sweep_events_equal
+from ...utils import are_bound_ported_sweep_events_equal
 from . import strategies
 
 

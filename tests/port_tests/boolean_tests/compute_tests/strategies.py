@@ -4,12 +4,12 @@ from hypothesis import strategies
 
 from martinez.polygon import Polygon
 from tests.strategies import (ported_operations_types,
-                              scalars_strategies,
-                              scalars_to_ported_polygons)
+                              scalars_strategies)
+from tests.port_tests.factories import scalars_to_ported_polygons
 from tests.utils import (identity,
                          pack,
-                         to_non_overlapping_ported_polygons_pair,
                          to_pairs)
+from tests.port_tests.utils import to_non_overlapping_ported_polygons_pair
 
 operations_types = ported_operations_types
 empty_polygons = strategies.builds(Polygon, strategies.builds(list))

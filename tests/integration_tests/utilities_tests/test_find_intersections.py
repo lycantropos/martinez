@@ -6,7 +6,7 @@ from hypothesis import given
 
 from martinez.segment import Segment as PortedSegment
 from martinez.utilities import find_intersections as ported_find_intersections
-from tests.utils import are_bound_ported_points_sequences_equal
+from ..utils import are_bound_ported_points_sequences_equal
 from . import strategies
 
 

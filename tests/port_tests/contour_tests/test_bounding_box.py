@@ -2,8 +2,8 @@ from hypothesis import given
 
 from martinez.bounding_box import BoundingBox
 from martinez.contour import Contour
-from tests.utils import (implication,
-                         is_bounding_box_empty)
+from tests.utils import (implication)
+from ...integration_tests.utils import are_bounding_boxes_empty
 from . import strategies
 
 
@@ -15,4 +15,4 @@ def test_basic(contour: Contour) -> None:
 @given(strategies.contours)
 def test_empty(contour: Contour) -> None:
     assert implication(not contour.points,
-                       is_bounding_box_empty(contour.bounding_box))
+                       are_bounding_boxes_empty(contour.bounding_box))

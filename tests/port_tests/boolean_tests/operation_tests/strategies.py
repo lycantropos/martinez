@@ -10,23 +10,21 @@ from martinez.hints import Scalar
 from martinez.polygon import Polygon
 from tests.strategies import (booleans,
                               ported_operations_types,
-                              scalars_strategies,
-                              scalars_to_nested_ported_sweep_events,
-                              scalars_to_ported_points,
-                              scalars_to_ported_polygons,
-                              scalars_to_ported_sweep_events,
-                              to_double_nested_sweep_events)
+                              scalars_strategies)
+from tests.port_tests.factories import scalars_to_nested_ported_sweep_events, \
+    scalars_to_ported_points, \
+    scalars_to_ported_polygons, scalars_to_ported_sweep_events
 from tests.utils import (Strategy,
-                         are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          cleave_in_tuples,
                          compose,
                          identity,
                          is_sweep_event_non_degenerate,
-                         to_maybe,
-                         to_non_overlapping_ported_polygons_pair,
+                         to_double_nested_sweep_events, to_maybe,
                          to_pairs,
                          to_triplets)
+from tests.port_tests.utils import to_non_overlapping_ported_polygons_pair
+from tests.bind_tests.utils import are_non_overlapping_bound_sweep_events
 
 points = scalars_strategies.flatmap(scalars_to_ported_points)
 sweep_events = scalars_strategies.flatmap(scalars_to_ported_sweep_events)
@@ -58,7 +56,7 @@ nested_sweep_events_pairs = (scalars_strategies
                              .flatmap(to_pairs))
 nested_sweep_events_pairs = (
         nested_sweep_events_pairs
-        .filter(are_non_overlapping_sweep_events_pair)
+        .filter(are_non_overlapping_bound_sweep_events)
         | nested_sweep_events_pairs
         .filter(are_sweep_events_pair_with_different_polygon_types))
 operations_types = ported_operations_types

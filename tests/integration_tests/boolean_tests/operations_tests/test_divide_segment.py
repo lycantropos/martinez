@@ -8,8 +8,8 @@ from hypothesis import given
 from martinez.boolean import (Operation as Ported,
                               SweepEvent as PortedSweepEvent)
 from martinez.point import Point as PortedPoint
-from tests.utils import (are_bound_ported_operations_equal,
-                         are_bound_ported_sweep_events_lists_equal)
+from ...utils import are_bound_ported_operations_equal, \
+    are_bound_ported_sweep_events_lists_equal
 from . import strategies
 
 

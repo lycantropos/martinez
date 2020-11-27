@@ -4,8 +4,8 @@ from _martinez import SweepEvent as Bound
 from hypothesis import given
 
 from martinez.boolean import SweepEvent as Ported
-from tests.utils import (are_bound_ported_sweep_events_equal,
-                         pickle_round_trip)
+from tests.utils import (pickle_round_trip)
+from ...utils import are_bound_ported_sweep_events_equal
 from . import strategies
 
 

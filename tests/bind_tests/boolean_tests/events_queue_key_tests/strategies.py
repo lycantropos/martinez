@@ -7,9 +7,9 @@ from _martinez import (EventsQueueKey,
 from hypothesis import strategies
 
 from tests.strategies import (booleans,
-                              bound_polygons_types,
-                              to_bound_sweep_events,
-                              to_nested_bound_sweep_events)
+                              bound_polygons_types)
+from tests.bind_tests.factories import to_bound_sweep_events, \
+    to_nested_bound_sweep_events
 from tests.utils import Strategy
 
 booleans = booleans

@@ -7,8 +7,8 @@ from hypothesis import given
 
 from martinez.boolean import (Operation as Ported,
                               SweepEvent as PortedSweepEvent)
-from tests.utils import (are_bound_ported_polygons_equal,
-                         are_bound_ported_sweep_events_lists_equal)
+from ...utils import are_bound_ported_polygons_equal, \
+    are_bound_ported_sweep_events_lists_equal
 from . import strategies
 
 

@@ -4,7 +4,7 @@ from _martinez import Operation as Bound
 from hypothesis import given
 
 from martinez.boolean import Operation as Ported
-from tests.utils import are_bound_ported_sweep_events_lists_equal
+from ...utils import are_bound_ported_sweep_events_lists_equal
 from . import strategies
 
 

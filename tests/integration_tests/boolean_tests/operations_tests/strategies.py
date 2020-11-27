@@ -1,32 +1,33 @@
 from typing import (List,
                     Tuple)
 
-from _martinez import (Operation as Bound,
-                       OperationType as BoundOperationType,
-                       Polygon as BoundPolygon,
-                       SweepEvent as BoundSweepEvent)
 from hypothesis import strategies
 
-from martinez.boolean import (Operation as Ported,
-                              OperationType as PortedOperationType,
-                              SweepEvent as PortedSweepEvent)
-from martinez.polygon import Polygon as PortedPolygon
+from tests.bind_tests.utils import (BoundOperation,
+                                    BoundOperationType,
+                                    BoundPolygon,
+                                    BoundSweepEvent,
+                                    are_non_overlapping_bound_sweep_events)
+from tests.integration_tests.factories import (
+    make_cyclic_bound_with_ported_sweep_events,
+    to_bound_with_ported_contours_pair,
+    to_bound_with_ported_contours_vertices_pair,
+    to_bound_with_ported_points_pair,
+    to_bound_with_ported_polygons_pair,
+    to_bound_with_ported_sweep_events)
+from tests.integration_tests.utils import to_non_overlapping_contours_lists
+from tests.port_tests.utils import (PortedOperation,
+                                    PortedOperationType,
+                                    PortedPolygon,
+                                    PortedSweepEvent)
 from tests.strategies import (booleans,
                               bound_with_ported_operations_types_pairs,
-                              make_cyclic_bound_with_ported_sweep_events,
-                              single_precision_floats as floats,
-                              to_bound_with_ported_contours_pair,
-                              to_bound_with_ported_contours_vertices_pair,
-                              to_bound_with_ported_points_pair,
-                              to_bound_with_ported_polygons_pair,
-                              to_bound_with_ported_sweep_events)
+                              single_precision_floats as floats)
 from tests.utils import (MAX_CONTOURS_COUNT,
                          MAX_NESTING_DEPTH,
                          Strategy,
-                         are_non_overlapping_sweep_events_pair,
                          are_sweep_events_pair_with_different_polygon_types,
                          to_double_nested_sweep_event,
-                         to_non_overlapping_contours_lists,
                          to_pairs,
                          transpose)
 
@@ -88,8 +89,9 @@ def are_non_overlapping_sweep_events_pair_pair(
                                 Tuple[PortedSweepEvent, PortedSweepEvent]]
 ) -> bool:
     bound_events_pair, ported_events_pair = events_pair_pair
-    return (are_non_overlapping_sweep_events_pair(bound_events_pair)
-            and are_non_overlapping_sweep_events_pair(ported_events_pair))
+    return (are_non_overlapping_bound_sweep_events(bound_events_pair)
+            and
+            are_non_overlapping_bound_sweep_events(ported_events_pair))
 
 
 def are_sweep_events_pair_pair_with_different_polygon_types(
@@ -137,13 +139,13 @@ def to_bound_with_ported_operations_pair(
         left_polygons_pair: Tuple[BoundPolygon, PortedPolygon],
         right_polygons_pair: Tuple[BoundPolygon, PortedPolygon],
         operations_types_pair: Tuple[BoundOperationType, PortedOperationType],
-) -> Tuple[Bound, Ported]:
+) -> Tuple[BoundOperation, PortedOperation]:
     bound_left, ported_left = left_polygons_pair
     bound_right, ported_right = right_polygons_pair
     (bound_operation_type,
      ported_operation_type) = operations_types_pair
-    return (Bound(bound_left, bound_right, bound_operation_type),
-            Ported(ported_left, ported_right, ported_operation_type))
+    return (BoundOperation(bound_left, bound_right, bound_operation_type),
+            PortedOperation(ported_left, ported_right, ported_operation_type))
 
 
 operations_pairs = strategies.builds(to_bound_with_ported_operations_pair,
@@ -155,8 +157,10 @@ non_trivial_operations_pairs = strategies.builds(
         operations_types_pairs)
 
 
-def to_pre_processed_operations_pair(operations: Tuple[Bound, Ported]
-                                     ) -> Tuple[Bound, Ported]:
+def to_pre_processed_operations_pair(operations: Tuple[BoundOperation,
+                                                       PortedOperation]
+                                     ) -> Tuple[BoundOperation,
+                                                PortedOperation]:
     bound, ported = operations
     bound.process_segments()
     ported.process_segments()
@@ -170,12 +174,12 @@ pre_processed_non_trivial_operations_pairs = (
 
 
 def to_operations_with_events_lists_pair(
-        operations: Tuple[Bound, Ported]
-) -> Tuple[Tuple[Bound, Ported],
+        operations: Tuple[BoundOperation, PortedOperation]
+) -> Tuple[Tuple[BoundOperation, PortedOperation],
            Tuple[List[BoundSweepEvent], List[PortedSweepEvent]]]:
     bound, ported = operations
-    return operations, (Bound.collect_events(bound.sweep()),
-                        Ported.collect_events(ported.sweep()))
+    return operations, (BoundOperation.collect_events(bound.sweep()),
+                        PortedOperation.collect_events(ported.sweep()))
 
 
 operations_with_events_lists_pairs = (

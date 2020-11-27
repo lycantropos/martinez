@@ -7,7 +7,7 @@ from hypothesis import given
 
 from martinez.contour import Contour as PortedContour
 from martinez.polygon import Polygon as Ported
-from tests.utils import are_bound_ported_polygons_equal
+from ..utils import are_bound_ported_polygons_equal
 from . import strategies
 
 

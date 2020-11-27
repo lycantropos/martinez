@@ -8,7 +8,7 @@ from hypothesis import given
 from martinez.boolean import (OperationType as PortedOperationType,
                               Polygon as PortedPolygon,
                               compute as ported)
-from tests.utils import are_bound_ported_polygons_equal
+from ...utils import are_bound_ported_polygons_equal
 from . import strategies
 
 

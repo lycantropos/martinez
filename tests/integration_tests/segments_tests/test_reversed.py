@@ -4,7 +4,7 @@ from _martinez import Segment as Bound
 from hypothesis import given
 
 from martinez.segment import Segment as Ported
-from tests.utils import are_bound_ported_segments_equal
+from ..utils import are_bound_ported_segments_equal
 from . import strategies
 
 

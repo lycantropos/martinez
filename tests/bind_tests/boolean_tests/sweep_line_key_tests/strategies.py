@@ -1,8 +1,8 @@
 from _martinez import SweepLineKey
 from hypothesis import strategies
 
-from tests.strategies import (to_bound_sweep_events,
-                              to_nested_bound_sweep_events)
+from tests.bind_tests.factories import to_bound_sweep_events, \
+    to_nested_bound_sweep_events
 
 sweep_events = to_bound_sweep_events()
 sweep_line_keys = strategies.builds(SweepLineKey, sweep_events)

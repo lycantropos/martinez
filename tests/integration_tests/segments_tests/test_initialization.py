@@ -6,7 +6,7 @@ from hypothesis import given
 
 from martinez.point import Point as PortedPoint
 from martinez.segment import Segment as Ported
-from tests.utils import are_bound_ported_points_equal
+from ..utils import are_bound_ported_points_equal
 from . import strategies
 
 

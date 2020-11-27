@@ -2,10 +2,10 @@ from hypothesis import strategies
 
 from tests.strategies import (booleans,
                               single_precision_floats as floats,
-                              to_bound_with_ported_contours_pair,
-                              to_bound_with_ported_points_pair,
-                              to_bound_with_ported_polygons_pair,
                               unsigned_integers_lists)
+from tests.integration_tests.factories import \
+    to_bound_with_ported_contours_pair, to_bound_with_ported_points_pair, \
+    to_bound_with_ported_polygons_pair
 from tests.utils import transpose
 
 points_pairs = strategies.builds(to_bound_with_ported_points_pair,

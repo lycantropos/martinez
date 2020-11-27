@@ -5,16 +5,18 @@ from hypothesis import strategies
 
 from martinez.polygon import Polygon as PortedPolygon
 from tests.strategies import (bound_with_ported_operations_types_pairs,
-                              single_precision_floats as floats,
-                              to_bound_with_ported_contours_pair,
-                              to_bound_with_ported_contours_vertices_pair,
-                              to_bound_with_ported_polygons_pair)
+                              single_precision_floats as floats)
+from tests.integration_tests.factories import \
+    to_bound_with_ported_contours_pair, \
+    to_bound_with_ported_contours_vertices_pair, \
+    to_bound_with_ported_polygons_pair
 from tests.utils import (MAX_CONTOURS_COUNT,
-                         to_non_overlapping_bound_polygons_pair,
-                         to_non_overlapping_contours_lists,
-                         to_non_overlapping_ported_polygons_pair,
                          to_pairs,
                          transpose)
+from tests.port_tests.utils import to_non_overlapping_ported_polygons_pair
+from tests.integration_tests.utils import \
+    to_non_overlapping_contours_lists
+from tests.bind_tests.utils import to_non_overlapping_bound_polygons_pair
 
 operations_types_pairs = bound_with_ported_operations_types_pairs
 contours_vertices_pairs = to_bound_with_ported_contours_vertices_pair(floats)

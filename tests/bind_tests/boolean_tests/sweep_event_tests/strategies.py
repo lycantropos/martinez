@@ -5,11 +5,10 @@ from tests.strategies import (booleans,
                               bound_edges_types,
                               bound_polygons_types,
                               floats,
-                              to_acyclic_bound_sweep_events,
-                              to_bound_sweep_events,
-                              to_nested_bound_sweep_events,
-                              to_plain_bound_sweep_events,
                               unsigned_integers)
+from tests.bind_tests.factories import to_acyclic_bound_sweep_events, \
+    to_bound_sweep_events, \
+    to_nested_bound_sweep_events, to_plain_bound_sweep_events
 
 booleans = booleans
 unsigned_integers = unsigned_integers
