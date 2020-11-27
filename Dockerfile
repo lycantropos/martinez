@@ -19,4 +19,4 @@ COPY martinez martinez/
 COPY src/ src/
 COPY tests/ tests/
 
-RUN python setup.py develop
+RUN pip install -e .
