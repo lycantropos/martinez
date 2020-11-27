@@ -381,6 +381,8 @@ PYBIND11_MODULE(MODULE_NAME, m) {
         Python binding of polygon clipping algorithm by F. Martínez et al.
     )pbdoc";
 
+  m.attr("__version__") = C_STR(VERSION_INFO);
+
   m.def("compute", &cbop::compute, pybind11::arg("left"),
         pybind11::arg("right"), pybind11::arg("operation_type"));
 
@@ -704,10 +706,4 @@ PYBIND11_MODULE(MODULE_NAME, m) {
              return stream.str();
            })
       .def_property_readonly("event", &SweepLineKey::event);
-
-#ifdef VERSION_INFO
-  m.attr("__version__") = VERSION_INFO;
-#else
-  m.attr("__version__") = "dev";
-#endif
 }
