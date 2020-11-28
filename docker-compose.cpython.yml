@@ -7,7 +7,7 @@ services:
       args:
         - IMAGE_NAME=${CPYTHON_IMAGE_NAME}
         - IMAGE_VERSION=${CPYTHON_IMAGE_VERSION}
-    image: lycantropos/martinez-cpython:0.6.0-alpha
+    image: lycantropos/martinez-cpython:0.6.0
     volumes:
       - ./martinez/:/opt/martinez/martinez/
       - ./pytest.ini:/opt/martinez/pytest.ini
